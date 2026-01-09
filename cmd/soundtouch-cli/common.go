@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/user_account/bose-soundtouch/pkg/client"
-	"github.com/user_account/bose-soundtouch/pkg/config"
+	"github.com/gesellix/bose-soundtouch/pkg/client"
+	"github.com/gesellix/bose-soundtouch/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 

@@ -61,7 +61,7 @@ package main
 
 import (
     "fmt"
-    "github.com/user_account/bose-soundtouch/pkg/client"
+    "github.com/gesellix/bose-soundtouch/pkg/client"
 )
 
 func main() {

@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/user_account/bose-soundtouch/pkg/models"
+	"github.com/gesellix/bose-soundtouch/pkg/models"
 	"github.com/gorilla/websocket"
 )
 

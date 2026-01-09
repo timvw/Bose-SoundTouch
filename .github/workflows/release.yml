@@ -255,7 +255,7 @@ jobs:
           ## 🚀 Quick Start
 
           \`\`\`bash
-          go get github.com/user_account/bose-soundtouch@$TAG_NAME
+          go get github.com/gesellix/bose-soundtouch@$TAG_NAME
           \`\`\`
 
           \`\`\`go
@@ -265,7 +265,7 @@ jobs:
               "fmt"
               "log"
 
-              "github.com/user_account/bose-soundtouch/pkg/client"
+              "github.com/gesellix/bose-soundtouch/pkg/client"
           )
 
           func main() {

@@ -36,7 +36,7 @@ This document describes the planning for a Golang-based API client for the Bose 
 
 ### Final Project Structure
 ```
-github.com/user_account/bose-soundtouch/
+github.com/gesellix/bose-soundtouch/
 ├── cmd/
 │   ├── cli/                    # CLI Tool (Main Application)
 │   │   └── main.go
@@ -545,9 +545,9 @@ import (
     "log"
     "time"
     
-    "github.com/user_account/bose-soundtouch/pkg/client"
-    "github.com/user_account/bose-soundtouch/pkg/discovery"
-    "github.com/user_account/bose-soundtouch/pkg/models"
+    "github.com/gesellix/bose-soundtouch/pkg/client"
+    "github.com/gesellix/bose-soundtouch/pkg/discovery"
+    "github.com/gesellix/bose-soundtouch/pkg/models"
 )
 
 func main() {

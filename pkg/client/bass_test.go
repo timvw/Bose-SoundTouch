@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/user_account/bose-soundtouch/pkg/models"
+	"github.com/gesellix/bose-soundtouch/pkg/models"
 )
 
 func TestClient_GetBass(t *testing.T) {

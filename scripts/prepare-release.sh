@@ -7,7 +7,7 @@
 set -e
 
 VERSION=${1:-"v1.0.0"}
-GITHUB_REPO="user_account/bose-soundtouch"
+GITHUB_REPO="gesellix/bose-soundtouch"
 
 echo "🚀 Preparing local release build $VERSION for $GITHUB_REPO"
 echo "💡 Note: This is for local testing. Use 'git tag && git push --tags' for automated release"

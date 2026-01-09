@@ -54,7 +54,7 @@ The Bose SoundTouch Go client provides comprehensive bass control functionality 
 ### Basic Bass Control
 
 ```go
-import "github.com/user_account/bose-soundtouch/pkg/client"
+import "github.com/gesellix/bose-soundtouch/pkg/client"
 
 // Create client
 config := client.ClientConfig{
@@ -117,7 +117,7 @@ newBass, err := c.DecreaseBass(1)  // Decrease by 1, clamp if needed
 ### Validation and Limits
 
 ```go
-import "github.com/user_account/bose-soundtouch/pkg/models"
+import "github.com/gesellix/bose-soundtouch/pkg/models"
 
 // Validate bass level before setting
 if models.ValidateBassLevel(level) {

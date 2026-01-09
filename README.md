@@ -2,6 +2,8 @@
 
 A modern Go library and CLI tool for interacting with Bose SoundTouch devices via their Web API.
 
+> **Note**: This implementation is based on the [official Bose SoundTouch Web API documentation](https://assets.bosecreative.com/m/496577402d128874/original/SoundTouch-Web-API.pdf) provided by Bose Corporation at their [SoundTouch End-of-Life page](https://www.bose.de/de_de/landing_pages/soundtouch-eol.html). This is an independent project and is not affiliated with or endorsed by Bose Corporation.
+
 ## Features
 
 ### ✅ Implemented (90% Complete - 18/20 endpoints)
@@ -66,12 +68,12 @@ go run ./cmd/websocket-demo -host 192.168.1.10 -filter nowPlaying,volume -verbos
 
 ### Using Go
 ```bash
-go install github.com/user_account/bose-soundtouch/cmd/soundtouch-cli@latest
+go install github.com/gesellix/bose-soundtouch/cmd/soundtouch-cli@latest
 ```
 
 ### From Source
 ```bash
-git clone https://github.com/user_account/bose-soundtouch.git
+git clone https://github.com/gesellix/bose-soundtouch.git
 cd bose-soundtouch
 make build
 ```
@@ -362,7 +364,7 @@ import (
     "fmt"
     "log"
     
-    "github.com/user_account/bose-soundtouch/pkg/client"
+    "github.com/gesellix/bose-soundtouch/pkg/client"
 )
 
 func main() {
@@ -423,8 +425,8 @@ import (
     "os/signal"
     "syscall"
     
-    "github.com/user_account/bose-soundtouch/pkg/client"
-    "github.com/user_account/bose-soundtouch/pkg/models"
+    "github.com/gesellix/bose-soundtouch/pkg/client"
+    "github.com/gesellix/bose-soundtouch/pkg/models"
 )
 
 func main() {
@@ -507,8 +509,8 @@ import (
     "log"
     "time"
     
-    "github.com/user_account/bose-soundtouch/pkg/client"
-    "github.com/user_account/bose-soundtouch/pkg/models"
+    "github.com/gesellix/bose-soundtouch/pkg/client"
+    "github.com/gesellix/bose-soundtouch/pkg/models"
 )
 
 // Custom logger for WebSocket events
@@ -561,10 +563,10 @@ import (
     "log"
     "time"
     
-    "github.com/user_account/bose-soundtouch/pkg/client"
-    "github.com/user_account/bose-soundtouch/pkg/config"
-    "github.com/user_account/bose-soundtouch/pkg/discovery"
-    "github.com/user_account/bose-soundtouch/pkg/models"
+    "github.com/gesellix/bose-soundtouch/pkg/client"
+    "github.com/gesellix/bose-soundtouch/pkg/config"
+    "github.com/gesellix/bose-soundtouch/pkg/discovery"
+    "github.com/gesellix/bose-soundtouch/pkg/models"
 )
 
 func main() {
@@ -732,8 +734,8 @@ import (
     "log"
     "time"
 
-    "github.com/user_account/bose-soundtouch/pkg/client"
-    "github.com/user_account/bose-soundtouch/pkg/discovery"
+    "github.com/gesellix/bose-soundtouch/pkg/client"
+    "github.com/gesellix/bose-soundtouch/pkg/discovery"
 )
 
 func main() {
@@ -1033,6 +1035,12 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## References
 
-- [Official Bose SoundTouch Web API Documentation](docs/2025.12.18%20SoundTouch%20Web%20API.pdf)
+This project is based on the official Bose SoundTouch Web API documentation provided by Bose Corporation:
+
+- **API Documentation Source**: [SoundTouch Web API PDF](https://assets.bosecreative.com/m/496577402d128874/original/SoundTouch-Web-API.pdf) 
+- **Official Bose Page**: [SoundTouch End-of-Life Information](https://www.bose.de/de_de/landing_pages/soundtouch-eol.html)
+- [Local Copy of API Documentation](docs/2025.12.18%20SoundTouch%20Web%20API.pdf)
 - [Project Development Plan](docs/PLAN.md)
 - [Development Guidelines](docs/CLAUDE.md)
+
+**Note**: This is an independent implementation based on publicly available API documentation. This project is not affiliated with or endorsed by Bose Corporation.

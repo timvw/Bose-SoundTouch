@@ -27,8 +27,8 @@ import (
     "log"
     "time"
     
-    "github.com/user_account/bose-soundtouch/pkg/client"
-    "github.com/user_account/bose-soundtouch/pkg/models"
+    "github.com/gesellix/bose-soundtouch/pkg/client"
+    "github.com/gesellix/bose-soundtouch/pkg/models"
 )
 
 func main() {
@@ -551,8 +551,8 @@ wsClient.OnVolumeUpdated(func(event *models.VolumeUpdatedEvent) {
 See the generated Go documentation for complete API details:
 
 ```bash
-go doc github.com/user_account/bose-soundtouch/pkg/client.WebSocketClient
-go doc github.com/user_account/bose-soundtouch/pkg/models.WebSocketEvent
+go doc github.com/gesellix/bose-soundtouch/pkg/client.WebSocketClient
+go doc github.com/gesellix/bose-soundtouch/pkg/models.WebSocketEvent
 ```
 
 ## Testing

@@ -32,8 +32,8 @@ import (
     "log"
     "time"
 
-    "github.com/user_account/bose-soundtouch/pkg/client"
-    "github.com/user_account/bose-soundtouch/pkg/discovery"
+    "github.com/gesellix/bose-soundtouch/pkg/client"
+    "github.com/gesellix/bose-soundtouch/pkg/discovery"
 )
 
 func discoverAllDevices(timeout time.Duration) ([]*client.Client, error) {

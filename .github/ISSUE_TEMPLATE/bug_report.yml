@@ -104,7 +104,7 @@ body:
 
         import (
             "fmt"
-            "github.com/user_account/bose-soundtouch/pkg/client"
+            "github.com/gesellix/bose-soundtouch/pkg/client"
         )
 
         func main() {
@@ -121,7 +121,7 @@ body:
       render: shell
       placeholder: |
         Error: connection refused
-        at github.com/user_account/bose-soundtouch/pkg/client.(*Client).makeRequest
+        at github.com/gesellix/bose-soundtouch/pkg/client.(*Client).makeRequest
         ...
     validations:
       required: false

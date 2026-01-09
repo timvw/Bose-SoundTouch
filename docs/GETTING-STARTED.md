@@ -23,7 +23,7 @@ go mod init soundtouch-example
 ### Step 2: Add the SoundTouch Client
 
 ```bash
-go get github.com/user_account/bose-soundtouch
+go get github.com/gesellix/bose-soundtouch
 ```
 
 ### Step 3: Find Your Device
@@ -38,7 +38,7 @@ import (
     "log"
     "time"
 
-    "github.com/user_account/bose-soundtouch/pkg/discovery"
+    "github.com/gesellix/bose-soundtouch/pkg/discovery"
 )
 
 func main() {
@@ -84,8 +84,8 @@ import (
     "log"
     "time"
 
-    "github.com/user_account/bose-soundtouch/pkg/client"
-    "github.com/user_account/bose-soundtouch/pkg/discovery"
+    "github.com/gesellix/bose-soundtouch/pkg/client"
+    "github.com/gesellix/bose-soundtouch/pkg/discovery"
 )
 
 func main() {
@@ -313,7 +313,7 @@ import (
     "os/signal"
     "syscall"
 
-    "github.com/user_account/bose-soundtouch/pkg/client"
+    "github.com/gesellix/bose-soundtouch/pkg/client"
 )
 
 func main() {

@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/user_account/bose-soundtouch/pkg/config"
-	"github.com/user_account/bose-soundtouch/pkg/models"
+	"github.com/gesellix/bose-soundtouch/pkg/config"
+	"github.com/gesellix/bose-soundtouch/pkg/models"
 )
 
 // UnifiedDiscoveryService combines SSDP and mDNS discovery methods

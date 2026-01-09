@@ -13,10 +13,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/user_account/bose-soundtouch/pkg/client"
-	"github.com/user_account/bose-soundtouch/pkg/config"
-	"github.com/user_account/bose-soundtouch/pkg/discovery"
-	"github.com/user_account/bose-soundtouch/pkg/models"
+	"github.com/gesellix/bose-soundtouch/pkg/client"
+	"github.com/gesellix/bose-soundtouch/pkg/config"
+	"github.com/gesellix/bose-soundtouch/pkg/discovery"
+	"github.com/gesellix/bose-soundtouch/pkg/models"
 )
 
 // parseHostPort splits a host:port string into separate host and port components

@@ -5,7 +5,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/user_account/bose-soundtouch/pkg/models"
+	"github.com/gesellix/bose-soundtouch/pkg/models"
 	"github.com/urfave/cli/v2"
 )
 

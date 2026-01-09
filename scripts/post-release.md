@@ -5,8 +5,8 @@ After successfully releasing v1.0.0, follow this checklist to maximize visibilit
 ## ✅ Immediate Actions (Within 24 hours)
 
 ### Go Package Registry
-- [ ] Verify pkg.go.dev indexing: https://pkg.go.dev/github.com/user_account/bose-soundtouch
-- [ ] If not indexed, submit via: `go get github.com/user_account/bose-soundtouch@v1.0.0`
+- [ ] Verify pkg.go.dev indexing: https://pkg.go.dev/github.com/gesellix/bose-soundtouch
+- [ ] If not indexed, submit via: `go get github.com/gesellix/bose-soundtouch@v1.0.0`
 - [ ] Check documentation rendering on pkg.go.dev
 
 ### Community Engagement
@@ -23,13 +23,13 @@ After successfully releasing v1.0.0, follow this checklist to maximize visibilit
   ✅ Real-time WebSocket events
   ✅ 4000+ lines of documentation
   ✅ CLI tool with cross-platform binaries
-  Tested on real hardware! https://github.com/user_account/bose-soundtouch"
+  Tested on real hardware! https://github.com/gesellix/bose-soundtouch"
   ```
 
 - [ ] **Hacker News** submission:
   ```
   Title: "Bose SoundTouch Go Library – Complete API with WebSocket Events"
-  URL: https://github.com/user_account/bose-soundtouch
+  URL: https://github.com/gesellix/bose-soundtouch
   ```
 
 ### Social Media
@@ -46,7 +46,7 @@ After successfully releasing v1.0.0, follow this checklist to maximize visibilit
   Perfect for home automation & music control apps
   
   #golang #IoT #music #opensource
-  https://github.com/user_account/bose-soundtouch"
+  https://github.com/gesellix/bose-soundtouch"
   ```
 
 - [ ] **LinkedIn** professional post (if applicable)
@@ -72,7 +72,7 @@ After successfully releasing v1.0.0, follow this checklist to maximize visibilit
 - [ ] Submit to **awesome-go**: https://github.com/avelino/awesome-go
   ```
   Category: Audio and Music
-  Entry: [bose-soundtouch](https://github.com/user_account/bose-soundtouch) - Go library for controlling Bose SoundTouch speakers with 100% API coverage and WebSocket events.
+  Entry: [bose-soundtouch](https://github.com/gesellix/bose-soundtouch) - Go library for controlling Bose SoundTouch speakers with 100% API coverage and WebSocket events.
   ```
 
 - [ ] Submit to **go-awesome**: https://github.com/shivammg/go-awesome
@@ -103,7 +103,7 @@ After successfully releasing v1.0.0, follow this checklist to maximize visibilit
 - [ ] **Helm chart** for Kubernetes deployment
 - [ ] **Homebrew formula** for easy CLI installation:
   ```bash
-  brew install user_account/tap/soundtouch-cli
+  brew install gesellix/tap/soundtouch-cli
   ```
 
 ## 📊 Success Metrics to Track
@@ -165,7 +165,7 @@ The project demonstrates several interesting engineering challenges:
 
 Would this be interesting for [blog/podcast]? I'd be happy to discuss the technical details and lessons learned.
 
-GitHub: https://github.com/user_account/bose-soundtouch
+GitHub: https://github.com/gesellix/bose-soundtouch
 
 Best regards,
 [Your name]

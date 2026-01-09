@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/user_account/bose-soundtouch/pkg/models"
+	"github.com/gesellix/bose-soundtouch/pkg/models"
 )
 
 // Integration tests for bass control functionality

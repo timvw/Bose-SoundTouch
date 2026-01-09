@@ -44,7 +44,7 @@ The Bose SoundTouch Go client provides comprehensive source selection functional
 ### Basic Source Selection
 
 ```go
-import "github.com/user_account/bose-soundtouch/pkg/client"
+import "github.com/gesellix/bose-soundtouch/pkg/client"
 
 // Create client
 config := client.ClientConfig{

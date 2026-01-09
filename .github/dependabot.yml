@@ -13,9 +13,9 @@ updates:
       timezone: "UTC"
     open-pull-requests-limit: 5
     reviewers:
-      - "user_account"
+      - "gesellix"
     assignees:
-      - "user_account"
+      - "gesellix"
     commit-message:
       prefix: "deps"
       include: "scope"
@@ -48,9 +48,9 @@ updates:
       timezone: "UTC"
     open-pull-requests-limit: 3
     reviewers:
-      - "user_account"
+      - "gesellix"
     assignees:
-      - "user_account"
+      - "gesellix"
     commit-message:
       prefix: "ci"
       include: "scope"
