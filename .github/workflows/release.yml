@@ -148,7 +148,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v6
         with:
-          name: binaries
+          name: ${{ steps.build.outputs.binary_name }}
           path: ${{ steps.build.outputs.binary_name }}
           retention-days: 1
 
@@ -161,7 +161,6 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v7
         with:
-          name: binaries
           path: ./binaries
 
       - name: Generate checksums
@@ -170,7 +169,18 @@ jobs:
 
           # Debug: Show the downloaded structure
           echo "📁 Downloaded artifact structure:"
-          ls -la
+          find . -type f -name "soundtouch-cli-*"
+
+          # Flatten directory structure (artifacts are in subdirs)
+          # Move all binary files to current directory
+          find . -type f -name "soundtouch-cli-*" -exec mv {} . \;
+
+          # Remove empty directories
+          find . -type d -empty -delete
+
+          # Debug: Show flattened structure
+          echo "📁 Flattened structure:"
+          ls -la soundtouch-cli-* || echo "No files found matching pattern"
 
           # Generate SHA256 checksums
           if ls soundtouch-cli-* 1> /dev/null 2>&1; then
