@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/user_account/bose-soundtouch/pkg/models"
 	"github.com/urfave/cli/v2"
@@ -155,5 +156,153 @@ func prevCommand(c *cli.Context) error {
 	}
 
 	PrintSuccess("Previous track command sent")
+	return nil
+}
+
+// sendKey sends a generic key command
+func sendKey(c *cli.Context) error {
+	key := c.String("key")
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader(fmt.Sprintf("Sending %s key command", key), clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	err = client.SendKey(strings.ToUpper(key))
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to send key command: %v", err))
+		return err
+	}
+
+	PrintSuccess(fmt.Sprintf("%s key command sent", key))
+	return nil
+}
+
+// powerCommand sends the POWER key command
+func powerCommand(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader("Sending POWER key command", clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	err = client.SendKey(models.KeyPower)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to send power command: %v", err))
+		return err
+	}
+
+	PrintSuccess("Power command sent")
+	return nil
+}
+
+// muteCommand sends the MUTE key command
+func muteCommand(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader("Sending MUTE key command", clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	err = client.SendKey(models.KeyMute)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to send mute command: %v", err))
+		return err
+	}
+
+	PrintSuccess("Mute command sent")
+	return nil
+}
+
+// thumbsUpCommand sends the THUMBS_UP key command
+func thumbsUpCommand(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader("Sending THUMBS_UP key command", clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	err = client.SendKey(models.KeyThumbsUp)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to send thumbs up command: %v", err))
+		return err
+	}
+
+	PrintSuccess("Thumbs up command sent")
+	return nil
+}
+
+// thumbsDownCommand sends the THUMBS_DOWN key command
+func thumbsDownCommand(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader("Sending THUMBS_DOWN key command", clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	err = client.SendKey(models.KeyThumbsDown)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to send thumbs down command: %v", err))
+		return err
+	}
+
+	PrintSuccess("Thumbs down command sent")
+	return nil
+}
+
+// volumeUpKey sends the VOLUME_UP key command
+func volumeUpKey(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader("Sending VOLUME_UP key command", clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	err = client.VolumeUp()
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to send volume up command: %v", err))
+		return err
+	}
+
+	PrintSuccess("Volume up command sent")
+	return nil
+}
+
+// volumeDownKey sends the VOLUME_DOWN key command
+func volumeDownKey(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader("Sending VOLUME_DOWN key command", clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	err = client.VolumeDown()
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to send volume down command: %v", err))
+		return err
+	}
+
+	PrintSuccess("Volume down command sent")
 	return nil
 }

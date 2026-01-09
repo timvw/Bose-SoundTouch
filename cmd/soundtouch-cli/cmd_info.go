@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/urfave/cli/v2"
 )
@@ -183,9 +184,75 @@ func getPresets(c *cli.Context) error {
 
 		// Show preset creation time if available
 		if preset.CreatedOn != nil && *preset.CreatedOn != 0 {
-			fmt.Printf("       Created: Unix timestamp %d\n", *preset.CreatedOn)
+			createdTime := time.Unix(*preset.CreatedOn, 0)
+			fmt.Printf("       Created: %s\n", createdTime.Format("2006-01-02 15:04:05"))
 		}
+
+		fmt.Println()
 	}
+
+	return nil
+}
+
+// selectPreset selects a preset by number (1-6)
+func selectPreset(c *cli.Context) error {
+	presetNum := c.Int("preset")
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader(fmt.Sprintf("Selecting preset %d", presetNum), clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	err = client.SelectPreset(presetNum)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to select preset: %v", err))
+		return err
+	}
+
+	PrintSuccess(fmt.Sprintf("Preset %d selected", presetNum))
+	return nil
+}
+
+// getTrackInfo gets the track information
+func getTrackInfo(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader("Getting track information", clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	trackInfo, err := client.GetTrackInfo()
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to get track info: %v", err))
+		return err
+	}
+
+	fmt.Println("Track Information:")
+	fmt.Printf("  Source: %s\n", trackInfo.Source)
+
+	if trackInfo.Track != "" {
+		fmt.Printf("  Track: %s\n", trackInfo.Track)
+	}
+
+	if trackInfo.Artist != "" {
+		fmt.Printf("  Artist: %s\n", trackInfo.Artist)
+	}
+
+	if trackInfo.Album != "" {
+		fmt.Printf("  Album: %s\n", trackInfo.Album)
+	}
+
+	if trackInfo.StationName != "" {
+		fmt.Printf("  Station: %s\n", trackInfo.StationName)
+	}
+
+	fmt.Printf("  Play Status: %s\n", trackInfo.PlayStatus)
 
 	return nil
 }

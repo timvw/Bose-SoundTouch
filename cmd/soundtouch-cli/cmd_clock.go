@@ -1,3 +1,4 @@
+// Package main provides the soundtouch-cli clock control commands.
 package main
 
 import (
@@ -60,12 +61,21 @@ func setClockTime(c *cli.Context) error {
 		minute = now.Minute()
 		PrintDeviceHeader(fmt.Sprintf("Setting clock time to current time (%02d:%02d)", hour, minute), clientConfig.Host, clientConfig.Port)
 	} else {
-		hour, minute, err = parseTimeString(timeStr)
-		if err != nil {
-			PrintError(fmt.Sprintf("Invalid time format. Use HH:MM or 'now': %v", err))
-			return err
+		// Try to parse as Unix timestamp first
+		if timestamp, parseErr := strconv.ParseInt(timeStr, 10, 64); parseErr == nil {
+			targetTime := time.Unix(timestamp, 0)
+			hour = targetTime.Hour()
+			minute = targetTime.Minute()
+			PrintDeviceHeader(fmt.Sprintf("Setting clock time from Unix timestamp %d (%02d:%02d)", timestamp, hour, minute), clientConfig.Host, clientConfig.Port)
+		} else {
+			// Parse as HH:MM format
+			hour, minute, err = parseTimeString(timeStr)
+			if err != nil {
+				PrintError(fmt.Sprintf("Invalid time format. Use HH:MM, Unix timestamp, or 'now': %v", err))
+				return err
+			}
+			PrintDeviceHeader(fmt.Sprintf("Setting clock time to %02d:%02d", hour, minute), clientConfig.Host, clientConfig.Port)
 		}
-		PrintDeviceHeader(fmt.Sprintf("Setting clock time to %02d:%02d", hour, minute), clientConfig.Host, clientConfig.Port)
 	}
 
 	client, err := CreateSoundTouchClient(clientConfig)
@@ -243,8 +253,10 @@ func setClockDisplayFormat(c *cli.Context) error {
 		formatSetting = models.ClockFormat12Hour
 	case "24", "24h", "24hour":
 		formatSetting = models.ClockFormat24Hour
+	case "auto":
+		formatSetting = models.ClockFormatAuto
 	default:
-		PrintError("Invalid format. Use: 12 (12-hour) or 24 (24-hour)")
+		PrintError("Invalid format. Use: 12 (12-hour), 24 (24-hour), or auto")
 		return fmt.Errorf("invalid format value")
 	}
 

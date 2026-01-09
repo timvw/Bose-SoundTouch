@@ -141,6 +141,88 @@ func main() {
 					},
 				},
 			},
+			// Preset commands
+			{
+				Name:   "preset",
+				Usage:  "Select preset by number",
+				Action: selectPreset,
+				Flags: append(CommonFlags, &cli.IntFlag{
+					Name:     "preset",
+					Usage:    "Preset number (1-6)",
+					Required: true,
+				}),
+				Before: RequireHost,
+			},
+			// Key commands
+			{
+				Name:    "key",
+				Aliases: []string{"k"},
+				Usage:   "Send key commands",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "send",
+						Usage:  "Send generic key command",
+						Action: sendKey,
+						Flags: append(CommonFlags, &cli.StringFlag{
+							Name:     "key",
+							Aliases:  []string{"k"},
+							Usage:    "Key name (PLAY, PAUSE, STOP, POWER, MUTE, etc.)",
+							Required: true,
+						}),
+						Before: RequireHost,
+					},
+					{
+						Name:   "power",
+						Usage:  "Send POWER key command",
+						Action: powerCommand,
+						Flags:  CommonFlags,
+						Before: RequireHost,
+					},
+					{
+						Name:   "mute",
+						Usage:  "Send MUTE key command",
+						Action: muteCommand,
+						Flags:  CommonFlags,
+						Before: RequireHost,
+					},
+					{
+						Name:   "thumbs-up",
+						Usage:  "Send THUMBS_UP key command",
+						Action: thumbsUpCommand,
+						Flags:  CommonFlags,
+						Before: RequireHost,
+					},
+					{
+						Name:   "thumbs-down",
+						Usage:  "Send THUMBS_DOWN key command",
+						Action: thumbsDownCommand,
+						Flags:  CommonFlags,
+						Before: RequireHost,
+					},
+					{
+						Name:   "volume-up",
+						Usage:  "Send VOLUME_UP key command",
+						Action: volumeUpKey,
+						Flags:  CommonFlags,
+						Before: RequireHost,
+					},
+					{
+						Name:   "volume-down",
+						Usage:  "Send VOLUME_DOWN key command",
+						Action: volumeDownKey,
+						Flags:  CommonFlags,
+						Before: RequireHost,
+					},
+				},
+			},
+			// Track info
+			{
+				Name:   "track",
+				Usage:  "Get track information",
+				Action: getTrackInfo,
+				Flags:  CommonFlags,
+				Before: RequireHost,
+			},
 			// Volume commands
 			{
 				Name:    "volume",
@@ -337,8 +419,8 @@ func main() {
 						Flags: append(CommonFlags, &cli.IntFlag{
 							Name:    "amount",
 							Aliases: []string{"a"},
-							Usage:   "Amount to shift left (1-5)",
-							Value:   1,
+							Usage:   "Amount to shift left (1-10, default: 5)",
+							Value:   5,
 						}),
 						Before: RequireHost,
 					},
@@ -349,8 +431,8 @@ func main() {
 						Flags: append(CommonFlags, &cli.IntFlag{
 							Name:    "amount",
 							Aliases: []string{"a"},
-							Usage:   "Amount to shift right (1-5)",
-							Value:   1,
+							Usage:   "Amount to shift right (1-10, default: 5)",
+							Value:   5,
 						}),
 						Before: RequireHost,
 					},
