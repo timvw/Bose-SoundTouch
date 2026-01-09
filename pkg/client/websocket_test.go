@@ -32,17 +32,11 @@ func (m *mockLogger) getMessages() []string {
 	return result
 }
 
-func (m *mockLogger) clear() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.messages = nil
-}
-
 // setupMockWebSocketServer creates a test WebSocket server
 func setupMockWebSocketServer(t *testing.T) (*httptest.Server, chan []byte) {
 	t.Helper()
 	upgrader := websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool {
+		CheckOrigin: func(_ *http.Request) bool {
 			return true
 		},
 	}
@@ -176,11 +170,11 @@ func TestWebSocketClient_IndividualHandlers(t *testing.T) {
 		// Handler implementation for testing
 	})
 
-	wsClient.OnVolumeUpdated(func(event *models.VolumeUpdatedEvent) {
+	wsClient.OnVolumeUpdated(func(_ *models.VolumeUpdatedEvent) {
 		// Handler implementation for testing
 	})
 
-	wsClient.OnConnectionState(func(event *models.ConnectionStateUpdatedEvent) {
+	wsClient.OnConnectionState(func(_ *models.ConnectionStateUpdatedEvent) {
 		// Handler implementation for testing
 	})
 
@@ -433,11 +427,11 @@ func TestWebSocketClient_ConcurrentAccess(_ *testing.T) {
 		go func() {
 			defer wg.Done()
 
-			wsClient.OnNowPlaying(func(event *models.NowPlayingUpdatedEvent) {
+			wsClient.OnNowPlaying(func(_ *models.NowPlayingUpdatedEvent) {
 				// Handler implementation
 			})
 
-			wsClient.OnVolumeUpdated(func(event *models.VolumeUpdatedEvent) {
+			wsClient.OnVolumeUpdated(func(_ *models.VolumeUpdatedEvent) {
 				// Handler implementation
 			})
 
@@ -456,7 +450,7 @@ func BenchmarkWebSocketClient_HandleMessage(b *testing.B) {
 		Logger: &mockLogger{},
 	})
 
-	wsClient.OnNowPlaying(func(event *models.NowPlayingUpdatedEvent) {
+	wsClient.OnNowPlaying(func(_ *models.NowPlayingUpdatedEvent) {
 		// Minimal handler for benchmarking
 	})
 
@@ -483,7 +477,7 @@ func BenchmarkWebSocketClient_SetHandlers(b *testing.B) {
 	wsClient := client.NewWebSocketClient(nil)
 
 	handlers := &models.WebSocketEventHandlers{
-		OnNowPlaying:    func(event *models.NowPlayingUpdatedEvent) {},
+		OnNowPlaying:    func(_ *models.NowPlayingUpdatedEvent) {},
 		OnVolumeUpdated: func(event *models.VolumeUpdatedEvent) {},
 	}
 

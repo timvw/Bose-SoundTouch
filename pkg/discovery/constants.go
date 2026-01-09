@@ -1,3 +1,4 @@
+// Package discovery provides device discovery functionality for Bose SoundTouch devices using mDNS and UPnP protocols.
 package discovery
 
 import "time"

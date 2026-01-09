@@ -1,3 +1,4 @@
+// Package main provides a command-line interface for controlling Bose SoundTouch devices.
 package main
 
 import (
@@ -1640,9 +1641,9 @@ func handleClockCommands(host string, port int, timeout time.Duration, getClockT
 	// Get clock time
 	if getClockTime {
 		fmt.Printf("Getting clock time from %s:%d...\n", host, port)
-		clockTime, err := soundtouchClient.GetClockTime()
-		if err != nil {
-			return fmt.Errorf("failed to get clock time: %w", err)
+		clockTime, clockErr := soundtouchClient.GetClockTime()
+		if clockErr != nil {
+			return fmt.Errorf("failed to get clock time: %w", clockErr)
 		}
 
 		fmt.Printf("Device Clock Time:\n")
@@ -1686,9 +1687,9 @@ func handleClockCommands(host string, port int, timeout time.Duration, getClockT
 	// Get clock display settings
 	if getClockDisplay {
 		fmt.Printf("Getting clock display settings from %s:%d...\n", host, port)
-		clockDisplay, err := soundtouchClient.GetClockDisplay()
-		if err != nil {
-			return fmt.Errorf("failed to get clock display settings: %w", err)
+		clockDisplay, displayErr := soundtouchClient.GetClockDisplay()
+		if displayErr != nil {
+			return fmt.Errorf("failed to get clock display settings: %w", displayErr)
 		}
 
 		fmt.Printf("Clock Display Settings:\n")

@@ -34,6 +34,7 @@ type Logger interface {
 // DefaultLogger uses standard log package
 type DefaultLogger struct{}
 
+// Printf implements the Logger interface by printing formatted messages with a WebSocket prefix.
 func (d DefaultLogger) Printf(format string, v ...interface{}) {
 	log.Printf("[WebSocket] "+format, v...)
 }
@@ -181,7 +182,7 @@ func (ws *WebSocketClient) connectWithConfig(config *WebSocketConfig) error {
 	// Establish connection
 	conn, resp, err := dialer.DialContext(ws.ctx, wsURL.String(), nil)
 	if resp != nil && resp.Body != nil {
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 	}
 	if err != nil {
 		return fmt.Errorf("failed to connect to WebSocket: %w", err)

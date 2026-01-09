@@ -349,7 +349,7 @@ func (d *DiscoveryService) parseLocationURL(location string) (*models.Discovered
 }
 
 // enrichDeviceInfo tries to get additional device information from the device description
-func (d *DiscoveryService) enrichDeviceInfo(device *models.DiscoveredDevice, location string) error {
+func (d *DiscoveryService) enrichDeviceInfo(_ *models.DiscoveredDevice, location string) error {
 	log.Printf("UPnP: Attempting to enrich device info by fetching %s", location)
 
 	client := &http.Client{

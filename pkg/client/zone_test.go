@@ -73,7 +73,7 @@ func TestClient_GetZone(t *testing.T) {
 
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(tt.responseStatus)
-				w.Write([]byte(tt.responseXML))
+				_, _ = w.Write([]byte(tt.responseXML))
 			}))
 			defer server.Close()
 
@@ -170,7 +170,7 @@ func TestClient_SetZone(t *testing.T) {
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(tt.responseStatus)
 				if tt.responseStatus != http.StatusOK {
-					w.Write([]byte(`<error>Server Error</error>`))
+					_, _ = w.Write([]byte(`<error>Server Error</error>`))
 				}
 			}))
 			defer server.Close()
@@ -256,7 +256,7 @@ func TestClient_AddToZone(t *testing.T) {
 	<member ipaddress="192.168.1.11">EFGH5678IJKL</member>
 </zone>`
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(response))
+			_, _ = w.Write([]byte(response))
 		} else if r.URL.Path == "/setZone" && r.Method == http.MethodPost {
 			setZoneCalled = true
 			w.WriteHeader(http.StatusOK)
@@ -297,7 +297,7 @@ func TestClient_RemoveFromZone(t *testing.T) {
 	<member ipaddress="192.168.1.12">IJKL9012MNOP</member>
 </zone>`
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(response))
+			_, _ = w.Write([]byte(response))
 		} else if r.URL.Path == "/setZone" && r.Method == http.MethodPost {
 			setZoneCalled = true
 			w.WriteHeader(http.StatusOK)
@@ -338,7 +338,7 @@ func TestClient_DissolveZone(t *testing.T) {
 	<member ipaddress="192.168.1.12">IJKL9012MNOP</member>
 </zone>`
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(response))
+			_, _ = w.Write([]byte(response))
 		} else if r.URL.Path == "/setZone" && r.Method == http.MethodPost {
 			setZoneCalled = true
 			w.WriteHeader(http.StatusOK)
@@ -397,7 +397,7 @@ func TestClient_IsInZone(t *testing.T) {
 
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(tt.responseXML))
+				_, _ = w.Write([]byte(tt.responseXML))
 			}))
 			defer server.Close()
 
@@ -480,9 +480,9 @@ func TestClient_GetZoneStatus(t *testing.T) {
 				w.WriteHeader(http.StatusOK)
 
 				if r.URL.Path == "/getZone" {
-					w.Write([]byte(tt.zoneXML))
+					_, _ = w.Write([]byte(tt.zoneXML))
 				} else if r.URL.Path == "/info" {
-					w.Write([]byte(tt.deviceInfoXML))
+					_, _ = w.Write([]byte(tt.deviceInfoXML))
 				} else {
 					w.WriteHeader(http.StatusNotFound)
 				}
@@ -546,7 +546,7 @@ func TestClient_GetZoneMembers(t *testing.T) {
 
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(tt.responseXML))
+				_, _ = w.Write([]byte(tt.responseXML))
 			}))
 			defer server.Close()
 
@@ -605,7 +605,7 @@ func TestClient_Zone_ErrorHandling(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == "/getZone" {
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(`<error>Server Error</error>`))
+				_, _ = w.Write([]byte(`<error>Server Error</error>`))
 			}
 		}))
 		defer server.Close()
@@ -626,7 +626,7 @@ func TestClient_Zone_ErrorHandling(t *testing.T) {
 
 // Benchmark tests
 func BenchmarkClient_GetZone(b *testing.B) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		response := `<?xml version="1.0" encoding="UTF-8" ?>
 <zone master="ABCD1234EFGH">
 	<member ipaddress="192.168.1.11">EFGH5678IJKL</member>
@@ -634,7 +634,7 @@ func BenchmarkClient_GetZone(b *testing.B) {
 </zone>`
 		w.Header().Set("Content-Type", "application/xml")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(response))
+		_, _ = w.Write([]byte(response))
 	}))
 	defer server.Close()
 
@@ -650,7 +650,7 @@ func BenchmarkClient_GetZone(b *testing.B) {
 }
 
 func BenchmarkClient_SetZone(b *testing.B) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/xml")
 		w.WriteHeader(http.StatusOK)
 	}))

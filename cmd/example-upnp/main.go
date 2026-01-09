@@ -1,3 +1,4 @@
+// Package main provides an example of discovering SoundTouch devices using UPnP.
 package main
 
 import (

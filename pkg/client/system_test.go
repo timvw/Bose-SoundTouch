@@ -53,7 +53,7 @@ func TestClient_GetClockTime(t *testing.T) {
 				}
 
 				w.WriteHeader(tt.statusCode)
-				w.Write([]byte(tt.serverResponse))
+				_, _ = w.Write([]byte(tt.serverResponse))
 			}))
 			defer server.Close()
 
@@ -216,7 +216,7 @@ func TestClient_GetClockDisplay(t *testing.T) {
 				}
 
 				w.WriteHeader(tt.statusCode)
-				w.Write([]byte(tt.serverResponse))
+				_, _ = w.Write([]byte(tt.serverResponse))
 			}))
 			defer server.Close()
 
@@ -475,7 +475,7 @@ func TestClient_GetNetworkInfo(t *testing.T) {
 				}
 
 				w.WriteHeader(tt.statusCode)
-				w.Write([]byte(tt.serverResponse))
+				_, _ = w.Write([]byte(tt.serverResponse))
 			}))
 			defer server.Close()
 
@@ -510,18 +510,18 @@ func TestClient_SystemEndpoints_Integration(t *testing.T) {
 		switch r.URL.Path {
 		case "/clockTime":
 			if r.Method == "GET" {
-				w.Write([]byte(`<clockTime zone="UTC" utc="1609459200">2021-01-01 00:00:00</clockTime>`))
+				_, _ = w.Write([]byte(`<clockTime zone="UTC" utc="1609459200">2021-01-01 00:00:00</clockTime>`))
 			} else if r.Method == "POST" {
 				w.WriteHeader(http.StatusOK)
 			}
 		case "/clockDisplay":
 			if r.Method == "GET" {
-				w.Write([]byte(`<clockDisplay enabled="true" format="24" brightness="75"></clockDisplay>`))
+				_, _ = w.Write([]byte(`<clockDisplay enabled="true" format="24" brightness="75"></clockDisplay>`))
 			} else if r.Method == "POST" {
 				w.WriteHeader(http.StatusOK)
 			}
 		case "/networkInfo":
-			w.Write([]byte(`<networkInfo wifiProfileCount="2">
+			_, _ = w.Write([]byte(`<networkInfo wifiProfileCount="2">
 <interfaces>
 <interface type="WIFI_INTERFACE" name="wlan0" macAddress="AA:BB:CC:DD:EE:FF" ipAddress="192.168.1.10" ssid="TestNetwork" frequencyKHz="5500000" state="NETWORK_WIFI_CONNECTED" signal="EXCELLENT_SIGNAL" mode="STATION"/>
 </interfaces>

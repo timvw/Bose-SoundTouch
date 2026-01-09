@@ -393,7 +393,7 @@ func TestClient_SelectSource_ErrorHandling(t *testing.T) {
 			name: "Server returns 404",
 			serverResponse: func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusNotFound)
-				w.Write([]byte("Not Found"))
+				_, _ = w.Write([]byte("Not Found"))
 			},
 			wantError:     true,
 			errorContains: "API request failed with status 404",
@@ -402,7 +402,7 @@ func TestClient_SelectSource_ErrorHandling(t *testing.T) {
 			name: "Server returns 500",
 			serverResponse: func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte("Internal Server Error"))
+				_, _ = w.Write([]byte("Internal Server Error"))
 			},
 			wantError:     true,
 			errorContains: "API request failed with status 500",

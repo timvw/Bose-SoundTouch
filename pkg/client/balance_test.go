@@ -82,7 +82,7 @@ func TestClient_GetBalance(t *testing.T) {
 				}
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(tt.serverResponse))
+				_, _ = w.Write([]byte(tt.serverResponse))
 			}))
 			defer server.Close()
 
@@ -345,7 +345,7 @@ func TestClient_IncreaseBalance(t *testing.T) {
 							fmt.Sprintf("%d", tt.expectedNewBalance) + `</actualbalance></balance>`
 					}
 					w.WriteHeader(http.StatusOK)
-					w.Write([]byte(response))
+					_, _ = w.Write([]byte(response))
 				} else if r.Method == "POST" && r.URL.Path == "/balance" {
 					postCallCount++
 					w.WriteHeader(http.StatusOK)
@@ -432,7 +432,7 @@ func TestClient_DecreaseBalance(t *testing.T) {
 							fmt.Sprintf("%d", tt.expectedNewBalance) + `</actualbalance></balance>`
 					}
 					w.WriteHeader(http.StatusOK)
-					w.Write([]byte(response))
+					_, _ = w.Write([]byte(response))
 				} else if r.Method == "POST" && r.URL.Path == "/balance" {
 					postCallCount++
 					w.WriteHeader(http.StatusOK)
@@ -481,7 +481,7 @@ func TestClient_Balance_ErrorHandling(t *testing.T) {
 			name: "GetBalance server returns 404",
 			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusNotFound)
-				w.Write([]byte("Not Found"))
+				_, _ = w.Write([]byte("Not Found"))
 			},
 			method: func(c *Client) error {
 				_, err := c.GetBalance()
@@ -494,7 +494,7 @@ func TestClient_Balance_ErrorHandling(t *testing.T) {
 			name: "SetBalance server returns 500",
 			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte("Internal Server Error"))
+				_, _ = w.Write([]byte("Internal Server Error"))
 			},
 			method: func(c *Client) error {
 				return c.SetBalance(15)
@@ -506,7 +506,7 @@ func TestClient_Balance_ErrorHandling(t *testing.T) {
 			name: "GetBalance invalid XML response",
 			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte("invalid xml"))
+				_, _ = w.Write([]byte("invalid xml"))
 			},
 			method: func(c *Client) error {
 				_, err := c.GetBalance()

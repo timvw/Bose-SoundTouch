@@ -82,7 +82,12 @@ func (si *SourceItem) GetDisplayName() string {
 	if si.SourceAccount != "" && si.SourceAccount != si.Source {
 		return si.SourceAccount
 	}
-	return strings.Title(strings.ToLower(si.Source))
+	// Manually implement title case to replace deprecated strings.Title
+	source := strings.ToLower(si.Source)
+	if len(source) == 0 {
+		return source
+	}
+	return strings.ToUpper(source[:1]) + source[1:]
 }
 
 // IsSpotify returns true if this is a Spotify source

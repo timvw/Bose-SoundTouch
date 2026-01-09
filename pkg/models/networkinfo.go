@@ -107,9 +107,10 @@ func (n *NetworkInformation) HasEthernet() bool {
 
 // GetConnectedWiFiInterface returns the connected WiFi interface if available
 func (n *NetworkInformation) GetConnectedWiFiInterface() *NetworkInterface {
-	for _, iface := range n.GetInterfaces() {
-		if iface.IsWiFi() && iface.IsConnected() {
-			return &iface
+	interfaces := n.GetInterfaces()
+	for i := range interfaces {
+		if interfaces[i].IsWiFi() && interfaces[i].IsConnected() {
+			return &interfaces[i]
 		}
 	}
 	return nil
@@ -117,9 +118,10 @@ func (n *NetworkInformation) GetConnectedWiFiInterface() *NetworkInterface {
 
 // GetConnectedEthernetInterface returns the connected Ethernet interface if available
 func (n *NetworkInformation) GetConnectedEthernetInterface() *NetworkInterface {
-	for _, iface := range n.GetInterfaces() {
-		if iface.IsEthernet() && iface.IsConnected() {
-			return &iface
+	interfaces := n.GetInterfaces()
+	for i := range interfaces {
+		if interfaces[i].IsEthernet() && interfaces[i].IsConnected() {
+			return &interfaces[i]
 		}
 	}
 	return nil

@@ -34,7 +34,8 @@ const (
 	EventTypeRecentsUpdated WebSocketEventType = "recentsUpdated"
 	// EventTypeLanguageUpdated indicates a language setting change
 	EventTypeLanguageUpdated WebSocketEventType = "languageUpdated"
-	EventTypeUnknown         WebSocketEventType = "unknown"
+	// EventTypeUnknown indicates an unrecognized event type
+	EventTypeUnknown WebSocketEventType = "unknown"
 )
 
 // String returns a human-readable string representation

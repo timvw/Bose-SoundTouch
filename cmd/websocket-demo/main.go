@@ -1,10 +1,10 @@
+// Package main provides a demonstration of WebSocket event handling for Bose SoundTouch devices.
 package main
 
 import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"os/signal"
@@ -101,13 +101,13 @@ func main() {
 		discoveryService := discovery.NewUnifiedDiscoveryService(cfg)
 		devices, err := discoveryService.DiscoverDevices(ctx)
 		if err != nil {
-			cancel()
-			log.Fatalf("Discovery failed: %v", err)
+			fmt.Printf("Discovery failed: %v\n", err)
+			return
 		}
 
 		if len(devices) == 0 {
 			fmt.Println("No SoundTouch devices found")
-			os.Exit(1)
+			return
 		}
 
 		// Use first discovered device
@@ -136,7 +136,8 @@ func main() {
 	fmt.Println("Testing device connectivity...")
 	deviceInfo, err := soundTouchClient.GetDeviceInfo()
 	if err != nil {
-		log.Fatalf("Failed to connect to device: %v", err)
+		fmt.Printf("Failed to connect to device: %v\n", err)
+		return
 	}
 	macAddress := ""
 	if len(deviceInfo.NetworkInfo) > 0 {
@@ -172,7 +173,8 @@ func main() {
 	fmt.Println("Connecting to WebSocket...")
 	err = wsClient.ConnectWithConfig(wsConfig)
 	if err != nil {
-		log.Fatalf("Failed to connect to WebSocket: %v", err)
+		fmt.Printf("Failed to connect to WebSocket: %v\n", err)
+		return
 	}
 
 	fmt.Println("Connected! Listening for events...")

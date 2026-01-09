@@ -1,3 +1,4 @@
+// Package client provides HTTP client functionality for interacting with Bose SoundTouch devices.
 package client
 
 import (
@@ -648,8 +649,9 @@ func (c *Client) get(endpoint string, result interface{}) error {
 		return fmt.Errorf("failed to execute request: %w", err)
 	}
 	defer func() {
-		if err := resp.Body.Close(); err != nil {
+		if closeErr := resp.Body.Close(); closeErr != nil {
 			// Log the error but don't override the main error
+			_ = closeErr // Explicitly ignore the error
 		}
 	}()
 
@@ -703,8 +705,9 @@ func (c *Client) post(endpoint string, payload, result interface{}) error {
 		return fmt.Errorf("failed to execute request: %w", err)
 	}
 	defer func() {
-		if err := resp.Body.Close(); err != nil {
+		if closeErr := resp.Body.Close(); closeErr != nil {
 			// Log the error but don't override the main error
+			_ = closeErr // Explicitly ignore the error
 		}
 	}()
 

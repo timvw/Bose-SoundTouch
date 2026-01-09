@@ -81,7 +81,7 @@ func TestClient_GetBass(t *testing.T) {
 				}
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(tt.serverResponse))
+				_, _ = w.Write([]byte(tt.serverResponse))
 			}))
 			defer server.Close()
 
@@ -372,7 +372,7 @@ func TestClient_IncreaseBass(t *testing.T) {
 						}
 					}
 					w.WriteHeader(http.StatusOK)
-					w.Write([]byte(response))
+					_, _ = w.Write([]byte(response))
 				} else if r.Method == "POST" && r.URL.Path == "/bass" {
 					postCallCount++
 					w.WriteHeader(http.StatusOK)
@@ -467,7 +467,7 @@ func TestClient_DecreaseBass(t *testing.T) {
 						}
 					}
 					w.WriteHeader(http.StatusOK)
-					w.Write([]byte(response))
+					_, _ = w.Write([]byte(response))
 				} else if r.Method == "POST" && r.URL.Path == "/bass" {
 					postCallCount++
 					w.WriteHeader(http.StatusOK)
@@ -514,9 +514,9 @@ func TestClient_Bass_ErrorHandling(t *testing.T) {
 	}{
 		{
 			name: "GetBass server returns 404",
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusNotFound)
-				w.Write([]byte("Not Found"))
+				_, _ = w.Write([]byte("Not Found"))
 			},
 			method: func(c *Client) error {
 				_, err := c.GetBass()
@@ -527,9 +527,9 @@ func TestClient_Bass_ErrorHandling(t *testing.T) {
 		},
 		{
 			name: "SetBass server returns 500",
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte("Internal Server Error"))
+				_, _ = w.Write([]byte("Internal Server Error"))
 			},
 			method: func(c *Client) error {
 				return c.SetBass(3)
@@ -539,9 +539,9 @@ func TestClient_Bass_ErrorHandling(t *testing.T) {
 		},
 		{
 			name: "GetBass invalid XML response",
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte("invalid xml"))
+				_, _ = w.Write([]byte("invalid xml"))
 			},
 			method: func(c *Client) error {
 				_, err := c.GetBass()
