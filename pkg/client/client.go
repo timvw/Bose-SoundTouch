@@ -184,7 +184,7 @@ func (c *Client) SendKey(keyValue string) error {
 	// Send press state
 	keyPress := models.NewKey(keyValue)
 
-	err := c.post("/key", keyPress, nil)
+	err := c.post("/key", keyPress)
 	if err != nil {
 		return fmt.Errorf("failed to send key press: %w", err)
 	}
@@ -192,7 +192,7 @@ func (c *Client) SendKey(keyValue string) error {
 	// Send release state
 	keyRelease := models.NewKeyRelease(keyValue)
 
-	err = c.post("/key", keyRelease, nil)
+	err = c.post("/key", keyRelease)
 	if err != nil {
 		return fmt.Errorf("failed to send key release: %w", err)
 	}
@@ -213,7 +213,7 @@ func (c *Client) SendKeyPressOnly(keyValue string) error {
 
 	key := models.NewKey(keyValue)
 
-	return c.post("/key", key, nil)
+	return c.post("/key", key)
 }
 
 // SendKeyRelease sends a key release command
@@ -224,7 +224,7 @@ func (c *Client) SendKeyRelease(keyValue string) error {
 
 	key := models.NewKeyRelease(keyValue)
 
-	return c.post("/key", key, nil)
+	return c.post("/key", key)
 }
 
 // SendKeyReleaseOnly sends only the key release state (alias for SendKeyRelease)
@@ -311,7 +311,7 @@ func (c *Client) SetVolume(level int) error {
 
 	volumeReq := models.NewVolumeRequest(level)
 
-	return c.post("/volume", volumeReq, nil)
+	return c.post("/volume", volumeReq)
 }
 
 // SetVolumeSafe sets volume with validation and clamping
@@ -379,7 +379,7 @@ func (c *Client) SetBass(level int) error {
 		return fmt.Errorf("failed to create bass request: %w", err)
 	}
 
-	return c.post("/bass", bassReq, nil)
+	return c.post("/bass", bassReq)
 }
 
 // SetBassSafe sets bass with validation and clamping
@@ -447,7 +447,7 @@ func (c *Client) SetBalance(level int) error {
 		return fmt.Errorf("failed to create balance request: %w", err)
 	}
 
-	return c.post("/balance", balanceReq, nil)
+	return c.post("/balance", balanceReq)
 }
 
 // SetBalanceSafe sets balance with validation and clamping
@@ -526,7 +526,7 @@ func (c *Client) SelectSource(source, sourceAccount string) error {
 		contentItem.ItemName = "Stored Music"
 	}
 
-	return c.post("/select", contentItem, nil)
+	return c.post("/select", contentItem)
 }
 
 // SelectSourceFromItem selects an audio source using a SourceItem
@@ -581,7 +581,7 @@ func (c *Client) SetClockTime(request *models.ClockTimeRequest) error {
 		return fmt.Errorf("invalid clock time request: %w", err)
 	}
 
-	err := c.post("/clockTime", request, nil)
+	err := c.post("/clockTime", request)
 	if err != nil {
 		return fmt.Errorf("failed to set clock time: %w", err)
 	}
@@ -617,7 +617,7 @@ func (c *Client) SetClockDisplay(request *models.ClockDisplayRequest) error {
 		return fmt.Errorf("no changes specified in clock display request")
 	}
 
-	err := c.post("/clockDisplay", request, nil)
+	err := c.post("/clockDisplay", request)
 	if err != nil {
 		return fmt.Errorf("failed to set clock display: %w", err)
 	}
@@ -726,7 +726,7 @@ func (c *Client) get(endpoint string, result interface{}) error {
 }
 
 // post performs a POST request with XML body
-func (c *Client) post(endpoint string, payload, result interface{}) error {
+func (c *Client) post(endpoint string, payload interface{}) error {
 	url := c.baseURL + endpoint
 
 	var body io.Reader
@@ -766,24 +766,6 @@ func (c *Client) post(endpoint string, payload, result interface{}) error {
 		return fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(responseBody))
 	}
 
-	if result != nil {
-		responseBody, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return fmt.Errorf("failed to read response body: %w", err)
-		}
-
-		// Parse the actual response first
-		if err := xml.Unmarshal(responseBody, result); err != nil {
-			// Check if it might be an API error response instead
-			var apiError models.APIError
-			if xmlErr := xml.Unmarshal(responseBody, &apiError); xmlErr == nil && apiError.Message != "" {
-				return &apiError
-			}
-
-			return fmt.Errorf("failed to unmarshal XML response: %w", err)
-		}
-	}
-
 	return nil
 }
 
@@ -802,7 +784,7 @@ func (c *Client) SetZone(zoneRequest *models.ZoneRequest) error {
 		return fmt.Errorf("invalid zone request: %w", err)
 	}
 
-	return c.post("/setZone", zoneRequest, nil)
+	return c.post("/setZone", zoneRequest)
 }
 
 // CreateZone creates a new multiroom zone with the specified master and members
@@ -914,7 +896,7 @@ func (c *Client) SetName(name string) error {
 		Value:   name,
 	}
 
-	return c.post("/name", nameRequest, nil)
+	return c.post("/name", nameRequest)
 }
 
 // GetBassCapabilities retrieves the bass capabilities for the device
