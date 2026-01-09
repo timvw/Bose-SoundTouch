@@ -148,7 +148,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v6
         with:
-          name: ${{ steps.build.outputs.binary_name }}
+          name: binaries
           path: ${{ steps.build.outputs.binary_name }}
           retention-days: 1
 
@@ -161,38 +161,42 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v7
         with:
+          name: binaries
           path: ./binaries
 
       - name: Generate checksums
         run: |
           cd binaries
 
-          # Flatten directory structure (artifacts are in subdirs)
-          find . -name "soundtouch-cli-*" -exec mv {} . \;
-
-          # Remove empty directories
-          find . -type d -empty -delete
+          # Debug: Show the downloaded structure
+          echo "📁 Downloaded artifact structure:"
+          ls -la
 
           # Generate SHA256 checksums
-          sha256sum soundtouch-cli-* > checksums.sha256
+          if ls soundtouch-cli-* 1> /dev/null 2>&1; then
+            sha256sum soundtouch-cli-* > checksums.sha256
+            sha512sum soundtouch-cli-* > checksums.sha512
 
-          # Generate SHA512 checksums
-          sha512sum soundtouch-cli-* > checksums.sha512
+            echo "📋 Generated checksums:"
+            cat checksums.sha256
 
-          echo "📋 Generated checksums:"
-          cat checksums.sha256
+            # Verify all expected files are present
+            EXPECTED_COUNT=7  # Based on build matrix
+            ACTUAL_COUNT=$(ls soundtouch-cli-* | wc -l)
 
-          # Verify all expected files are present
-          EXPECTED_COUNT=7  # Based on build matrix
-          ACTUAL_COUNT=$(ls soundtouch-cli-* | wc -l)
+            if [[ $ACTUAL_COUNT -ne $EXPECTED_COUNT ]]; then
+              echo "❌ Expected $EXPECTED_COUNT binaries, found $ACTUAL_COUNT"
+              ls -la
+              exit 1
+            fi
 
-          if [[ $ACTUAL_COUNT -ne $EXPECTED_COUNT ]]; then
-            echo "❌ Expected $EXPECTED_COUNT binaries, found $ACTUAL_COUNT"
+            echo "✅ All $ACTUAL_COUNT binaries present"
+          else
+            echo "❌ No binary files found"
+            echo "Directory contents:"
             ls -la
             exit 1
           fi
-
-          echo "✅ All $ACTUAL_COUNT binaries present"
 
       - name: Upload checksums
         uses: actions/upload-artifact@v6
