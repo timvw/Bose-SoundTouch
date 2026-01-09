@@ -23,7 +23,7 @@ func TestClient_Bass_Integration(t *testing.T) {
 	}
 
 	// Parse host:port if provided
-	finalHost, finalPort := parseBassHostPort(host, 8090)
+	finalHost, finalPort := parseBassHostPort(host)
 
 	config := &Config{
 		Host:      finalHost,
@@ -165,7 +165,7 @@ func TestClient_Bass_IncrementDecrement_Integration(t *testing.T) {
 	}
 
 	// Parse host:port if provided
-	finalHost, finalPort := parseBassHostPort(host, 8090)
+	finalHost, finalPort := parseBassHostPort(host)
 
 	config := &Config{
 		Host:      finalHost,
@@ -296,7 +296,7 @@ func TestClient_Bass_ErrorHandling_Integration(t *testing.T) {
 	}
 
 	// Parse host:port if provided
-	finalHost, finalPort := parseBassHostPort(host, 8090)
+	finalHost, finalPort := parseBassHostPort(host)
 
 	config := &Config{
 		Host:      finalHost,
@@ -354,7 +354,7 @@ func BenchmarkClient_Bass_Integration(b *testing.B) {
 	}
 
 	// Parse host:port if provided
-	finalHost, finalPort := parseBassHostPort(host, 8090)
+	finalHost, finalPort := parseBassHostPort(host)
 
 	config := &Config{
 		Host:      finalHost,
@@ -424,9 +424,9 @@ func BenchmarkClient_Bass_Integration(b *testing.B) {
 
 // parseBassHostPort is a helper function for integration tests
 // This is a simple version for test use
-func parseBassHostPort(hostPort string, defaultPort int) (string, int) {
+func parseBassHostPort(hostPort string) (string, int) {
 	if !containsSubstring(hostPort, ":") {
-		return hostPort, defaultPort
+		return hostPort, defaultSoundTouchPort
 	}
 
 	// Simple parsing - in real use, we'd use net.SplitHostPort
@@ -448,7 +448,7 @@ func parseBassHostPort(hostPort string, defaultPort int) (string, int) {
 
 	if len(parts) == 2 {
 		// Try to parse port
-		port := defaultPort
+		port := defaultSoundTouchPort
 		portStr := parts[1]
 		portInt := 0
 
@@ -468,5 +468,5 @@ func parseBassHostPort(hostPort string, defaultPort int) (string, int) {
 		return parts[0], port
 	}
 
-	return hostPort, defaultPort
+	return hostPort, defaultSoundTouchPort
 }

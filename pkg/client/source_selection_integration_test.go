@@ -21,7 +21,7 @@ func TestClient_SelectSource_Integration(t *testing.T) {
 	}
 
 	// Parse host:port if provided
-	finalHost, finalPort := parseHostPort(host, 8090)
+	finalHost, finalPort := parseHostPort(host)
 
 	config := &Config{
 		Host:      finalHost,
@@ -142,7 +142,7 @@ func TestClient_SelectSourceFromItem_Integration(t *testing.T) {
 	}
 
 	// Parse host:port if provided
-	finalHost, finalPort := parseHostPort(host, 8090)
+	finalHost, finalPort := parseHostPort(host)
 
 	config := &Config{
 		Host:      finalHost,
@@ -190,7 +190,7 @@ func TestClient_SelectSource_ErrorHandling_Integration(t *testing.T) {
 	}
 
 	// Parse host:port if provided
-	finalHost, finalPort := parseHostPort(host, 8090)
+	finalHost, finalPort := parseHostPort(host)
 
 	config := &Config{
 		Host:      finalHost,
@@ -247,7 +247,7 @@ func TestClient_ConvenienceSourceMethods_Integration(t *testing.T) {
 	}
 
 	// Parse host:port if provided
-	finalHost, finalPort := parseHostPort(host, 8090)
+	finalHost, finalPort := parseHostPort(host)
 
 	config := &Config{
 		Host:      finalHost,
@@ -347,7 +347,7 @@ func BenchmarkClient_SelectSource_Integration(b *testing.B) {
 	}
 
 	// Parse host:port if provided
-	finalHost, finalPort := parseHostPort(host, 8090)
+	finalHost, finalPort := parseHostPort(host)
 
 	config := &Config{
 		Host:      finalHost,
@@ -384,9 +384,9 @@ func BenchmarkClient_SelectSource_Integration(b *testing.B) {
 
 // parseHostPort is a helper function for integration tests
 // This is a simple version for test use
-func parseHostPort(hostPort string, defaultPort int) (string, int) {
+func parseHostPort(hostPort string) (string, int) {
 	if !containsSubstring(hostPort, ":") {
-		return hostPort, defaultPort
+		return hostPort, defaultSoundTouchPort
 	}
 
 	// Simple parsing - in real use, we'd use net.SplitHostPort
@@ -408,7 +408,7 @@ func parseHostPort(hostPort string, defaultPort int) (string, int) {
 
 	if len(parts) == 2 {
 		// Try to parse port
-		port := defaultPort
+		port := defaultSoundTouchPort
 		portStr := parts[1]
 		portInt := 0
 
@@ -428,5 +428,5 @@ func parseHostPort(hostPort string, defaultPort int) (string, int) {
 		return parts[0], port
 	}
 
-	return hostPort, defaultPort
+	return hostPort, defaultSoundTouchPort
 }

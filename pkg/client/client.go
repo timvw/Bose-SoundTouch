@@ -12,6 +12,9 @@ import (
 	"github.com/user_account/bose-soundtouch/pkg/models"
 )
 
+// defaultSoundTouchPort is the standard port for SoundTouch devices
+const defaultSoundTouchPort = 8090
+
 // Client represents a SoundTouch API client
 type Client struct {
 	baseURL    string
