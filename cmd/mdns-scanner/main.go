@@ -18,6 +18,7 @@ func main() {
 	verbose := flag.Bool("v", false, "Enable verbose logging")
 	timeout := flag.Duration("timeout", 10*time.Second, "Discovery timeout")
 	service := flag.String("service", "_services._dns-sd._udp", "Service type to scan for (use _services._dns-sd._udp to find all)")
+
 	flag.Parse()
 
 	// Configure logging
@@ -58,7 +59,6 @@ func main() {
 			Timeout: *timeout,
 			Entries: entries,
 		})
-
 		if err != nil {
 			if *verbose {
 				log.Printf("mDNS query completed with error: %v", err)
@@ -72,6 +72,7 @@ func main() {
 
 	// Collect discovered services
 	start := time.Now()
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -139,10 +140,12 @@ done:
 				if service.Port > 0 {
 					fmt.Printf("     Port: %d\n", service.Port)
 				}
+
 				if len(service.TxtRecords) > 0 {
 					fmt.Printf("     TXT Records: %v\n", service.TxtRecords)
 				}
 			}
+
 			fmt.Println()
 		}
 	}
@@ -205,6 +208,7 @@ func parseServiceEntry(entry *mdns.ServiceEntry, verbose bool) *ServiceInfo {
 	if entry.AddrV4 != nil {
 		service.IPv4 = entry.AddrV4.String()
 	}
+
 	if entry.AddrV6 != nil {
 		service.IPv6 = entry.AddrV6.String()
 	}

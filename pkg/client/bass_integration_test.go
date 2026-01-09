@@ -366,6 +366,7 @@ func BenchmarkClient_Bass_Integration(b *testing.B) {
 
 	b.Run("GetBass", func(b *testing.B) {
 		b.ResetTimer()
+
 		for i := 0; i < b.N; i++ {
 			_, err := client.GetBass()
 			if err != nil {
@@ -377,6 +378,7 @@ func BenchmarkClient_Bass_Integration(b *testing.B) {
 	b.Run("SetBass", func(b *testing.B) {
 		bassLevels := []int{-3, 0, 3, -1, 1} // Cycle through different levels
 		b.ResetTimer()
+
 		for i := 0; i < b.N; i++ {
 			level := bassLevels[i%len(bassLevels)]
 			err := client.SetBass(level)

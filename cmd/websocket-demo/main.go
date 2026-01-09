@@ -72,6 +72,7 @@ func main() {
 	var filters map[string]bool
 	if *eventFilter != "" {
 		filters = make(map[string]bool)
+
 		filterList := strings.Split(*eventFilter, ",")
 		for _, f := range filterList {
 			f = strings.TrimSpace(f)
@@ -79,6 +80,7 @@ func main() {
 				fmt.Printf("Invalid filter '%s'. Valid filters: nowPlaying, volume, connection, preset, zone, bass\n", f)
 				os.Exit(1)
 			}
+
 			filters[f] = true
 		}
 	}
@@ -99,6 +101,7 @@ func main() {
 			CacheEnabled:     false,
 		}
 		discoveryService := discovery.NewUnifiedDiscoveryService(cfg)
+
 		devices, err := discoveryService.DiscoverDevices(ctx)
 		if err != nil {
 			fmt.Printf("Discovery failed: %v\n", err)
@@ -139,10 +142,12 @@ func main() {
 		fmt.Printf("Failed to connect to device: %v\n", err)
 		return
 	}
+
 	macAddress := ""
 	if len(deviceInfo.NetworkInfo) > 0 {
 		macAddress = deviceInfo.NetworkInfo[0].MacAddress
 	}
+
 	fmt.Printf("Connected to: %s (Type: %s, MAC: %s)\n",
 		deviceInfo.Name, deviceInfo.Type, macAddress)
 
@@ -171,6 +176,7 @@ func main() {
 
 	// Connect to WebSocket
 	fmt.Println("Connecting to WebSocket...")
+
 	err = wsClient.ConnectWithConfig(wsConfig)
 	if err != nil {
 		fmt.Printf("Failed to connect to WebSocket: %v\n", err)
@@ -247,6 +253,7 @@ func setupEventHandlers(wsClient *client.WebSocketClient, filters map[string]boo
 				if np.Album != "" {
 					fmt.Printf("  💿 %s\n", np.Album)
 				}
+
 				fmt.Printf("  📻 Source: %s\n", np.Source)
 				fmt.Printf("  ▶️  Status: %s\n", np.PlayStatus.String())
 
@@ -338,6 +345,7 @@ func setupEventHandlers(wsClient *client.WebSocketClient, filters map[string]boo
 
 			if len(zone.Members) > 0 {
 				fmt.Printf("  👥 Members (%d):\n", len(zone.Members))
+
 				for i, member := range zone.Members {
 					fmt.Printf("    %d. %s (%s)\n", i+1, member.DeviceID, member.IP)
 				}
@@ -372,6 +380,7 @@ func setupEventHandlers(wsClient *client.WebSocketClient, filters map[string]boo
 	wsClient.OnUnknownEvent(func(event *models.WebSocketEvent) {
 		fmt.Printf("\n❓ Unknown Event [%s]:\n", event.DeviceID)
 		types := event.GetEventTypes()
+
 		for _, eventType := range types {
 			fmt.Printf("  📝 Type: %s\n", eventType)
 		}
@@ -389,6 +398,7 @@ func getFilterKeys(filters map[string]bool) []string {
 	for k := range filters {
 		keys = append(keys, k)
 	}
+
 	return keys
 }
 

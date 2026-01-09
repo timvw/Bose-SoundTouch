@@ -248,6 +248,7 @@ func (c *Client) VolumeDown() error {
 // SelectPreset sends a preset key command (1-6)
 func (c *Client) SelectPreset(presetNumber int) error {
 	var keyValue string
+
 	switch presetNumber {
 	case 1:
 		keyValue = models.KeyPreset1
@@ -648,6 +649,7 @@ func (c *Client) get(endpoint string, result interface{}) error {
 	if err != nil {
 		return fmt.Errorf("failed to execute request: %w", err)
 	}
+
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
 			// Log the error but don't override the main error
@@ -704,6 +706,7 @@ func (c *Client) post(endpoint string, payload, result interface{}) error {
 	if err != nil {
 		return fmt.Errorf("failed to execute request: %w", err)
 	}
+
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
 			// Log the error but don't override the main error

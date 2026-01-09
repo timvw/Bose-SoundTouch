@@ -556,6 +556,7 @@ func handleDiscovery(showInfo bool, timeout time.Duration) error {
 	}
 
 	discoveryService := discovery.NewUnifiedDiscoveryService(cfg)
+
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.DiscoveryTimeout+5*time.Second)
 	defer cancel()
 
@@ -657,6 +658,7 @@ func showDeviceInfoWithConfig(host string, port int, cfg *config.Config) error {
 
 	if len(deviceInfo.NetworkInfo) > 0 {
 		fmt.Printf("  Network Info:\n")
+
 		for _, net := range deviceInfo.NetworkInfo {
 			fmt.Printf("    - Type: %s\n", net.Type)
 			fmt.Printf("      MAC Address: %s\n", net.MacAddress)
@@ -666,6 +668,7 @@ func showDeviceInfoWithConfig(host string, port int, cfg *config.Config) error {
 
 	if len(deviceInfo.Components) > 0 {
 		fmt.Printf("  Components:\n")
+
 		for _, component := range deviceInfo.Components {
 			fmt.Printf("    - Category: %s\n", component.ComponentCategory)
 			if component.SoftwareVersion != "" {
@@ -1733,6 +1736,7 @@ func handleClockCommands(host string, port int, timeout time.Duration, getClockT
 		fmt.Printf("Setting clock format to %s on %s:%d...\n", clockFormat, host, port)
 
 		var format models.ClockFormat
+
 		switch clockFormat {
 		case "12":
 			format = models.ClockFormat12Hour
@@ -1994,6 +1998,7 @@ func handleGetZone(client *client.Client) error {
 		fmt.Printf("  Status: Active multiroom zone\n")
 		fmt.Printf("  Total Devices: %d\n", zone.GetTotalDeviceCount())
 		fmt.Printf("  Zone Members:\n")
+
 		for i, member := range zone.Members {
 			fmt.Printf("    %d. %s", i+1, member.DeviceID)
 			if member.IP != "" {

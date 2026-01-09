@@ -15,6 +15,7 @@ import (
 func main() {
 	verbose := flag.Bool("v", false, "Enable verbose logging")
 	timeout := flag.Duration("timeout", 5*time.Second, "Discovery timeout")
+
 	flag.Parse()
 
 	// Configure logging
@@ -38,11 +39,13 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout+2*time.Second)
 	defer cancel()
 
-	fmt.Println("Searching for SoundTouch devices via mDNS...")
-	fmt.Println("This will search for devices advertising _soundtouch._tcp.local. service")
+	fmt.Println("Searching for SoundTouch devices via mDNS (Bonjour)...")
+	fmt.Printf("Timeout: %v\n", *timeout)
+
 	if *verbose {
 		fmt.Println("Verbose logging enabled - watch for technical details...")
 	}
+
 	fmt.Println()
 
 	start := time.Now()
@@ -64,6 +67,7 @@ func main() {
 		fmt.Println("No SoundTouch devices found via mDNS")
 		fmt.Println()
 		fmt.Println("Technical Status:")
+
 		if *verbose {
 			fmt.Println("✓ mDNS query was sent (check logs above for details)")
 			fmt.Println("✓ No network errors during discovery process")
@@ -71,12 +75,14 @@ func main() {
 		} else {
 			fmt.Println("Run with -v flag for detailed technical information")
 		}
+
 		fmt.Println()
 		fmt.Println("This could mean:")
 		fmt.Println("- No SoundTouch devices on network")
 		fmt.Println("- Devices don't support Bonjour/mDNS")
 		fmt.Println("- Network blocks multicast traffic (common in corporate networks)")
 		fmt.Println("- Devices use different service name than '_soundtouch._tcp.local.'")
+
 		return
 	}
 

@@ -351,6 +351,7 @@ func TestClient_IncreaseBalance(t *testing.T) {
 					w.WriteHeader(http.StatusOK)
 				}
 			}))
+
 			defer server.Close()
 
 			config := &Config{
@@ -438,6 +439,7 @@ func TestClient_DecreaseBalance(t *testing.T) {
 					w.WriteHeader(http.StatusOK)
 				}
 			}))
+
 			defer server.Close()
 
 			config := &Config{

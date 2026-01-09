@@ -16,6 +16,7 @@ import (
 func main() {
 	verbose := flag.Bool("v", false, "Enable verbose logging")
 	timeout := flag.Duration("timeout", 5*time.Second, "Discovery timeout")
+
 	flag.Parse()
 
 	// Configure logging
@@ -38,9 +39,11 @@ func main() {
 
 	fmt.Println("Searching for SoundTouch devices via UPnP/SSDP...")
 	fmt.Println("This will send M-SEARCH requests to multicast address 239.255.255.250:1900")
+
 	if *verbose {
 		fmt.Println("Verbose logging enabled - watch for technical details...")
 	}
+
 	fmt.Println()
 
 	start := time.Now()
@@ -72,6 +75,7 @@ func main() {
 		fmt.Println("No SoundTouch devices found via UPnP/SSDP")
 		fmt.Println()
 		fmt.Println("Technical Status:")
+
 		if *verbose {
 			fmt.Println("✓ SSDP M-SEARCH request was sent (check logs above for details)")
 			fmt.Println("✓ UDP multicast connection established")
@@ -86,6 +90,7 @@ func main() {
 		fmt.Println("- Network blocks multicast traffic (common in corporate networks)")
 		fmt.Println("- Firewall blocks UDP port 1900")
 		fmt.Println("- Devices are not advertising MediaRenderer service")
+
 		return
 	}
 

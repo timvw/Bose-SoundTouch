@@ -362,6 +362,7 @@ func (ws *WebSocketClient) handleEvent(event *models.WebSocketEvent) {
 
 	for _, eventType := range eventTypes {
 		hasKnownEvent = true
+
 		switch eventType {
 		case models.EventTypeNowPlaying:
 			if handlers.OnNowPlaying != nil && event.NowPlayingUpdated != nil {
