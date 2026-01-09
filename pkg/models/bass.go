@@ -68,7 +68,7 @@ func (b *Bass) IsAtTarget() bool {
 	return b.TargetBass == b.ActualBass
 }
 
-// GetLevelName returns a descriptive name for the bass level
+// GetBassLevelName returns a descriptive name for the bass level
 func GetBassLevelName(level int) string {
 	switch {
 	case level < -6:

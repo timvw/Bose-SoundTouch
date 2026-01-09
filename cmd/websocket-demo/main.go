@@ -45,9 +45,9 @@ func parseHostPort(hostPort string, defaultPort int) (string, int) {
 
 func main() {
 	var (
-		host        = flag.String("host", "", "SoundTouch device host/IP address (can include port like host:8090)")
-		port        = flag.Int("port", 8090, "SoundTouch device port")
-		timeout     = flag.Duration("timeout", 10*time.Second, "Request timeout")
+		host = flag.String("host", "", "SoundTouch device host/IP address (can include port like host:8090)")
+		port = flag.Int("port", 8090, "SoundTouch device port")
+
 		discover    = flag.Bool("discover", false, "Discover SoundTouch devices and connect to first found")
 		duration    = flag.Duration("duration", 0, "How long to listen for events (0 = infinite)")
 		reconnect   = flag.Bool("reconnect", true, "Enable automatic reconnection")
@@ -101,6 +101,7 @@ func main() {
 		discoveryService := discovery.NewUnifiedDiscoveryService(cfg)
 		devices, err := discoveryService.DiscoverDevices(ctx)
 		if err != nil {
+			cancel()
 			log.Fatalf("Discovery failed: %v", err)
 		}
 
@@ -123,10 +124,10 @@ func main() {
 	}
 
 	// Create client
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:    deviceHost,
 		Port:    devicePort,
-		Timeout: *timeout,
+		Timeout: 10 * time.Second,
 	}
 
 	soundTouchClient := client.NewClient(clientConfig)

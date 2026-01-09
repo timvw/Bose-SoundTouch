@@ -1,3 +1,4 @@
+// Package main provides a simple mDNS scanner to discover SoundTouch devices on the network.
 package main
 
 import (

@@ -2,6 +2,7 @@ package discovery
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -79,6 +80,7 @@ func (d *DiscoveryService) DiscoverDevices(ctx context.Context) ([]*models.Disco
 	if d.config.UPnPEnabled {
 		upnpDevices, err := d.performDiscovery(ctx)
 		if err != nil {
+			log.Printf("UPnP: Discovery failed: %v", err)
 			// Don't fail completely if UPnP fails, just log and continue with configured devices
 			// We'll just use configured devices
 		} else {
@@ -141,7 +143,9 @@ func (d *DiscoveryService) performDiscovery(ctx context.Context) ([]*models.Disc
 		log.Printf("UPnP: Failed to create UDP connection to %s: %v", ssdpAddr, err)
 		return nil, fmt.Errorf("failed to create UDP connection: %w", err)
 	}
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 
 	log.Printf("UPnP: Successfully connected to SSDP multicast address %s", ssdpAddr)
 
@@ -178,7 +182,8 @@ func (d *DiscoveryService) performDiscovery(ctx context.Context) ([]*models.Disc
 		default:
 			n, err := conn.Read(buffer)
 			if err != nil {
-				if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+				var netErr net.Error
+				if errors.As(err, &netErr) && netErr.Timeout() {
 					log.Printf("UPnP: Read timeout reached after %v, stopping discovery", d.timeout)
 					break // Timeout reached, stop reading
 				}
@@ -356,7 +361,9 @@ func (d *DiscoveryService) enrichDeviceInfo(device *models.DiscoveredDevice, loc
 		log.Printf("UPnP: Failed to fetch device description from %s: %v", location, err)
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	log.Printf("UPnP: Successfully fetched device description from %s (Status: %s)", location, resp.Status)
 
@@ -408,9 +415,9 @@ func (d *DiscoveryService) getConfiguredDevices() []*models.DiscoveredDevice {
 }
 
 // mergeDevices merges two device lists, avoiding duplicates based on host
-func (d *DiscoveryService) mergeDevices(existing, new []*models.DiscoveredDevice) []*models.DiscoveredDevice {
+func (d *DiscoveryService) mergeDevices(existing, newDevices []*models.DiscoveredDevice) []*models.DiscoveredDevice {
 	hostSet := make(map[string]bool)
-	result := make([]*models.DiscoveredDevice, 0, len(existing)+len(new))
+	result := make([]*models.DiscoveredDevice, 0, len(existing)+len(newDevices))
 
 	// Add existing devices
 	for _, device := range existing {
@@ -421,7 +428,7 @@ func (d *DiscoveryService) mergeDevices(existing, new []*models.DiscoveredDevice
 	}
 
 	// Add new devices if not already present
-	for _, device := range new {
+	for _, device := range newDevices {
 		if !hostSet[device.Host] {
 			result = append(result, device)
 			hostSet[device.Host] = true

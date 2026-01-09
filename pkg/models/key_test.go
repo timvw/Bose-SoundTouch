@@ -315,7 +315,7 @@ func BenchmarkKeyXMLMarshal(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		xml.Marshal(key)
+		_, _ = xml.Marshal(key)
 	}
 }
 

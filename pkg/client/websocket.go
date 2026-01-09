@@ -179,7 +179,10 @@ func (ws *WebSocketClient) connectWithConfig(config *WebSocketConfig) error {
 	}
 
 	// Establish connection
-	conn, _, err := dialer.DialContext(ws.ctx, wsURL.String(), nil)
+	conn, resp, err := dialer.DialContext(ws.ctx, wsURL.String(), nil)
+	if resp != nil && resp.Body != nil {
+		defer resp.Body.Close()
+	}
 	if err != nil {
 		return fmt.Errorf("failed to connect to WebSocket: %w", err)
 	}
@@ -232,7 +235,7 @@ func (ws *WebSocketClient) readLoop(config *WebSocketConfig) {
 		ws.mu.Lock()
 		ws.connected = false
 		if ws.conn != nil {
-			ws.conn.Close()
+			_ = ws.conn.Close()
 			ws.conn = nil
 		}
 		ws.mu.Unlock()
@@ -259,7 +262,7 @@ func (ws *WebSocketClient) readLoop(config *WebSocketConfig) {
 		}
 
 		// Set read deadline
-		conn.SetReadDeadline(time.Now().Add(60 * time.Second))
+		_ = conn.SetReadDeadline(time.Now().Add(60 * time.Second))
 
 		// Read message
 		messageType, data, err := conn.ReadMessage()
@@ -300,7 +303,7 @@ func (ws *WebSocketClient) pingLoop(config *WebSocketConfig) {
 			}
 
 			// Set write deadline for ping
-			conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			_ = conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				ws.logger.Printf("Failed to send ping: %v", err)
 				return
@@ -413,7 +416,7 @@ func (ws *WebSocketClient) SendMessage(message []byte) error {
 		return fmt.Errorf("not connected")
 	}
 
-	conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	_ = conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 	return conn.WriteMessage(websocket.TextMessage, message)
 }
 

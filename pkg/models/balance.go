@@ -1,3 +1,4 @@
+// Package models provides data structures and types for the Bose SoundTouch API.
 package models
 
 import (

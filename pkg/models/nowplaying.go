@@ -79,12 +79,18 @@ type Position struct {
 type PlayStatus string
 
 const (
-	PlayStatusPlaying     PlayStatus = "PLAY_STATE"
-	PlayStatusPaused      PlayStatus = "PAUSE_STATE"
-	PlayStatusStopped     PlayStatus = "STOP_STATE"
-	PlayStatusBuffering   PlayStatus = "BUFFERING_STATE"
+	// PlayStatusPlaying indicates the device is currently playing content
+	PlayStatusPlaying PlayStatus = "PLAY_STATE"
+	// PlayStatusPaused indicates the device is paused
+	PlayStatusPaused PlayStatus = "PAUSE_STATE"
+	// PlayStatusStopped indicates the device is stopped
+	PlayStatusStopped PlayStatus = "STOP_STATE"
+	// PlayStatusBuffering indicates the device is buffering content
+	PlayStatusBuffering PlayStatus = "BUFFERING_STATE"
+	// PlayStatusInvalidPlay indicates an invalid play state
 	PlayStatusInvalidPlay PlayStatus = "INVALID_PLAY_STATE"
-	PlayStatusStandby     PlayStatus = "STANDBY"
+	// PlayStatusStandby indicates the device is in standby mode
+	PlayStatusStandby PlayStatus = "STANDBY"
 )
 
 // IsPlaying returns true if the device is currently playing
@@ -141,8 +147,10 @@ func (ps *PlayStatus) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 type ShuffleSetting string
 
 const (
+	// ShuffleOff indicates shuffle is disabled
 	ShuffleOff ShuffleSetting = "SHUFFLE_OFF"
-	ShuffleOn  ShuffleSetting = "SHUFFLE_ON"
+	// ShuffleOn indicates shuffle is enabled
+	ShuffleOn ShuffleSetting = "SHUFFLE_ON"
 )
 
 // IsEnabled returns true if shuffle is enabled
@@ -182,8 +190,11 @@ func (ss *ShuffleSetting) UnmarshalXML(d *xml.Decoder, start xml.StartElement) e
 type RepeatSetting string
 
 const (
+	// RepeatOff indicates no repeat mode
 	RepeatOff RepeatSetting = "REPEAT_OFF"
+	// RepeatOne indicates repeat current track
 	RepeatOne RepeatSetting = "REPEAT_ONE"
+	// RepeatAll indicates repeat all tracks
 	RepeatAll RepeatSetting = "REPEAT_ALL"
 )
 

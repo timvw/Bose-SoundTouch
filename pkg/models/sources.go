@@ -26,9 +26,12 @@ type SourceItem struct {
 type SourceStatus string
 
 const (
-	SourceStatusReady       SourceStatus = "READY"
+	// SourceStatusReady indicates the source is ready for use
+	SourceStatusReady SourceStatus = "READY"
+	// SourceStatusUnavailable indicates the source is not available
 	SourceStatusUnavailable SourceStatus = "UNAVAILABLE"
-	SourceStatusError       SourceStatus = "ERROR"
+	// SourceStatusError indicates an error with the source
+	SourceStatusError SourceStatus = "ERROR"
 )
 
 // IsReady returns true if the source is ready for use

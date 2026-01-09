@@ -85,7 +85,7 @@ func TestClient_GetBass(t *testing.T) {
 			}))
 			defer server.Close()
 
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:], // Remove "http://"
 				Port:      80,
 				Timeout:   testTimeout,
@@ -202,7 +202,7 @@ func TestClient_SetBass(t *testing.T) {
 				}))
 				defer server.Close()
 
-				config := ClientConfig{
+				config := &Config{
 					Host:      server.URL[7:],
 					Port:      80,
 					Timeout:   testTimeout,
@@ -217,7 +217,7 @@ func TestClient_SetBass(t *testing.T) {
 				}
 			} else {
 				// Test validation without server
-				config := ClientConfig{
+				config := &Config{
 					Host:      "localhost",
 					Port:      8090,
 					Timeout:   testTimeout,
@@ -277,7 +277,7 @@ func TestClient_SetBassSafe(t *testing.T) {
 			}))
 			defer server.Close()
 
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:],
 				Port:      80,
 				Timeout:   testTimeout,
@@ -380,7 +380,7 @@ func TestClient_IncreaseBass(t *testing.T) {
 			}))
 			defer server.Close()
 
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:],
 				Port:      80,
 				Timeout:   testTimeout,
@@ -475,7 +475,7 @@ func TestClient_DecreaseBass(t *testing.T) {
 			}))
 			defer server.Close()
 
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:],
 				Port:      80,
 				Timeout:   testTimeout,
@@ -557,7 +557,7 @@ func TestClient_Bass_ErrorHandling(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(tt.serverResponse))
 			defer server.Close()
 
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:],
 				Port:      80,
 				Timeout:   testTimeout,
@@ -616,7 +616,7 @@ func TestClient_Bass_RequestFormat(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := ClientConfig{
+	config := &Config{
 		Host:      server.URL[7:],
 		Port:      80,
 		Timeout:   testTimeout,

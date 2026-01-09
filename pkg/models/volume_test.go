@@ -440,7 +440,7 @@ func BenchmarkVolumeXMLMarshal(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		xml.Marshal(req)
+		_, _ = xml.Marshal(req)
 	}
 }
 

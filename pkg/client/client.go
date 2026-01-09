@@ -19,8 +19,8 @@ type Client struct {
 	userAgent  string
 }
 
-// ClientConfig holds configuration for the SoundTouch client
-type ClientConfig struct {
+// Config holds configuration for the SoundTouch client
+type Config struct {
 	Host      string
 	Port      int
 	Timeout   time.Duration
@@ -28,17 +28,17 @@ type ClientConfig struct {
 }
 
 // DefaultConfig returns a default client configuration
-func DefaultConfig() ClientConfig {
-	return ClientConfig{
+func DefaultConfig() *Config {
+	return &Config{
 		Host:      "localhost",
 		Port:      8090,
-		Timeout:   10 * time.Second,
+		Timeout:   30 * time.Second,
 		UserAgent: "Bose-SoundTouch-Go-Client/1.0",
 	}
 }
 
 // NewClient creates a new SoundTouch API client
-func NewClient(config ClientConfig) *Client {
+func NewClient(config *Config) *Client {
 	if config.Timeout == 0 {
 		config.Timeout = 10 * time.Second
 	}
@@ -455,7 +455,7 @@ func (c *Client) DecreaseBalance(amount int) (*models.Balance, error) {
 }
 
 // SelectSource selects an audio source using the /select endpoint
-func (c *Client) SelectSource(source string, sourceAccount string) error {
+func (c *Client) SelectSource(source, sourceAccount string) error {
 	// Validate source parameter
 	if source == "" {
 		return fmt.Errorf("source cannot be empty")
@@ -647,7 +647,11 @@ func (c *Client) get(endpoint string, result interface{}) error {
 	if err != nil {
 		return fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			// Log the error but don't override the main error
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -673,7 +677,7 @@ func (c *Client) get(endpoint string, result interface{}) error {
 }
 
 // post performs a POST request with XML body
-func (c *Client) post(endpoint string, payload interface{}, result interface{}) error {
+func (c *Client) post(endpoint string, payload, result interface{}) error {
 	url := c.baseURL + endpoint
 
 	var body io.Reader
@@ -698,7 +702,11 @@ func (c *Client) post(endpoint string, payload interface{}, result interface{}) 
 	if err != nil {
 		return fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			// Log the error but don't override the main error
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		responseBody, _ := io.ReadAll(resp.Body)

@@ -133,7 +133,7 @@ func TestClient_SelectSource(t *testing.T) {
 			defer server.Close()
 
 			// Create client
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:], // Remove "http://"
 				Port:      80,
 				Timeout:   testTimeout,
@@ -242,7 +242,7 @@ func TestClient_SelectSourceFromItem(t *testing.T) {
 			defer server.Close()
 
 			// Create client
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:],
 				Port:      80,
 				Timeout:   testTimeout,
@@ -348,7 +348,7 @@ func TestClient_ConvenienceSourceMethods(t *testing.T) {
 			defer server.Close()
 
 			// Create client
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:],
 				Port:      80,
 				Timeout:   testTimeout,
@@ -415,7 +415,7 @@ func TestClient_SelectSource_ErrorHandling(t *testing.T) {
 					Message: "Invalid source selection",
 					Code:    400,
 				}
-				xml.NewEncoder(w).Encode(apiError)
+				_ = xml.NewEncoder(w).Encode(apiError)
 			},
 			wantError:     true,
 			errorContains: "Invalid source selection",
@@ -429,7 +429,7 @@ func TestClient_SelectSource_ErrorHandling(t *testing.T) {
 			defer server.Close()
 
 			// Create client
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:],
 				Port:      80,
 				Timeout:   testTimeout,
@@ -497,7 +497,7 @@ func TestClient_SelectSource_RequestFormat(t *testing.T) {
 	defer server.Close()
 
 	// Create client
-	config := ClientConfig{
+	config := &Config{
 		Host:      server.URL[7:],
 		Port:      80,
 		Timeout:   testTimeout,

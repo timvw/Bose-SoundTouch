@@ -86,7 +86,7 @@ func TestClient_GetBalance(t *testing.T) {
 			}))
 			defer server.Close()
 
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:], // Remove "http://"
 				Port:      80,
 				Timeout:   testTimeout,
@@ -203,7 +203,7 @@ func TestClient_SetBalance(t *testing.T) {
 				}))
 				defer server.Close()
 
-				config := ClientConfig{
+				config := &Config{
 					Host:      server.URL[7:],
 					Port:      80,
 					Timeout:   testTimeout,
@@ -218,7 +218,7 @@ func TestClient_SetBalance(t *testing.T) {
 				}
 			} else {
 				// Test validation without server
-				config := ClientConfig{
+				config := &Config{
 					Host:      "localhost",
 					Port:      8090,
 					Timeout:   testTimeout,
@@ -278,7 +278,7 @@ func TestClient_SetBalanceSafe(t *testing.T) {
 			}))
 			defer server.Close()
 
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:],
 				Port:      80,
 				Timeout:   testTimeout,
@@ -353,7 +353,7 @@ func TestClient_IncreaseBalance(t *testing.T) {
 			}))
 			defer server.Close()
 
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:],
 				Port:      80,
 				Timeout:   testTimeout,
@@ -440,7 +440,7 @@ func TestClient_DecreaseBalance(t *testing.T) {
 			}))
 			defer server.Close()
 
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:],
 				Port:      80,
 				Timeout:   testTimeout,
@@ -479,7 +479,7 @@ func TestClient_Balance_ErrorHandling(t *testing.T) {
 	}{
 		{
 			name: "GetBalance server returns 404",
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusNotFound)
 				w.Write([]byte("Not Found"))
 			},
@@ -492,7 +492,7 @@ func TestClient_Balance_ErrorHandling(t *testing.T) {
 		},
 		{
 			name: "SetBalance server returns 500",
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte("Internal Server Error"))
 			},
@@ -504,7 +504,7 @@ func TestClient_Balance_ErrorHandling(t *testing.T) {
 		},
 		{
 			name: "GetBalance invalid XML response",
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte("invalid xml"))
 			},
@@ -522,7 +522,7 @@ func TestClient_Balance_ErrorHandling(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(tt.serverResponse))
 			defer server.Close()
 
-			config := ClientConfig{
+			config := &Config{
 				Host:      server.URL[7:],
 				Port:      80,
 				Timeout:   testTimeout,
@@ -581,7 +581,7 @@ func TestClient_Balance_RequestFormat(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := ClientConfig{
+	config := &Config{
 		Host:      server.URL[7:],
 		Port:      80,
 		Timeout:   testTimeout,

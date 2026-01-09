@@ -18,7 +18,7 @@ type mockLogger struct {
 	mu       sync.Mutex
 }
 
-func (m *mockLogger) Printf(format string, v ...interface{}) {
+func (m *mockLogger) Printf(format string, _ ...interface{}) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.messages = append(m.messages, format)
@@ -40,6 +40,7 @@ func (m *mockLogger) clear() {
 
 // setupMockWebSocketServer creates a test WebSocket server
 func setupMockWebSocketServer(t *testing.T) (*httptest.Server, chan []byte) {
+	t.Helper()
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
 			return true
@@ -54,7 +55,9 @@ func setupMockWebSocketServer(t *testing.T) (*httptest.Server, chan []byte) {
 			t.Errorf("Failed to upgrade connection: %v", err)
 			return
 		}
-		defer conn.Close()
+		defer func() {
+			_ = conn.Close()
+		}()
 
 		// Send test messages from the channel
 		go func() {
@@ -73,7 +76,7 @@ func setupMockWebSocketServer(t *testing.T) (*httptest.Server, chan []byte) {
 			}
 
 			if messageType == websocket.PingMessage {
-				conn.WriteMessage(websocket.PongMessage, nil)
+				_ = conn.WriteMessage(websocket.PongMessage, nil)
 			}
 		}
 	}))
@@ -147,10 +150,10 @@ func TestWebSocketClient_SetHandlers(t *testing.T) {
 	wsClient := client.NewWebSocketClient(nil)
 
 	handlers := &models.WebSocketEventHandlers{
-		OnNowPlaying: func(event *models.NowPlayingUpdatedEvent) {
+		OnNowPlaying: func(_ *models.NowPlayingUpdatedEvent) {
 			// Handler implementation for testing
 		},
-		OnVolumeUpdated: func(event *models.VolumeUpdatedEvent) {
+		OnVolumeUpdated: func(_ *models.VolumeUpdatedEvent) {
 			// Handler implementation for testing
 		},
 	}
@@ -169,7 +172,7 @@ func TestWebSocketClient_IndividualHandlers(t *testing.T) {
 	client := NewClientFromHost("192.168.1.10")
 	wsClient := client.NewWebSocketClient(nil)
 
-	wsClient.OnNowPlaying(func(event *models.NowPlayingUpdatedEvent) {
+	wsClient.OnNowPlaying(func(_ *models.NowPlayingUpdatedEvent) {
 		// Handler implementation for testing
 	})
 
@@ -417,7 +420,7 @@ func TestWebSocketClient_ConfigValidation(t *testing.T) {
 	})
 }
 
-func TestWebSocketClient_ConcurrentAccess(t *testing.T) {
+func TestWebSocketClient_ConcurrentAccess(_ *testing.T) {
 	client := NewClientFromHost("192.168.1.10")
 	wsClient := client.NewWebSocketClient(nil)
 

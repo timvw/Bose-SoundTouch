@@ -25,7 +25,7 @@ func TestClient_Bass_Integration(t *testing.T) {
 	// Parse host:port if provided
 	finalHost, finalPort := parseBassHostPort(host, 8090)
 
-	config := ClientConfig{
+	config := &Config{
 		Host:      finalHost,
 		Port:      finalPort,
 		Timeout:   15 * time.Second,
@@ -162,7 +162,7 @@ func TestClient_Bass_IncrementDecrement_Integration(t *testing.T) {
 	// Parse host:port if provided
 	finalHost, finalPort := parseBassHostPort(host, 8090)
 
-	config := ClientConfig{
+	config := &Config{
 		Host:      finalHost,
 		Port:      finalPort,
 		Timeout:   15 * time.Second,
@@ -286,7 +286,7 @@ func TestClient_Bass_ErrorHandling_Integration(t *testing.T) {
 	// Parse host:port if provided
 	finalHost, finalPort := parseBassHostPort(host, 8090)
 
-	config := ClientConfig{
+	config := &Config{
 		Host:      finalHost,
 		Port:      finalPort,
 		Timeout:   15 * time.Second,
@@ -344,7 +344,7 @@ func BenchmarkClient_Bass_Integration(b *testing.B) {
 	// Parse host:port if provided
 	finalHost, finalPort := parseBassHostPort(host, 8090)
 
-	config := ClientConfig{
+	config := &Config{
 		Host:      finalHost,
 		Port:      finalPort,
 		Timeout:   15 * time.Second,
@@ -361,7 +361,7 @@ func BenchmarkClient_Bass_Integration(b *testing.B) {
 
 	// Restore original bass at the end
 	defer func() {
-		client.SetBass(originalBass.GetLevel())
+		_ = client.SetBass(originalBass.GetLevel())
 	}()
 
 	b.Run("GetBass", func(b *testing.B) {
@@ -388,7 +388,7 @@ func BenchmarkClient_Bass_Integration(b *testing.B) {
 
 	b.Run("IncreaseBass", func(b *testing.B) {
 		// Set to a safe starting point
-		client.SetBass(-3)
+		_ = client.SetBass(-3)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			// Keep increments small to avoid hitting limits
@@ -398,7 +398,7 @@ func BenchmarkClient_Bass_Integration(b *testing.B) {
 			}
 			// Reset to safe level periodically
 			if i%3 == 0 {
-				client.SetBass(-3)
+				_ = client.SetBass(-3)
 			}
 		}
 	})

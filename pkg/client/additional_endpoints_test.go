@@ -76,12 +76,12 @@ func TestClient_SetName(t *testing.T) {
 
 				// Send response
 				w.WriteHeader(tt.responseStatus)
-				w.Write([]byte(tt.responseBody))
+				_, _ = w.Write([]byte(tt.responseBody))
 			}))
 			defer server.Close()
 
 			// Create client pointing to test server
-			config := ClientConfig{
+			config := &Config{
 				Host: server.URL[7:], // Remove "http://" prefix
 				Port: 0,              // Will be ignored due to full URL in Host
 			}
@@ -187,12 +187,12 @@ func TestClient_GetBassCapabilities(t *testing.T) {
 
 				// Send response
 				w.WriteHeader(tt.responseStatus)
-				w.Write([]byte(tt.responseBody))
+				_, _ = w.Write([]byte(tt.responseBody))
 			}))
 			defer server.Close()
 
 			// Create client pointing to test server
-			config := ClientConfig{
+			config := &Config{
 				Host: server.URL[7:], // Remove "http://" prefix
 				Port: 0,              // Will be ignored due to full URL in Host
 			}
@@ -391,12 +391,12 @@ func TestClient_GetTrackInfo(t *testing.T) {
 
 				// Send response
 				w.WriteHeader(tt.responseStatus)
-				w.Write([]byte(tt.responseBody))
+				_, _ = w.Write([]byte(tt.responseBody))
 			}))
 			defer server.Close()
 
 			// Create client pointing to test server
-			config := ClientConfig{
+			config := &Config{
 				Host: server.URL[7:], // Remove "http://" prefix
 				Port: 0,              // Will be ignored due to full URL in Host
 			}
@@ -458,7 +458,7 @@ func TestClient_GetTrackInfo(t *testing.T) {
 
 func TestClient_NewEndpoints_NetworkError(t *testing.T) {
 	// Create client pointing to non-existent server
-	config := ClientConfig{
+	config := &Config{
 		Host: "192.168.1.999", // Invalid IP
 		Port: 8090,
 	}

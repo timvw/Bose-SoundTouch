@@ -23,7 +23,7 @@ func TestClient_SelectSource_Integration(t *testing.T) {
 	// Parse host:port if provided
 	finalHost, finalPort := parseHostPort(host, 8090)
 
-	config := ClientConfig{
+	config := &Config{
 		Host:      finalHost,
 		Port:      finalPort,
 		Timeout:   15 * time.Second,
@@ -141,7 +141,7 @@ func TestClient_SelectSourceFromItem_Integration(t *testing.T) {
 	// Parse host:port if provided
 	finalHost, finalPort := parseHostPort(host, 8090)
 
-	config := ClientConfig{
+	config := &Config{
 		Host:      finalHost,
 		Port:      finalPort,
 		Timeout:   15 * time.Second,
@@ -189,7 +189,7 @@ func TestClient_SelectSource_ErrorHandling_Integration(t *testing.T) {
 	// Parse host:port if provided
 	finalHost, finalPort := parseHostPort(host, 8090)
 
-	config := ClientConfig{
+	config := &Config{
 		Host:      finalHost,
 		Port:      finalPort,
 		Timeout:   15 * time.Second,
@@ -246,7 +246,7 @@ func TestClient_ConvenienceSourceMethods_Integration(t *testing.T) {
 	// Parse host:port if provided
 	finalHost, finalPort := parseHostPort(host, 8090)
 
-	config := ClientConfig{
+	config := &Config{
 		Host:      finalHost,
 		Port:      finalPort,
 		Timeout:   15 * time.Second,
@@ -344,7 +344,7 @@ func BenchmarkClient_SelectSource_Integration(b *testing.B) {
 	// Parse host:port if provided
 	finalHost, finalPort := parseHostPort(host, 8090)
 
-	config := ClientConfig{
+	config := &Config{
 		Host:      finalHost,
 		Port:      finalPort,
 		Timeout:   15 * time.Second,

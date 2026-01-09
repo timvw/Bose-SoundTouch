@@ -65,13 +65,13 @@ func TestLoadFromEnv_WithEnvVars(t *testing.T) {
 	clearTestEnvVars()
 
 	// Set test environment variables
-	os.Setenv("DISCOVERY_TIMEOUT", "15s")
-	os.Setenv("UPNP_ENABLED", "false")
-	os.Setenv("MDNS_ENABLED", "false")
-	os.Setenv("HTTP_TIMEOUT", "20s")
-	os.Setenv("USER_AGENT", "Test-Client/1.0")
-	os.Setenv("CACHE_ENABLED", "false")
-	os.Setenv("CACHE_TTL", "60s")
+	_ = os.Setenv("DISCOVERY_TIMEOUT", "15s")
+	_ = os.Setenv("UPNP_ENABLED", "false")
+	_ = os.Setenv("MDNS_ENABLED", "false")
+	_ = os.Setenv("HTTP_TIMEOUT", "20s")
+	_ = os.Setenv("USER_AGENT", "Test-Client/1.0")
+	_ = os.Setenv("CACHE_ENABLED", "false")
+	_ = os.Setenv("CACHE_TTL", "60s")
 
 	defer clearTestEnvVars()
 
@@ -427,6 +427,6 @@ func clearTestEnvVars() {
 	}
 
 	for _, env := range envVars {
-		os.Unsetenv(env)
+		_ = os.Unsetenv(env)
 	}
 }

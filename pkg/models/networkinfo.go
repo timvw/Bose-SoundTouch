@@ -74,9 +74,10 @@ func (n *NetworkInformation) GetInterfaces() []NetworkInterface {
 
 // GetInterfaceByType returns the first interface of the specified type
 func (n *NetworkInformation) GetInterfaceByType(interfaceType string) *NetworkInterface {
-	for _, iface := range n.GetInterfaces() {
-		if strings.EqualFold(iface.Type, interfaceType) {
-			return &iface
+	interfaces := n.GetInterfaces()
+	for i := range interfaces {
+		if strings.EqualFold(interfaces[i].Type, interfaceType) {
+			return &interfaces[i]
 		}
 	}
 	return nil
@@ -85,9 +86,10 @@ func (n *NetworkInformation) GetInterfaceByType(interfaceType string) *NetworkIn
 // GetActiveInterfaces returns only active/connected interfaces
 func (n *NetworkInformation) GetActiveInterfaces() []NetworkInterface {
 	var active []NetworkInterface
-	for _, iface := range n.GetInterfaces() {
-		if iface.IsConnected() {
-			active = append(active, iface)
+	interfaces := n.GetInterfaces()
+	for i := range interfaces {
+		if interfaces[i].IsConnected() {
+			active = append(active, interfaces[i])
 		}
 	}
 	return active
@@ -316,7 +318,8 @@ func (ni *NetworkInterface) FormatFrequency() string {
 
 // GetNetworkSummary returns a summary string of the network interface
 func (ni *NetworkInterface) GetNetworkSummary() string {
-	if ni.IsWiFi() && ni.IsConnected() {
+	switch {
+	case ni.IsWiFi() && ni.IsConnected():
 		ssid := ni.GetSSID()
 		if ssid == "" {
 			ssid = "Hidden Network"
@@ -327,12 +330,13 @@ func (ni *NetworkInterface) GetNetworkSummary() string {
 			return fmt.Sprintf("%s (%s, %s)", ssid, signal, band)
 		}
 		return fmt.Sprintf("%s (%s)", ssid, signal)
-	} else if ni.IsEthernet() && ni.IsConnected() {
+	case ni.IsEthernet() && ni.IsConnected():
 		return "Wired Connection"
-	} else if ni.IsConnected() {
+	case ni.IsConnected():
 		return "Connected"
+	default:
+		return "Disconnected"
 	}
-	return "Disconnected"
 }
 
 // String returns a string representation of the network interface

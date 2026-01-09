@@ -205,9 +205,9 @@ func (u *UnifiedDiscoveryService) getConfiguredDevices() []*models.DiscoveredDev
 }
 
 // mergeDevices merges two device lists, avoiding duplicates based on host
-func (u *UnifiedDiscoveryService) mergeDevices(existing, new []*models.DiscoveredDevice) []*models.DiscoveredDevice {
+func (u *UnifiedDiscoveryService) mergeDevices(existing, newDevices []*models.DiscoveredDevice) []*models.DiscoveredDevice {
 	hostSet := make(map[string]bool)
-	result := make([]*models.DiscoveredDevice, 0, len(existing)+len(new))
+	result := make([]*models.DiscoveredDevice, 0, len(existing)+len(newDevices))
 
 	// Add existing devices
 	for _, device := range existing {
@@ -218,7 +218,7 @@ func (u *UnifiedDiscoveryService) mergeDevices(existing, new []*models.Discovere
 	}
 
 	// Add new devices if not already present
-	for _, device := range new {
+	for _, device := range newDevices {
 		if !hostSet[device.Host] {
 			result = append(result, device)
 			hostSet[device.Host] = true

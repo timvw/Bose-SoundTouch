@@ -13,7 +13,7 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
-	config := ClientConfig{
+	config := &Config{
 		Host:    "192.168.1.100",
 		Port:    8090,
 		Timeout: 15 * time.Second,
@@ -35,7 +35,7 @@ func TestNewClient(t *testing.T) {
 }
 
 func TestNewClientWithDefaults(t *testing.T) {
-	config := ClientConfig{
+	config := &Config{
 		Host: "192.168.1.100",
 	}
 
@@ -369,7 +369,7 @@ func TestClient_GetNowPlaying(t *testing.T) {
 			host := serverURL.Hostname()
 			port, _ := strconv.Atoi(serverURL.Port())
 
-			client := NewClient(ClientConfig{
+			client := NewClient(&Config{
 				Host:      host,
 				Port:      port,
 				Timeout:   5 * time.Second,
@@ -424,7 +424,7 @@ func TestClient_GetNowPlaying_ServerError(t *testing.T) {
 	host := serverURL.Hostname()
 	port, _ := strconv.Atoi(serverURL.Port())
 
-	client := NewClient(ClientConfig{
+	client := NewClient(&Config{
 		Host:    host,
 		Port:    port,
 		Timeout: 5 * time.Second,
@@ -443,7 +443,7 @@ func TestClient_GetNowPlaying_ServerError(t *testing.T) {
 }
 
 func TestClient_GetNowPlaying_NetworkError(t *testing.T) {
-	client := NewClient(ClientConfig{
+	client := NewClient(&Config{
 		Host:    "non-existent-host.invalid",
 		Port:    8090,
 		Timeout: 1 * time.Second,
@@ -473,7 +473,7 @@ func TestClient_GetNowPlaying_InvalidXML(t *testing.T) {
 	host := serverURL.Hostname()
 	port, _ := strconv.Atoi(serverURL.Port())
 
-	client := NewClient(ClientConfig{
+	client := NewClient(&Config{
 		Host:    host,
 		Port:    port,
 		Timeout: 5 * time.Second,
@@ -555,7 +555,7 @@ func TestClient_GetSources(t *testing.T) {
 			host := serverURL.Hostname()
 			port, _ := strconv.Atoi(serverURL.Port())
 
-			client := NewClient(ClientConfig{
+			client := NewClient(&Config{
 				Host:      host,
 				Port:      port,
 				Timeout:   5 * time.Second,
@@ -615,7 +615,7 @@ func TestClient_GetSources_ServerError(t *testing.T) {
 	host := serverURL.Hostname()
 	port, _ := strconv.Atoi(serverURL.Port())
 
-	client := NewClient(ClientConfig{
+	client := NewClient(&Config{
 		Host:    host,
 		Port:    port,
 		Timeout: 5 * time.Second,
@@ -634,7 +634,7 @@ func TestClient_GetSources_ServerError(t *testing.T) {
 }
 
 func TestClient_GetSources_NetworkError(t *testing.T) {
-	client := NewClient(ClientConfig{
+	client := NewClient(&Config{
 		Host:    "non-existent-host.invalid",
 		Port:    8090,
 		Timeout: 1 * time.Second,
@@ -664,7 +664,7 @@ func TestClient_GetSources_InvalidXML(t *testing.T) {
 	host := serverURL.Hostname()
 	port, _ := strconv.Atoi(serverURL.Port())
 
-	client := NewClient(ClientConfig{
+	client := NewClient(&Config{
 		Host:    host,
 		Port:    port,
 		Timeout: 5 * time.Second,
@@ -738,7 +738,7 @@ func TestClient_GetName(t *testing.T) {
 			host := serverURL.Hostname()
 			port, _ := strconv.Atoi(serverURL.Port())
 
-			client := NewClient(ClientConfig{
+			client := NewClient(&Config{
 				Host:      host,
 				Port:      port,
 				Timeout:   5 * time.Second,
@@ -822,7 +822,7 @@ func TestClient_GetCapabilities(t *testing.T) {
 			host := serverURL.Hostname()
 			port, _ := strconv.Atoi(serverURL.Port())
 
-			client := NewClient(ClientConfig{
+			client := NewClient(&Config{
 				Host:      host,
 				Port:      port,
 				Timeout:   5 * time.Second,
@@ -916,7 +916,7 @@ func TestClient_GetPresets(t *testing.T) {
 			host := serverURL.Hostname()
 			port, _ := strconv.Atoi(serverURL.Port())
 
-			client := NewClient(ClientConfig{
+			client := NewClient(&Config{
 				Host:      host,
 				Port:      port,
 				Timeout:   5 * time.Second,
@@ -966,7 +966,7 @@ func TestClient_GetName_ServerError(t *testing.T) {
 	host := serverURL.Hostname()
 	port, _ := strconv.Atoi(serverURL.Port())
 
-	client := NewClient(ClientConfig{
+	client := NewClient(&Config{
 		Host:    host,
 		Port:    port,
 		Timeout: 5 * time.Second,
@@ -995,7 +995,7 @@ func TestClient_GetCapabilities_ServerError(t *testing.T) {
 	host := serverURL.Hostname()
 	port, _ := strconv.Atoi(serverURL.Port())
 
-	client := NewClient(ClientConfig{
+	client := NewClient(&Config{
 		Host:    host,
 		Port:    port,
 		Timeout: 5 * time.Second,
@@ -1024,7 +1024,7 @@ func TestClient_GetPresets_ServerError(t *testing.T) {
 	host := serverURL.Hostname()
 	port, _ := strconv.Atoi(serverURL.Port())
 
-	client := NewClient(ClientConfig{
+	client := NewClient(&Config{
 		Host:    host,
 		Port:    port,
 		Timeout: 5 * time.Second,

@@ -1,3 +1,4 @@
+// Package config provides configuration management for the Bose SoundTouch Go library.
 package config
 
 import (
@@ -57,9 +58,7 @@ func LoadFromEnv() (*Config, error) {
 	config := DefaultConfig()
 
 	// Load .env file if it exists
-	if err := loadDotEnv(); err != nil {
-		// Don't fail if .env doesn't exist, just continue with defaults
-	}
+	_ = loadDotEnv() // Don't fail if .env doesn't exist, just continue with defaults
 
 	// Parse environment variables
 	if timeout := os.Getenv("DISCOVERY_TIMEOUT"); timeout != "" {
@@ -160,7 +159,7 @@ func loadDotEnv() error {
 
 		// Set environment variable if not already set
 		if os.Getenv(key) == "" {
-			os.Setenv(key, value)
+			_ = os.Setenv(key, value)
 		}
 	}
 

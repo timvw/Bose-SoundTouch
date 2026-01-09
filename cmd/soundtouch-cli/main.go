@@ -322,7 +322,7 @@ func main() {
 
 // handleSetName sets the device name
 func handleSetName(host string, port int, timeout time.Duration, name string) error {
-	config := client.ClientConfig{
+	config := &client.Config{
 		Host:    host,
 		Port:    port,
 		Timeout: timeout,
@@ -342,7 +342,7 @@ func handleSetName(host string, port int, timeout time.Duration, name string) er
 
 // handleBassCapabilities gets the bass capabilities
 func handleBassCapabilities(host string, port int, timeout time.Duration) error {
-	config := client.ClientConfig{
+	config := &client.Config{
 		Host:    host,
 		Port:    port,
 		Timeout: timeout,
@@ -369,7 +369,7 @@ func handleBassCapabilities(host string, port int, timeout time.Duration) error 
 
 // handleTrackInfo gets the track information
 func handleTrackInfo(host string, port int, timeout time.Duration) error {
-	config := client.ClientConfig{
+	config := &client.Config{
 		Host:    host,
 		Port:    port,
 		Timeout: timeout,
@@ -615,7 +615,7 @@ func handleDeviceInfo(host string, port int, timeout time.Duration) error {
 }
 
 func showDeviceInfoWithConfig(host string, port int, cfg *config.Config) error {
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -692,7 +692,7 @@ func handleNowPlaying(host string, port int, timeout time.Duration) error {
 		cfg.HTTPTimeout = timeout
 	}
 
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -798,7 +798,7 @@ func handleSources(host string, port int, timeout time.Duration) error {
 		cfg.HTTPTimeout = timeout
 	}
 
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -912,7 +912,7 @@ func handleName(host string, port int, timeout time.Duration) error {
 		cfg.HTTPTimeout = timeout
 	}
 
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -950,7 +950,7 @@ func handleCapabilities(host string, port int, timeout time.Duration) error {
 		cfg.HTTPTimeout = timeout
 	}
 
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -1014,10 +1014,10 @@ func handleCapabilities(host string, port int, timeout time.Duration) error {
 	if len(capNames) > 0 {
 		fmt.Printf("Extended Capabilities:\n")
 		for _, capName := range capNames {
-			cap := capabilities.GetCapabilityByName(capName)
+			capability := capabilities.GetCapabilityByName(capName)
 			fmt.Printf("  • %s", capName)
-			if cap.URL != "" {
-				fmt.Printf(" (%s)", cap.URL)
+			if capability.URL != "" {
+				fmt.Printf(" (%s)", capability.URL)
 			}
 			fmt.Println()
 		}
@@ -1037,7 +1037,7 @@ func handlePresets(host string, port int, timeout time.Duration) error {
 		cfg.HTTPTimeout = timeout
 	}
 
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -1125,7 +1125,7 @@ func handleKeyCommands(host string, port int, timeout time.Duration, key string,
 		cfg.HTTPTimeout = timeout
 	}
 
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -1202,31 +1202,32 @@ func handleKeyCommands(host string, port int, timeout time.Duration, key string,
 	fmt.Printf("Sending %s command to %s:%d...\n", commandName, host, port)
 
 	// Execute the appropriate command
-	if key != "" {
+	switch {
+	case key != "":
 		err = soundtouchClient.SendKey(strings.ToUpper(key))
-	} else if play {
+	case play:
 		err = soundtouchClient.Play()
-	} else if pause {
+	case pause:
 		err = soundtouchClient.Pause()
-	} else if stop {
+	case stop:
 		err = soundtouchClient.Stop()
-	} else if next {
+	case next:
 		err = soundtouchClient.NextTrack()
-	} else if prev {
+	case prev:
 		err = soundtouchClient.PrevTrack()
-	} else if volumeUp {
+	case volumeUp:
 		err = soundtouchClient.VolumeUp()
-	} else if volumeDown {
+	case volumeDown:
 		err = soundtouchClient.VolumeDown()
-	} else if power {
+	case power:
 		err = soundtouchClient.SendKey(models.KeyPower)
-	} else if mute {
+	case mute:
 		err = soundtouchClient.SendKey(models.KeyMute)
-	} else if thumbsUp {
+	case thumbsUp:
 		err = soundtouchClient.SendKey(models.KeyThumbsUp)
-	} else if thumbsDown {
+	case thumbsDown:
 		err = soundtouchClient.SendKey(models.KeyThumbsDown)
-	} else if preset > 0 {
+	case preset > 0:
 		err = soundtouchClient.SelectPreset(preset)
 	}
 
@@ -1249,7 +1250,7 @@ func handleVolumeCommands(host string, port int, timeout time.Duration, getVolum
 		cfg.HTTPTimeout = timeout
 	}
 
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -1354,7 +1355,7 @@ func handleSourceCommands(host string, port int, timeout time.Duration, selectSo
 		cfg.HTTPTimeout = timeout
 	}
 
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -1424,7 +1425,7 @@ func handleBassCommands(host string, port int, timeout time.Duration, getBass bo
 		cfg.HTTPTimeout = timeout
 	}
 
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -1524,7 +1525,7 @@ func handleBalanceCommands(host string, port int, timeout time.Duration, getBala
 		cfg.HTTPTimeout = timeout
 	}
 
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -1627,7 +1628,7 @@ func handleClockCommands(host string, port int, timeout time.Duration, getClockT
 	}
 
 	// Configure client with custom timeout
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -1781,7 +1782,7 @@ func handleNetworkInfo(host string, port int, timeout time.Duration) error {
 	}
 
 	// Configure client with custom timeout
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,
@@ -1809,7 +1810,8 @@ func handleNetworkInfo(host string, port int, timeout time.Duration) error {
 		activeInterfaces := networkInfo.GetActiveInterfaces()
 		fmt.Printf("  Active Interfaces: %d\n\n", len(activeInterfaces))
 
-		for i, iface := range interfaces {
+		for i := range interfaces {
+			iface := &interfaces[i]
 			fmt.Printf("Interface %d:\n", i+1)
 			fmt.Printf("  • Type: %s", iface.GetType())
 			if iface.GetName() != "" {
@@ -1927,7 +1929,7 @@ func handleZoneCommands(host string, port int, timeout time.Duration, getZone, g
 		cfg.HTTPTimeout = timeout
 	}
 
-	clientConfig := client.ClientConfig{
+	clientConfig := &client.Config{
 		Host:      host,
 		Port:      port,
 		Timeout:   cfg.HTTPTimeout,

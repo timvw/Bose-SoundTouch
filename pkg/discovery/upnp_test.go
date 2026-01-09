@@ -433,12 +433,12 @@ func TestMergeDevices(t *testing.T) {
 		{Host: "192.168.1.101", Name: "Device 2", Port: 8090},
 	}
 
-	new := []*models.DiscoveredDevice{
+	newDevices := []*models.DiscoveredDevice{
 		{Host: "192.168.1.101", Name: "Duplicate", Port: 8090}, // Duplicate
 		{Host: "192.168.1.102", Name: "Device 3", Port: 8090},  // New
 	}
 
-	merged := service.mergeDevices(existing, new)
+	merged := service.mergeDevices(existing, newDevices)
 
 	if len(merged) != 3 {
 		t.Errorf("Expected 3 merged devices, got %d", len(merged))

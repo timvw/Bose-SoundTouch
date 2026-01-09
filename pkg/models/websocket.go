@@ -10,20 +10,31 @@ import (
 type WebSocketEventType string
 
 const (
-	// Event types as documented in SoundTouch API
-	EventTypeNowPlaying          WebSocketEventType = "nowPlayingUpdated"
-	EventTypeVolumeUpdated       WebSocketEventType = "volumeUpdated"
-	EventTypeConnectionState     WebSocketEventType = "connectionStateUpdated"
-	EventTypePresetUpdated       WebSocketEventType = "presetUpdated"
-	EventTypeZoneUpdated         WebSocketEventType = "zoneUpdated"
-	EventTypeBassUpdated         WebSocketEventType = "bassUpdated"
-	EventTypeClockTimeUpdated    WebSocketEventType = "clockTimeUpdated"
+	// EventTypeNowPlaying indicates a now playing status update
+	EventTypeNowPlaying WebSocketEventType = "nowPlayingUpdated"
+	// EventTypeVolumeUpdated indicates a volume level change
+	EventTypeVolumeUpdated WebSocketEventType = "volumeUpdated"
+	// EventTypeConnectionState indicates a connection state change
+	EventTypeConnectionState WebSocketEventType = "connectionStateUpdated"
+	// EventTypePresetUpdated indicates a preset configuration change
+	EventTypePresetUpdated WebSocketEventType = "presetUpdated"
+	// EventTypeZoneUpdated indicates a zone configuration change
+	EventTypeZoneUpdated WebSocketEventType = "zoneUpdated"
+	// EventTypeBassUpdated indicates a bass level change
+	EventTypeBassUpdated WebSocketEventType = "bassUpdated"
+	// EventTypeClockTimeUpdated indicates a clock time change
+	EventTypeClockTimeUpdated WebSocketEventType = "clockTimeUpdated"
+	// EventTypeClockDisplayUpdated indicates a clock display setting change
 	EventTypeClockDisplayUpdated WebSocketEventType = "clockDisplayUpdated"
-	EventTypeNameUpdated         WebSocketEventType = "nameUpdated"
-	EventTypeErrorUpdated        WebSocketEventType = "errorUpdated"
-	EventTypeRecentsUpdated      WebSocketEventType = "recentsUpdated"
-	EventTypeLanguageUpdated     WebSocketEventType = "languageUpdated"
-	EventTypeUnknown             WebSocketEventType = "unknown"
+	// EventTypeNameUpdated indicates a device name change
+	EventTypeNameUpdated WebSocketEventType = "nameUpdated"
+	// EventTypeErrorUpdated indicates an error status change
+	EventTypeErrorUpdated WebSocketEventType = "errorUpdated"
+	// EventTypeRecentsUpdated indicates a recent items list change
+	EventTypeRecentsUpdated WebSocketEventType = "recentsUpdated"
+	// EventTypeLanguageUpdated indicates a language setting change
+	EventTypeLanguageUpdated WebSocketEventType = "languageUpdated"
+	EventTypeUnknown         WebSocketEventType = "unknown"
 )
 
 // String returns a human-readable string representation
@@ -153,9 +164,10 @@ type ConnectionState struct {
 type ConnectionStateType string
 
 const (
-	ConnectionStateConnected    ConnectionStateType = "CONNECTED"
+	// ConnectionStateConnected indicates the device is connected
+	ConnectionStateConnected ConnectionStateType = "CONNECTED"
+	// ConnectionStateDisconnected indicates the device is disconnected
 	ConnectionStateDisconnected ConnectionStateType = "DISCONNECTED"
-	ConnectionStateConnecting   ConnectionStateType = "CONNECTING"
 )
 
 // IsConnected returns true if the device is connected

@@ -22,9 +22,12 @@ type ClockDisplay struct {
 type ClockFormat string
 
 const (
+	// ClockFormat12Hour represents 12-hour clock format
 	ClockFormat12Hour ClockFormat = "12"
+	// ClockFormat24Hour represents 24-hour clock format
 	ClockFormat24Hour ClockFormat = "24"
-	ClockFormatAuto   ClockFormat = "auto"
+	// ClockFormatAuto represents automatic clock format selection
+	ClockFormatAuto ClockFormat = "auto"
 )
 
 // IsEnabled returns true if the clock display is enabled

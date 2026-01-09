@@ -101,15 +101,16 @@ func (m *MDNSDiscoveryService) serviceEntryToDevice(entry *mdns.ServiceEntry) *m
 	var host string
 	var ipSource string
 
-	if entry.AddrV4 != nil {
+	switch {
+	case entry.AddrV4 != nil:
 		host = entry.AddrV4.String()
 		ipSource = "IPv4"
 		log.Printf("mDNS: Using IPv4 address: %s", host)
-	} else if entry.AddrV6 != nil {
+	case entry.AddrV6 != nil:
 		host = entry.AddrV6.String()
 		ipSource = "IPv6"
 		log.Printf("mDNS: Using IPv6 address: %s", host)
-	} else {
+	default:
 		// Try to resolve from hostname
 		log.Printf("mDNS: No direct IP address, trying to resolve hostname: %s", entry.Host)
 		ips, err := net.LookupIP(entry.Host)

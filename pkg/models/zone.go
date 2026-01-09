@@ -39,9 +39,12 @@ type MemberEntry struct {
 type ZoneStatus string
 
 const (
+	// ZoneStatusStandalone indicates the device is operating independently
 	ZoneStatusStandalone ZoneStatus = "STANDALONE"
-	ZoneStatusMaster     ZoneStatus = "MASTER"
-	ZoneStatusSlave      ZoneStatus = "SLAVE"
+	// ZoneStatusMaster indicates the device is the master in a zone
+	ZoneStatusMaster ZoneStatus = "MASTER"
+	// ZoneStatusSlave indicates the device is a slave in a zone
+	ZoneStatusSlave ZoneStatus = "SLAVE"
 )
 
 // String returns a human-readable string representation
@@ -245,11 +248,16 @@ func (zi *ZoneInfo) ToZoneRequest() *ZoneRequest {
 type ZoneOperation string
 
 const (
-	ZoneOpCreate    ZoneOperation = "CREATE"
-	ZoneOpModify    ZoneOperation = "MODIFY"
+	// ZoneOpCreate indicates creating a new zone
+	ZoneOpCreate ZoneOperation = "CREATE"
+	// ZoneOpModify indicates modifying an existing zone
+	ZoneOpModify ZoneOperation = "MODIFY"
+	// ZoneOpAddMember indicates adding a member to a zone
 	ZoneOpAddMember ZoneOperation = "ADD_MEMBER"
-	ZoneOpRemove    ZoneOperation = "REMOVE_MEMBER"
-	ZoneOpDissolve  ZoneOperation = "DISSOLVE"
+	// ZoneOpRemove indicates removing a member from a zone
+	ZoneOpRemove ZoneOperation = "REMOVE_MEMBER"
+	// ZoneOpDissolve indicates dissolving a zone
+	ZoneOpDissolve ZoneOperation = "DISSOLVE"
 )
 
 // String returns a human-readable string representation
