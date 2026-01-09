@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"strconv"
 	"strings"
 	"time"
@@ -102,28 +103,28 @@ func loadConfig(timeout time.Duration) (*config.Config, error) {
 	return cfg, nil
 }
 
-// parseHostPort parses a host:port string and returns host and port separately
-// If no port is specified, returns the defaultPort
+// parseHostPort splits a host:port string into separate host and port components
+// If no port is specified, returns the original host and the provided default port
 func parseHostPort(hostPort string, defaultPort int) (string, int) {
-	if !strings.Contains(hostPort, ":") {
-		return hostPort, defaultPort
+	// Check if host contains a port (has a colon)
+	if strings.Contains(hostPort, ":") {
+		host, portStr, err := net.SplitHostPort(hostPort)
+		if err != nil {
+			// If parsing fails, return original host and default port
+			return hostPort, defaultPort
+		}
+
+		port, err := strconv.Atoi(portStr)
+		if err != nil || port < 1 || port > 65535 {
+			// If port parsing fails or is invalid, return host and default port
+			return host, defaultPort
+		}
+
+		return host, port
 	}
 
-	// Simple parsing - in real use, we'd use net.SplitHostPort
-	parts := strings.Split(hostPort, ":")
-	if len(parts) != 2 {
-		return hostPort, defaultPort
-	}
-
-	host := parts[0]
-	portStr := parts[1]
-
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		return hostPort, defaultPort
-	}
-
-	return host, port
+	// No port specified, return original host and default port
+	return hostPort, defaultPort
 }
 
 // PrintDeviceHeader prints a standard header for device commands
