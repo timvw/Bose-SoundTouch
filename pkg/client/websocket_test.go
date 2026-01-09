@@ -494,7 +494,7 @@ func BenchmarkWebSocketClient_SetHandlers(b *testing.B) {
 
 	handlers := &models.WebSocketEventHandlers{
 		OnNowPlaying:    func(_ *models.NowPlayingUpdatedEvent) {},
-		OnVolumeUpdated: func(event *models.VolumeUpdatedEvent) {},
+		OnVolumeUpdated: func(_ *models.VolumeUpdatedEvent) {},
 	}
 
 	b.ResetTimer()

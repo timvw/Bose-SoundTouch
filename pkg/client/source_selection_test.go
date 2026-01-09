@@ -396,7 +396,7 @@ func TestClient_SelectSource_ErrorHandling(t *testing.T) {
 	}{
 		{
 			name: "Server returns 404",
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusNotFound)
 				_, _ = w.Write([]byte("Not Found"))
 			},
@@ -405,7 +405,7 @@ func TestClient_SelectSource_ErrorHandling(t *testing.T) {
 		},
 		{
 			name: "Server returns 500",
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = w.Write([]byte("Internal Server Error"))
 			},
@@ -414,7 +414,7 @@ func TestClient_SelectSource_ErrorHandling(t *testing.T) {
 		},
 		{
 			name: "Server returns API error",
-			serverResponse: func(w http.ResponseWriter, r *http.Request) {
+			serverResponse: func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusBadRequest)
 
 				apiError := models.APIError{

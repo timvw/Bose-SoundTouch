@@ -159,7 +159,7 @@ func TestGetDeviceInfo_Success(t *testing.T) {
 
 func TestGetDeviceInfo_HTTPError(t *testing.T) {
 	// Create mock server that returns 404
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		_, _ = w.Write([]byte("Not Found"))
 	}))
@@ -181,7 +181,7 @@ func TestGetDeviceInfo_HTTPError(t *testing.T) {
 
 func TestGetDeviceInfo_InvalidXML(t *testing.T) {
 	// Create mock server that returns invalid XML
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/xml")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("invalid xml content"))
@@ -204,7 +204,7 @@ func TestGetDeviceInfo_InvalidXML(t *testing.T) {
 
 func TestGetDeviceInfo_APIError(t *testing.T) {
 	// Create mock server that returns API error
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/xml")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><error code="404">Device not found</error>`))
@@ -228,7 +228,7 @@ func TestGetDeviceInfo_APIError(t *testing.T) {
 func TestPing_Success(t *testing.T) {
 	testData := loadTestData(t, "info_response.xml")
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/xml")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(testData))
@@ -244,7 +244,7 @@ func TestPing_Success(t *testing.T) {
 }
 
 func TestPing_Failure(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}))
 	defer server.Close()
@@ -268,7 +268,7 @@ func TestBaseURL(t *testing.T) {
 
 func TestClientTimeout(t *testing.T) {
 	// Create a server that delays response
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		time.Sleep(200 * time.Millisecond)
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`<info deviceID="test"></info>`))
@@ -419,7 +419,7 @@ func TestClient_GetNowPlaying(t *testing.T) {
 }
 
 func TestClient_GetNowPlaying_ServerError(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write([]byte("Internal Server Error"))
 	}))
@@ -465,7 +465,7 @@ func TestClient_GetNowPlaying_NetworkError(t *testing.T) {
 }
 
 func TestClient_GetNowPlaying_InvalidXML(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/xml")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("<invalid-xml>"))
@@ -608,7 +608,7 @@ func TestClient_GetSources(t *testing.T) {
 }
 
 func TestClient_GetSources_ServerError(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write([]byte("Internal Server Error"))
 	}))
@@ -654,7 +654,7 @@ func TestClient_GetSources_NetworkError(t *testing.T) {
 }
 
 func TestClient_GetSources_InvalidXML(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/xml")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("<invalid-xml>"))
@@ -959,7 +959,7 @@ func TestClient_GetPresets(t *testing.T) {
 }
 
 func TestClient_GetName_ServerError(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write([]byte("Internal Server Error"))
 	}))
