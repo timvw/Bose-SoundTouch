@@ -123,10 +123,10 @@ Tested with real SoundTouch devices:
 # Discover devices to find host:port
 $ soundtouch-cli -discover
 Found SoundTouch devices:
-  My SoundTouch Device (192.168.1.100:8090) - SoundTouch 20
+  My SoundTouch Device (192.168.1.10:8090) - SoundTouch 20
 
 # Use discovered host:port directly
-$ soundtouch-cli -host 192.168.1.100:8090 -play
+$ soundtouch-cli -host 192.168.1.10:8090 -play
 ```
 
 ### Different Port Scenarios
