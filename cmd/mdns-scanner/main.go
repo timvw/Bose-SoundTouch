@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	verbose := flag.Bool("v", false, "Enable verbose logging")
+	verbose := flag.Bool("verbose", false, "Enable verbose logging")
 	timeout := flag.Duration("timeout", 10*time.Second, "Discovery timeout")
 	service := flag.String("service", "_services._dns-sd._udp", "Service type to scan for (use _services._dns-sd._udp to find all)")
 

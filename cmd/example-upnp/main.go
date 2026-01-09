@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	verbose := flag.Bool("v", false, "Enable verbose logging")
+	verbose := flag.Bool("verbose", false, "Enable verbose logging")
 	timeout := flag.Duration("timeout", 5*time.Second, "Discovery timeout")
 
 	flag.Parse()
@@ -81,7 +81,7 @@ func main() {
 			fmt.Println("✓ UDP multicast connection established")
 			fmt.Println("✗ No devices responded with MediaRenderer service type")
 		} else {
-			fmt.Println("Run with -v flag for detailed technical information")
+			fmt.Println("Run with --verbose flag for detailed technical information")
 		}
 
 		fmt.Println()

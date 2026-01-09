@@ -15,7 +15,6 @@ import (
 var CommonFlags = []cli.Flag{
 	&cli.StringFlag{
 		Name:    "host",
-		Aliases: []string{"h"},
 		Usage:   "SoundTouch device host/IP address (can include port like host:8090)",
 		EnvVars: []string{"SOUNDTOUCH_HOST"},
 	},
