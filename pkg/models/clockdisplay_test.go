@@ -386,7 +386,7 @@ func TestNewClockDisplayRequest(t *testing.T) {
 	request := NewClockDisplayRequest()
 
 	if request == nil {
-		t.Error("Expected non-nil request")
+		t.Fatal("Expected non-nil request")
 	}
 
 	if request.Enabled != nil {

@@ -13,7 +13,7 @@ func TestNewUnifiedDiscoveryService(t *testing.T) {
 	service := NewUnifiedDiscoveryService(cfg)
 
 	if service == nil {
-		t.Error("Expected service to be created, got nil")
+		t.Fatal("Expected service to be created, got nil")
 	}
 
 	if service.config != cfg {
