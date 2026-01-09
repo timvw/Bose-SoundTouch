@@ -116,13 +116,13 @@ See [docs/DISCOVERY.md](docs/DISCOVERY.md) for detailed information.
 
 ```bash
 # Discover SoundTouch devices (combines UPnP, mDNS + configured devices)
-soundtouch-cli -discover
+soundtouch-cli discover devices
 
 # Discover and show detailed info for all devices
-soundtouch-cli -discover-all
+soundtouch-cli discover devices --all
 
 # Discover with custom timeout
-soundtouch-cli -discover -timeout 10s
+soundtouch-cli discover devices --timeout 10s
 ```
 
 #### Real-time WebSocket Events
@@ -159,16 +159,16 @@ See [docs/websocket-events.md](docs/websocket-events.md) for complete WebSocket 
 #### Device Information
 ```bash
 # Get device information by IP address
-soundtouch-cli -host 192.168.1.10 -info
+soundtouch-cli --host 192.168.1.10 info
 
 # With custom port and timeout
-soundtouch-cli -host 192.168.1.10 -port 8090 -timeout 15s -info
+soundtouch-cli --host 192.168.1.10 --port 8090 --timeout 15s info
 ```
 
 #### Now Playing Status
 ```bash
 # Get current playback information
-soundtouch-cli -host 192.168.1.10 -nowplaying
+soundtouch-cli --host 192.168.1.10 play now
 
 # Example output:
 # Now Playing:
@@ -187,54 +187,56 @@ soundtouch-cli -host 192.168.1.10 -nowplaying
 #### Audio Sources
 ```bash
 # Get available audio sources
-soundtouch-cli -host 192.168.1.10:8090 -sources
+soundtouch-cli --host 192.168.1.10 source list
 
 # Example output:
-# Audio Sources:
+# Available Audio Sources:
 #   Device ID: ABCD1234EFGH
-#   Total Sources: 14
-#   Ready Sources: 5
+#   Ready Sources:
+#   • AUX IN [Local, Available]
+#   • user+spotify@example.com (user) [Streaming]
+#   • Alexa
+#   • Tunein
+#   • Local_internet_radio
 #
-# Ready Sources:
-#   • AUX IN [Local, Multiroom]
-#   • user+spotify@example.com (user) [Remote, Multiroom, Streaming]
-#   • Alexa [Remote, Multiroom]
-#   • Tunein [Remote, Multiroom, Streaming]
-#   • Local_internet_radio [Remote, Multiroom, Streaming]
+#   All Sources:
+#   • AUX IN (Available)
+#   • SPOTIFY (Remote)
+#     Account: user+spotify@example.com
 #
-# Categories:
-#   Spotify: 1 account(s) ready
-#   AUX Input: Ready
-#   Streaming Services: 3 ready
+#   Streaming Services:
+#   • user+spotify@example.com (user)
+#   • Tunein
+#   • Local_internet_radio
 ```
 
 #### Media Controls
 ```bash
 # Basic playback controls
-soundtouch-cli -host 192.168.1.10:8090 -play
-soundtouch-cli -host 192.168.1.10:8090 -pause
-soundtouch-cli -host 192.168.1.10:8090 -stop
+soundtouch-cli --host 192.168.1.10 play start
+soundtouch-cli --host 192.168.1.10 play pause
+soundtouch-cli --host 192.168.1.10 play stop
 
 # Track navigation
-soundtouch-cli -host 192.168.1.10:8090 -next
-soundtouch-cli -host 192.168.1.10:8090 -prev
+soundtouch-cli --host 192.168.1.10 play next
+soundtouch-cli --host 192.168.1.10 play prev
 
 # Volume controls (key-based)
-soundtouch-cli -host 192.168.1.10:8090 -volume-up
-soundtouch-cli -host 192.168.1.10:8090 -volume-down
+soundtouch-cli --host 192.168.1.10 key volume-up
+soundtouch-cli --host 192.168.1.10 key volume-down
 
 # Preset selection
-soundtouch-cli -host 192.168.1.10:8090 -preset 1
-soundtouch-cli -host 192.168.1.10:8090 -preset 6
+soundtouch-cli --host 192.168.1.10 preset --preset 1
+soundtouch-cli --host 192.168.1.10 preset --preset 6
 
 # Generic key command
-soundtouch-cli -host 192.168.1.10:8090 -key STOP
+soundtouch-cli --host 192.168.1.10 key send --key STOP
 ```
 
 #### Volume Management
 ```bash
 # Get current volume
-soundtouch-cli -host 192.168.1.10:8090 -volume
+soundtouch-cli --host 192.168.1.10 volume get
 
 # Example output:
 # Current Volume:
@@ -243,19 +245,22 @@ soundtouch-cli -host 192.168.1.10:8090 -volume
 #   Target Level: 50
 #   Muted: false
 
-# Set specific volume (0-100, shows warning for >30)
-soundtouch-cli -host 192.168.1.10:8090 -set-volume 25
-soundtouch-cli -host 192.168.1.10:8090 -set-volume 0  # Mute
+# Set specific volume (0-100)
+soundtouch-cli --host 192.168.1.10 volume set --level 25
+soundtouch-cli --host 192.168.1.10 volume set --level 0  # Mute
 
 # Incremental volume control
-soundtouch-cli -host 192.168.1.10:8090 -inc-volume 3
-soundtouch-cli -host 192.168.1.10:8090 -dec-volume 5
+soundtouch-cli --host 192.168.1.10 volume up --amount 3
+soundtouch-cli --host 192.168.1.10 volume down --amount 5
 ```
 
 #### Device Name
 ```bash
 # Get device name
-soundtouch-cli -host 192.168.1.10 -name
+soundtouch-cli --host 192.168.1.10 name get
+
+# Set device name
+soundtouch-cli --host 192.168.1.10 name set --value "My SoundTouch"
 
 # Example output:
 # Device Name: My SoundTouch
@@ -264,7 +269,7 @@ soundtouch-cli -host 192.168.1.10 -name
 #### Device Capabilities
 ```bash
 # Get device capabilities
-soundtouch-cli -host 192.168.1.10 -capabilities
+soundtouch-cli --host 192.168.1.10 capabilities
 
 # Example output:
 # Device Capabilities:
@@ -288,7 +293,7 @@ soundtouch-cli -host 192.168.1.10 -capabilities
 #### Configured Presets
 ```bash
 # Get configured presets
-soundtouch-cli -host 192.168.1.10 -presets
+soundtouch-cli --host 192.168.1.10 presets
 
 # Example output:
 # Configured Presets:
@@ -308,21 +313,42 @@ soundtouch-cli -host 192.168.1.10 -presets
 #### System Information
 ```bash
 # Get device clock time
-soundtouch-cli -host 192.168.1.10 -clock-time
+soundtouch-cli --host 192.168.1.10 clock get
 
 # Set device time to current system time
-soundtouch-cli -host 192.168.1.10 -set-clock-time now
+soundtouch-cli --host 192.168.1.10 clock now
 
 # Get clock display settings
-soundtouch-cli -host 192.168.1.10 -clock-display
+soundtouch-cli --host 192.168.1.10 clock display get
 
 # Configure clock display
-soundtouch-cli -host 192.168.1.10 -enable-clock
-soundtouch-cli -host 192.168.1.10 -clock-format 24
-soundtouch-cli -host 192.168.1.10 -clock-brightness 75
+soundtouch-cli --host 192.168.1.10 clock display enable
+soundtouch-cli --host 192.168.1.10 clock display format --format 24
+soundtouch-cli --host 192.168.1.10 clock display brightness --brightness high
 
 # Get network information
-soundtouch-cli -host 192.168.1.10 -network-info
+soundtouch-cli --host 192.168.1.10 network info
+
+# Bass control
+soundtouch-cli --host 192.168.1.10 bass get
+soundtouch-cli --host 192.168.1.10 bass set --level 3
+soundtouch-cli --host 192.168.1.10 bass up --amount 2
+
+# Balance control
+soundtouch-cli --host 192.168.1.10 balance get
+soundtouch-cli --host 192.168.1.10 balance set --level -10
+soundtouch-cli --host 192.168.1.10 balance center
+
+# Source selection
+soundtouch-cli --host 192.168.1.10 source spotify
+soundtouch-cli --host 192.168.1.10 source bluetooth
+soundtouch-cli --host 192.168.1.10 source select --source SPOTIFY --account user@example.com
+
+# Zone management
+soundtouch-cli --host 192.168.1.10 zone get
+soundtouch-cli --host 192.168.1.10 zone create --members 192.168.1.11,192.168.1.12
+soundtouch-cli --host 192.168.1.10 zone add --member 192.168.1.13
+soundtouch-cli --host 192.168.1.10 zone dissolve
 ```
 
 ### Go Library Usage

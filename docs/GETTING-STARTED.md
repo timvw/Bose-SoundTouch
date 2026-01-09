@@ -441,16 +441,17 @@ Use the included CLI for quick testing:
 
 ```bash
 # Discovery
-go run ./cmd/soundtouch-cli -discover
+go run ./cmd/soundtouch-cli discover devices
 
 # Device info
-go run ./cmd/soundtouch-cli -host 192.168.1.100 -info
+go run ./cmd/soundtouch-cli --host 192.168.1.100 info
 
 # Basic controls
-go run ./cmd/soundtouch-cli -host 192.168.1.100 -play -volume 50
+go run ./cmd/soundtouch-cli --host 192.168.1.100 play start
+go run ./cmd/soundtouch-cli --host 192.168.1.100 volume set --level 50
 
-# WebSocket monitoring (separate terminal)
-go run ./cmd/soundtouch-cli -host 192.168.1.100 -monitor
+# WebSocket monitoring (use websocket-demo)
+go run ./cmd/websocket-demo --host 192.168.1.100
 ```
 
 ### Configuration Management
