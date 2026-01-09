@@ -30,6 +30,7 @@ func (p *Preset) GetCreatedTime() time.Time {
 	if p.CreatedOn != nil {
 		return time.Unix(*p.CreatedOn, 0)
 	}
+
 	return time.Time{}
 }
 
@@ -38,6 +39,7 @@ func (p *Preset) GetUpdatedTime() time.Time {
 	if p.UpdatedOn != nil {
 		return time.Unix(*p.UpdatedOn, 0)
 	}
+
 	return time.Time{}
 }
 
@@ -51,6 +53,7 @@ func (p *Preset) GetDisplayName() string {
 	if p.ContentItem != nil && p.ContentItem.ItemName != "" {
 		return p.ContentItem.ItemName
 	}
+
 	return "Preset " + strconv.Itoa(p.ID)
 }
 
@@ -59,6 +62,7 @@ func (p *Preset) GetArtworkURL() string {
 	if p.ContentItem != nil && p.ContentItem.ContainerArt != "" {
 		return p.ContentItem.ContainerArt
 	}
+
 	return ""
 }
 
@@ -77,6 +81,7 @@ func (p *Preset) GetSource() string {
 	if p.ContentItem != nil {
 		return p.ContentItem.Source
 	}
+
 	return ""
 }
 
@@ -85,6 +90,7 @@ func (p *Preset) GetSourceAccount() string {
 	if p.ContentItem != nil {
 		return p.ContentItem.SourceAccount
 	}
+
 	return ""
 }
 
@@ -93,6 +99,7 @@ func (p *Preset) GetContentType() string {
 	if p.ContentItem != nil {
 		return p.ContentItem.Type
 	}
+
 	return ""
 }
 
@@ -101,6 +108,7 @@ func (p *Preset) GetLocation() string {
 	if p.ContentItem != nil {
 		return p.ContentItem.Location
 	}
+
 	return ""
 }
 
@@ -121,34 +129,40 @@ func (ps *Presets) GetPresetByID(id int) *Preset {
 			return &preset
 		}
 	}
+
 	return nil
 }
 
 // GetSpotifyPresets returns all Spotify presets
 func (ps *Presets) GetSpotifyPresets() []Preset {
 	var spotify []Preset
+
 	for _, preset := range ps.Preset {
 		if preset.IsSpotifyPreset() {
 			spotify = append(spotify, preset)
 		}
 	}
+
 	return spotify
 }
 
 // GetPresetsBySource returns presets filtered by source
 func (ps *Presets) GetPresetsBySource(source string) []Preset {
 	var filtered []Preset
+
 	for _, preset := range ps.Preset {
 		if preset.GetSource() == source {
 			filtered = append(filtered, preset)
 		}
 	}
+
 	return filtered
 }
 
 // GetEmptyPresetSlots returns preset IDs that are empty (1-6)
 func (ps *Presets) GetEmptyPresetSlots() []int {
 	var empty []int
+
 	used := make(map[int]bool)
 
 	// Mark used slots
@@ -175,24 +189,29 @@ func (ps *Presets) HasPresets() bool {
 			return true
 		}
 	}
+
 	return false
 }
 
 // GetUsedPresetSlots returns preset IDs that have content
 func (ps *Presets) GetUsedPresetSlots() []int {
 	var used []int
+
 	for _, preset := range ps.Preset {
 		if !preset.IsEmpty() {
 			used = append(used, preset.ID)
 		}
 	}
+
 	return used
 }
 
 // GetMostRecentPreset returns the most recently updated preset
 func (ps *Presets) GetMostRecentPreset() *Preset {
-	var mostRecent *Preset
-	var latestTime int64
+	var (
+		mostRecent *Preset
+		latestTime int64
+	)
 
 	for _, preset := range ps.Preset {
 		if preset.UpdatedOn != nil && *preset.UpdatedOn > latestTime {
@@ -210,6 +229,7 @@ func (ps *Presets) GetMostRecentPreset() *Preset {
 // GetOldestPreset returns the oldest preset
 func (ps *Presets) GetOldestPreset() *Preset {
 	var oldest *Preset
+
 	var earliestTime int64 = 9223372036854775807 // max int64
 
 	for _, preset := range ps.Preset {
@@ -233,6 +253,7 @@ func (ps *Presets) GetPresetsSummary() map[string]int {
 
 	// Count by source
 	sources := make(map[string]int)
+
 	for _, preset := range ps.Preset {
 		if !preset.IsEmpty() {
 			source := preset.GetSource()

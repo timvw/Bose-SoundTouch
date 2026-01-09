@@ -47,9 +47,11 @@ func ClampBassLevel(level int) int {
 	if level < BassLevelMin {
 		return BassLevelMin
 	}
+
 	if level > BassLevelMax {
 		return BassLevelMax
 	}
+
 	return level
 }
 
@@ -109,6 +111,7 @@ func (b *Bass) String() string {
 func (b *Bass) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	// Use a temporary struct to avoid infinite recursion
 	type TempBass Bass
+
 	temp := (*TempBass)(b)
 
 	if err := d.DecodeElement(temp, &start); err != nil {
@@ -130,7 +133,9 @@ func (b *Bass) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 // MarshalXML implements custom XML marshaling
 func (b *Bass) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	type TempBass Bass
+
 	temp := (*TempBass)(b)
+
 	return e.EncodeElement(temp, start)
 }
 
@@ -194,9 +199,11 @@ func (bc *BassCapabilities) ClampLevel(level int) int {
 	if level < bc.BassMin {
 		return bc.BassMin
 	}
+
 	if level > bc.BassMax {
 		return bc.BassMax
 	}
+
 	return level
 }
 
@@ -205,5 +212,6 @@ func (bc *BassCapabilities) String() string {
 	if !bc.BassAvailable {
 		return "Bass control not supported"
 	}
+
 	return fmt.Sprintf("Bass: %d to %d (default: %d)", bc.BassMin, bc.BassMax, bc.BassDefault)
 }

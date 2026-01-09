@@ -35,6 +35,7 @@ func (c *ClockTime) GetTime() (time.Time, error) {
 				return t, nil
 			}
 		}
+
 		return time.Time{}, fmt.Errorf("unable to parse time value: %s", c.Value)
 	}
 
@@ -56,6 +57,7 @@ func (c *ClockTime) GetTimeString() string {
 	if t, err := c.GetTime(); err == nil {
 		return t.UTC().Format("2006-01-02 15:04:05")
 	}
+
 	return c.Value
 }
 
@@ -98,6 +100,7 @@ func NewClockTimeRequest(t time.Time) *ClockTimeRequest {
 // NewClockTimeRequestUTC creates a new clock time request from UTC timestamp
 func NewClockTimeRequestUTC(utc int64) *ClockTimeRequest {
 	t := time.Unix(utc, 0).UTC()
+
 	return &ClockTimeRequest{
 		UTC:   utc,
 		Value: t.Format("2006-01-02 15:04:05"),

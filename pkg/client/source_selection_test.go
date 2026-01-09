@@ -102,6 +102,7 @@ func TestClient_SelectSource(t *testing.T) {
 
 				// Parse and validate request body
 				var contentItem models.ContentItem
+
 				err := xml.NewDecoder(r.Body).Decode(&contentItem)
 				if err != nil {
 					t.Errorf("Failed to decode request XML: %v", err)
@@ -213,6 +214,7 @@ func TestClient_SelectSourceFromItem(t *testing.T) {
 				} else if err == nil {
 					t.Errorf("Expected error for nil source item")
 				}
+
 				return
 			}
 
@@ -220,6 +222,7 @@ func TestClient_SelectSourceFromItem(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Parse request body
 				var contentItem models.ContentItem
+
 				err := xml.NewDecoder(r.Body).Decode(&contentItem)
 				if err != nil {
 					t.Errorf("Failed to decode request XML: %v", err)
@@ -326,6 +329,7 @@ func TestClient_ConvenienceSourceMethods(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Parse request body
 				var contentItem models.ContentItem
+
 				err := xml.NewDecoder(r.Body).Decode(&contentItem)
 				if err != nil {
 					t.Errorf("Failed to decode request XML: %v", err)
@@ -412,6 +416,7 @@ func TestClient_SelectSource_ErrorHandling(t *testing.T) {
 			name: "Server returns API error",
 			serverResponse: func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusBadRequest)
+
 				apiError := models.APIError{
 					Message: "Invalid source selection",
 					Code:    400,
@@ -463,6 +468,7 @@ func TestClient_SelectSource_RequestFormat(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Read and parse the raw request body
 		var contentItem models.ContentItem
+
 		err := xml.NewDecoder(r.Body).Decode(&contentItem)
 		if err != nil {
 			t.Errorf("Failed to decode request XML: %v", err)
@@ -483,9 +489,11 @@ func TestClient_SelectSource_RequestFormat(t *testing.T) {
 		if contentItem.Source != "SPOTIFY" {
 			t.Errorf("Expected source SPOTIFY, got %s", contentItem.Source)
 		}
+
 		if contentItem.SourceAccount != "test_user" {
 			t.Errorf("Expected sourceAccount test_user, got %s", contentItem.SourceAccount)
 		}
+
 		if contentItem.ItemName != "Spotify" {
 			t.Errorf("Expected itemName Spotify, got %s", contentItem.ItemName)
 		}
@@ -554,5 +562,6 @@ func containsMiddleSubstring(s, substr string) bool {
 			return true
 		}
 	}
+
 	return false
 }

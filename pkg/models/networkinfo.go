@@ -80,18 +80,21 @@ func (n *NetworkInformation) GetInterfaceByType(interfaceType string) *NetworkIn
 			return &interfaces[i]
 		}
 	}
+
 	return nil
 }
 
 // GetActiveInterfaces returns only active/connected interfaces
 func (n *NetworkInformation) GetActiveInterfaces() []NetworkInterface {
 	var active []NetworkInterface
+
 	interfaces := n.GetInterfaces()
 	for i := range interfaces {
 		if interfaces[i].IsConnected() {
 			active = append(active, interfaces[i])
 		}
 	}
+
 	return active
 }
 
@@ -113,6 +116,7 @@ func (n *NetworkInformation) GetConnectedWiFiInterface() *NetworkInterface {
 			return &interfaces[i]
 		}
 	}
+
 	return nil
 }
 
@@ -124,6 +128,7 @@ func (n *NetworkInformation) GetConnectedEthernetInterface() *NetworkInterface {
 			return &interfaces[i]
 		}
 	}
+
 	return nil
 }
 
@@ -169,6 +174,7 @@ func (ni *NetworkInterface) GetFrequencyGHz() float64 {
 	if ni.FrequencyKHz == 0 {
 		return 0
 	}
+
 	return float64(ni.FrequencyKHz) / 1000000.0
 }
 
@@ -178,9 +184,11 @@ func (ni *NetworkInterface) GetFrequencyBand() string {
 	if ghz == 0 {
 		return ""
 	}
+
 	if ghz < 3.0 {
 		return "2.4GHz"
 	}
+
 	return "5GHz"
 }
 
@@ -226,6 +234,7 @@ func (ni *NetworkInterface) ValidateIP() bool {
 	if ni.IPAddress == "" {
 		return false
 	}
+
 	return net.ParseIP(ni.IPAddress) != nil
 }
 
@@ -234,7 +243,9 @@ func (ni *NetworkInterface) ValidateMAC() bool {
 	if ni.MacAddress == "" {
 		return false
 	}
+
 	_, err := net.ParseMAC(ni.MacAddress)
+
 	return err == nil
 }
 
@@ -315,6 +326,7 @@ func (ni *NetworkInterface) FormatFrequency() string {
 	}
 
 	mhz := float64(ni.FrequencyKHz) / 1000.0
+
 	return fmt.Sprintf("%.0f MHz", mhz)
 }
 
@@ -326,11 +338,14 @@ func (ni *NetworkInterface) GetNetworkSummary() string {
 		if ssid == "" {
 			ssid = "Hidden Network"
 		}
+
 		signal := ni.GetSignalDescription()
+
 		band := ni.GetFrequencyBand()
 		if band != "" {
 			return fmt.Sprintf("%s (%s, %s)", ssid, signal, band)
 		}
+
 		return fmt.Sprintf("%s (%s)", ssid, signal)
 	case ni.IsEthernet() && ni.IsConnected():
 		return "Wired Connection"

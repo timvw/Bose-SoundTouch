@@ -73,6 +73,7 @@ func TestClient_SelectSource_Integration(t *testing.T) {
 						return client.SelectTuneIn(src.SourceAccount)
 					}
 				}
+
 				return nil // Skip if no TuneIn available
 			},
 			checkSource: func() bool {
@@ -90,6 +91,7 @@ func TestClient_SelectSource_Integration(t *testing.T) {
 						return client.SelectSource(source.Source, source.SourceAccount)
 					}
 				}
+
 				return nil // Skip if no streaming sources available
 			},
 			checkSource: func() bool {
@@ -99,6 +101,7 @@ func TestClient_SelectSource_Integration(t *testing.T) {
 						return true
 					}
 				}
+
 				return false
 			},
 			description:   "Generic source selection",
@@ -389,6 +392,7 @@ func parseHostPort(hostPort string, defaultPort int) (string, int) {
 	// Simple parsing - in real use, we'd use net.SplitHostPort
 	parts := make([]string, 0, 2)
 	current := ""
+
 	for _, char := range hostPort {
 		if char == ':' {
 			parts = append(parts, current)
@@ -397,6 +401,7 @@ func parseHostPort(hostPort string, defaultPort int) (string, int) {
 			current += string(char)
 		}
 	}
+
 	if current != "" {
 		parts = append(parts, current)
 	}
@@ -406,6 +411,7 @@ func parseHostPort(hostPort string, defaultPort int) (string, int) {
 		port := defaultPort
 		portStr := parts[1]
 		portInt := 0
+
 		for _, char := range portStr {
 			if char >= '0' && char <= '9' {
 				portInt = portInt*10 + int(char-'0')
@@ -414,9 +420,11 @@ func parseHostPort(hostPort string, defaultPort int) (string, int) {
 				break
 			}
 		}
+
 		if portInt > 0 && portInt <= 65535 {
 			port = portInt
 		}
+
 		return parts[0], port
 	}
 

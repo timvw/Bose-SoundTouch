@@ -73,6 +73,7 @@ func TestGetDeviceInfo_Success(t *testing.T) {
 		if r.URL.Path != "/info" {
 			t.Errorf("Expected path '/info', got '%s'", r.URL.Path)
 		}
+
 		if r.Method != "GET" {
 			t.Errorf("Expected method GET, got %s", r.Method)
 		}
@@ -81,6 +82,7 @@ func TestGetDeviceInfo_Success(t *testing.T) {
 		if r.Header.Get("Accept") != "application/xml" {
 			t.Errorf("Expected Accept header 'application/xml', got '%s'", r.Header.Get("Accept"))
 		}
+
 		if r.Header.Get("User-Agent") != "Bose-SoundTouch-Go-Client/1.0" {
 			t.Errorf("Expected User-Agent header, got '%s'", r.Header.Get("User-Agent"))
 		}
@@ -132,6 +134,7 @@ func TestGetDeviceInfo_Success(t *testing.T) {
 		if comp.ComponentCategory != "SCM" {
 			t.Errorf("Expected first component category 'SCM', got '%s'", comp.ComponentCategory)
 		}
+
 		if comp.SerialNumber != "I6332527703739342000020" {
 			t.Errorf("Expected first component serial 'I6332527703739342000020', got '%s'", comp.SerialNumber)
 		}
@@ -147,6 +150,7 @@ func TestGetDeviceInfo_Success(t *testing.T) {
 		if net.Type != "SCM" {
 			t.Errorf("Expected first network type 'SCM', got '%s'", net.Type)
 		}
+
 		if net.IPAddress != "192.168.1.10" {
 			t.Errorf("Expected IP address '192.168.1.10', got '%s'", net.IPAddress)
 		}
@@ -382,6 +386,7 @@ func TestClient_GetNowPlaying(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error but got none")
 				}
+
 				return
 			}
 
@@ -449,7 +454,6 @@ func TestClient_GetNowPlaying_NetworkError(t *testing.T) {
 	})
 
 	_, err := client.GetNowPlaying()
-
 	if err == nil {
 		t.Error("Expected error for network error")
 	}
@@ -479,7 +483,6 @@ func TestClient_GetNowPlaying_InvalidXML(t *testing.T) {
 	})
 
 	_, err := client.GetNowPlaying()
-
 	if err == nil {
 		t.Error("Expected error for invalid XML response")
 	}
@@ -567,6 +570,7 @@ func TestClient_GetSources(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error but got none")
 				}
+
 				return
 			}
 
@@ -639,7 +643,6 @@ func TestClient_GetSources_NetworkError(t *testing.T) {
 	})
 
 	_, err := client.GetSources()
-
 	if err == nil {
 		t.Error("Expected error for network error")
 	}
@@ -669,7 +672,6 @@ func TestClient_GetSources_InvalidXML(t *testing.T) {
 	})
 
 	_, err := client.GetSources()
-
 	if err == nil {
 		t.Error("Expected error for invalid XML response")
 	}
@@ -749,6 +751,7 @@ func TestClient_GetName(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error but got none")
 				}
+
 				return
 			}
 
@@ -833,6 +836,7 @@ func TestClient_GetCapabilities(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error but got none")
 				}
+
 				return
 			}
 
@@ -927,6 +931,7 @@ func TestClient_GetPresets(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error but got none")
 				}
+
 				return
 			}
 
@@ -971,7 +976,6 @@ func TestClient_GetName_ServerError(t *testing.T) {
 	})
 
 	_, err := client.GetName()
-
 	if err == nil {
 		t.Error("Expected error for server error response")
 	}
@@ -1000,7 +1004,6 @@ func TestClient_GetCapabilities_ServerError(t *testing.T) {
 	})
 
 	_, err := client.GetCapabilities()
-
 	if err == nil {
 		t.Error("Expected error for server error response")
 	}
@@ -1029,7 +1032,6 @@ func TestClient_GetPresets_ServerError(t *testing.T) {
 	})
 
 	_, err := client.GetPresets()
-
 	if err == nil {
 		t.Error("Expected error for server error response")
 	}
@@ -1046,6 +1048,7 @@ func loadTestData(t *testing.T, filename string) string {
 	t.Helper()
 
 	path := filepath.Join("testdata", filename)
+
 	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("Failed to load test data %s: %v", filename, err)
@@ -1059,6 +1062,7 @@ func createTestClient(serverURL string) *Client {
 	config.Host = "localhost" // Will be overridden by baseURL
 	client := NewClient(config)
 	client.baseURL = serverURL
+
 	return client
 }
 

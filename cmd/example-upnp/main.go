@@ -83,6 +83,7 @@ func main() {
 		} else {
 			fmt.Println("Run with -v flag for detailed technical information")
 		}
+
 		fmt.Println()
 		fmt.Println("This could mean:")
 		fmt.Println("- No SoundTouch devices on network")

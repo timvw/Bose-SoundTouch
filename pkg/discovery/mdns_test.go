@@ -22,6 +22,7 @@ func TestNewMDNSDiscoveryService(t *testing.T) {
 
 func TestMDNSDiscoverDevices(t *testing.T) {
 	service := NewMDNSDiscoveryService(2 * time.Second)
+
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -41,12 +42,15 @@ func TestMDNSDiscoverDevices(t *testing.T) {
 		if device.Host == "" {
 			t.Error("Device host should not be empty")
 		}
+
 		if device.Port == 0 {
 			t.Error("Device port should not be zero")
 		}
+
 		if device.Name == "" {
 			t.Error("Device name should not be empty")
 		}
+
 		if device.Location == "" {
 			t.Error("Device location should not be empty")
 		}

@@ -21,20 +21,24 @@ type mockLogger struct {
 func (m *mockLogger) Printf(format string, _ ...interface{}) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
 	m.messages = append(m.messages, format)
 }
 
 func (m *mockLogger) getMessages() []string {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
 	result := make([]string, len(m.messages))
 	copy(result, m.messages)
+
 	return result
 }
 
 // setupMockWebSocketServer creates a test WebSocket server
 func setupMockWebSocketServer(t *testing.T) (*httptest.Server, chan []byte) {
 	t.Helper()
+
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(_ *http.Request) bool {
 			return true
@@ -157,9 +161,11 @@ func TestWebSocketClient_SetHandlers(t *testing.T) {
 
 	// Verify handlers were set
 	wsClient.mu.RLock()
+
 	if wsClient.handlers != handlers {
 		t.Error("Handlers were not set correctly")
 	}
+
 	wsClient.mu.RUnlock()
 }
 
@@ -181,15 +187,19 @@ func TestWebSocketClient_IndividualHandlers(t *testing.T) {
 
 	// Verify handlers were set
 	wsClient.mu.RLock()
+
 	if wsClient.handlers.OnNowPlaying == nil {
 		t.Error("OnNowPlaying handler not set")
 	}
+
 	if wsClient.handlers.OnVolumeUpdated == nil {
 		t.Error("OnVolumeUpdated handler not set")
 	}
+
 	if wsClient.handlers.OnConnectionState == nil {
 		t.Error("OnConnectionState handler not set")
 	}
+
 	wsClient.mu.RUnlock()
 }
 
@@ -265,8 +275,10 @@ func TestWebSocketClient_HandleMessage(t *testing.T) {
 		Logger: &mockLogger{},
 	})
 
-	var nowPlayingEvent *models.NowPlayingUpdatedEvent
-	var volumeEvent *models.VolumeUpdatedEvent
+	var (
+		nowPlayingEvent *models.NowPlayingUpdatedEvent
+		volumeEvent     *models.VolumeUpdatedEvent
+	)
 
 	wsClient.OnNowPlaying(func(event *models.NowPlayingUpdatedEvent) {
 		nowPlayingEvent = event
@@ -421,9 +433,11 @@ func TestWebSocketClient_ConcurrentAccess(_ *testing.T) {
 
 	// Test concurrent access to handlers
 	var wg sync.WaitGroup
+
 	numGoroutines := 10
 
 	wg.Add(numGoroutines)
+
 	for i := 0; i < numGoroutines; i++ {
 		go func() {
 			defer wg.Done()
@@ -468,6 +482,7 @@ func BenchmarkWebSocketClient_HandleMessage(b *testing.B) {
 </updates>`)
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		wsClient.handleMessage(xmlData)
 	}
@@ -483,6 +498,7 @@ func BenchmarkWebSocketClient_SetHandlers(b *testing.B) {
 	}
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		wsClient.SetHandlers(handlers)
 	}

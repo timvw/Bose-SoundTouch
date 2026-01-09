@@ -71,6 +71,7 @@ func (ss *SourceStatus) UnmarshalXML(d *xml.Decoder, start xml.StartElement) err
 	default:
 		*ss = SourceStatusUnavailable // Default fallback for unknown states
 	}
+
 	return nil
 }
 
@@ -79,6 +80,7 @@ func (si *SourceItem) GetDisplayName() string {
 	if si.DisplayName != "" {
 		return si.DisplayName
 	}
+
 	if si.SourceAccount != "" && si.SourceAccount != si.Source {
 		return si.SourceAccount
 	}
@@ -87,6 +89,7 @@ func (si *SourceItem) GetDisplayName() string {
 	if len(source) == 0 {
 		return source
 	}
+
 	return strings.ToUpper(source[:1]) + source[1:]
 }
 
@@ -113,6 +116,7 @@ func (si *SourceItem) IsStreamingService() bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -129,22 +133,26 @@ func (si *SourceItem) SupportsMultiroom() bool {
 // GetAvailableSources returns only sources that are ready for use
 func (s *Sources) GetAvailableSources() []SourceItem {
 	var available []SourceItem
+
 	for _, source := range s.SourceItem {
 		if source.Status.IsReady() {
 			available = append(available, source)
 		}
 	}
+
 	return available
 }
 
 // GetSourcesByType returns sources filtered by source type
 func (s *Sources) GetSourcesByType(sourceType string) []SourceItem {
 	var filtered []SourceItem
+
 	for _, source := range s.SourceItem {
 		if source.Source == sourceType {
 			filtered = append(filtered, source)
 		}
 	}
+
 	return filtered
 }
 
@@ -156,44 +164,52 @@ func (s *Sources) GetSpotifySources() []SourceItem {
 // GetReadySpotifySources returns only ready Spotify sources
 func (s *Sources) GetReadySpotifySources() []SourceItem {
 	var ready []SourceItem
+
 	for _, source := range s.GetSpotifySources() {
 		if source.Status.IsReady() {
 			ready = append(ready, source)
 		}
 	}
+
 	return ready
 }
 
 // GetStreamingSources returns all streaming service sources
 func (s *Sources) GetStreamingSources() []SourceItem {
 	var streaming []SourceItem
+
 	for _, source := range s.SourceItem {
 		if source.IsStreamingService() {
 			streaming = append(streaming, source)
 		}
 	}
+
 	return streaming
 }
 
 // GetLocalSources returns all local input sources
 func (s *Sources) GetLocalSources() []SourceItem {
 	var local []SourceItem
+
 	for _, source := range s.SourceItem {
 		if source.IsLocalSource() {
 			local = append(local, source)
 		}
 	}
+
 	return local
 }
 
 // GetMultiroomSources returns sources that support multiroom playback
 func (s *Sources) GetMultiroomSources() []SourceItem {
 	var multiroom []SourceItem
+
 	for _, source := range s.SourceItem {
 		if source.SupportsMultiroom() {
 			multiroom = append(multiroom, source)
 		}
 	}
+
 	return multiroom
 }
 
@@ -205,6 +221,7 @@ func (s *Sources) HasSource(sourceType string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 

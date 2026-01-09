@@ -85,10 +85,13 @@ func main() {
 		}
 	}
 
-	var deviceHost string
-	var devicePort int
+	var (
+		deviceHost string
+		devicePort int
+	)
 
 	// Discover devices if no host specified or discover flag used
+
 	if *host == "" || *discover {
 		fmt.Println("Discovering SoundTouch devices...")
 
@@ -137,6 +140,7 @@ func main() {
 
 	// Test basic connectivity
 	fmt.Println("Testing device connectivity...")
+
 	deviceInfo, err := soundTouchClient.GetDeviceInfo()
 	if err != nil {
 		fmt.Printf("Failed to connect to device: %v\n", err)
@@ -184,9 +188,11 @@ func main() {
 	}
 
 	fmt.Println("Connected! Listening for events...")
+
 	if len(filters) > 0 {
 		fmt.Printf("Filtering events: %v\n", getFilterKeys(filters))
 	}
+
 	if *duration > 0 {
 		fmt.Printf("Will listen for %v\n", *duration)
 	} else {
@@ -229,6 +235,7 @@ func main() {
 
 	// Disconnect WebSocket
 	fmt.Println("Disconnecting...")
+
 	if err := wsClient.Disconnect(); err != nil {
 		fmt.Printf("Error during disconnect: %v\n", err)
 	}
@@ -247,9 +254,11 @@ func setupEventHandlers(wsClient *client.WebSocketClient, filters map[string]boo
 				fmt.Println("  ⏹️  Nothing playing")
 			} else {
 				fmt.Printf("  🎵 %s\n", np.GetDisplayTitle())
+
 				if artist := np.GetDisplayArtist(); artist != "" {
 					fmt.Printf("  👤 %s\n", artist)
 				}
+
 				if np.Album != "" {
 					fmt.Printf("  💿 %s\n", np.Album)
 				}
@@ -264,6 +273,7 @@ func setupEventHandlers(wsClient *client.WebSocketClient, filters map[string]boo
 				if np.ShuffleSetting != "" {
 					fmt.Printf("  🔀 Shuffle: %s\n", np.ShuffleSetting.String())
 				}
+
 				if np.RepeatSetting != "" {
 					fmt.Printf("  🔁 Repeat: %s\n", np.RepeatSetting.String())
 				}
@@ -271,6 +281,7 @@ func setupEventHandlers(wsClient *client.WebSocketClient, filters map[string]boo
 
 			if verbose {
 				fmt.Printf("  📱 Raw Source: %s, Account: %s\n", np.Source, np.SourceAccount)
+
 				if np.Art != nil && np.Art.URL != "" {
 					fmt.Printf("  🖼️  Artwork: %s\n", np.Art.URL)
 				}
@@ -288,9 +299,11 @@ func setupEventHandlers(wsClient *client.WebSocketClient, filters map[string]boo
 				fmt.Println("  🔇 Muted")
 			} else {
 				fmt.Printf("  🔊 Level: %d\n", vol.ActualVolume)
+
 				if vol.TargetVolume != vol.ActualVolume {
 					fmt.Printf("  🎯 Target: %d\n", vol.TargetVolume)
 				}
+
 				fmt.Printf("  📊 %s\n", models.GetVolumeLevelName(vol.ActualVolume))
 			}
 
@@ -372,6 +385,7 @@ func setupEventHandlers(wsClient *client.WebSocketClient, filters map[string]boo
 			} else if bass.ActualBass < 0 {
 				levelDesc = "Reduced"
 			}
+
 			fmt.Printf("  📊 %s\n", levelDesc)
 		})
 	}

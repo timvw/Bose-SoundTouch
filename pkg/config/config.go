@@ -100,6 +100,7 @@ func LoadFromEnv() (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse preferred devices: %w", err)
 	}
+
 	config.PreferredDevices = devices
 
 	return config, nil
@@ -257,6 +258,7 @@ func (c *Config) Validate() error {
 		if device.Host == "" {
 			return fmt.Errorf("device %d: host cannot be empty", i)
 		}
+
 		if device.Port <= 0 || device.Port > 65535 {
 			return fmt.Errorf("device %d: invalid port %d", i, device.Port)
 		}

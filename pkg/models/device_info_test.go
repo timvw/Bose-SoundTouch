@@ -10,6 +10,7 @@ func TestName_UnmarshalXML(t *testing.T) {
 	xmlData := `<?xml version="1.0" encoding="UTF-8" ?><name>Sound Machinechen</name>`
 
 	var name Name
+
 	err := xml.Unmarshal([]byte(xmlData), &name)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -36,6 +37,7 @@ func TestName_EmptyName(t *testing.T) {
 	xmlData := `<?xml version="1.0" encoding="UTF-8" ?><name></name>`
 
 	var name Name
+
 	err := xml.Unmarshal([]byte(xmlData), &name)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -73,6 +75,7 @@ func TestCapabilities_UnmarshalXML(t *testing.T) {
 </capabilities>`
 
 	var capabilities Capabilities
+
 	err := xml.Unmarshal([]byte(xmlData), &capabilities)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -135,18 +138,21 @@ func TestCapabilities_UnmarshalXML(t *testing.T) {
 
 	// Test summaries
 	networkCaps := capabilities.GetNetworkCapabilities()
+
 	expectedNetworkCaps := []string{"Dual Mode", "WSAPI Proxy"}
 	if len(networkCaps) != len(expectedNetworkCaps) {
 		t.Errorf("Expected %d network capabilities, got %d", len(expectedNetworkCaps), len(networkCaps))
 	}
 
 	audioCaps := capabilities.GetAudioCapabilities()
+
 	expectedAudioCaps := []string{"L/R Stereo"}
 	if len(audioCaps) != len(expectedAudioCaps) {
 		t.Errorf("Expected %d audio capabilities, got %d", len(expectedAudioCaps), len(audioCaps))
 	}
 
 	systemCaps := capabilities.GetSystemCapabilities()
+
 	expectedSystemCaps := []string{"Power Saving Disabled"}
 	if len(systemCaps) != len(expectedSystemCaps) {
 		t.Errorf("Expected %d system capabilities, got %d", len(expectedSystemCaps), len(systemCaps))
@@ -168,6 +174,7 @@ func TestCapabilities_HostedWifiConfig(t *testing.T) {
 </capabilities>`
 
 	var capabilities Capabilities
+
 	err := xml.Unmarshal([]byte(xmlData), &capabilities)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -217,6 +224,7 @@ func TestPresets_UnmarshalXML(t *testing.T) {
 </presets>`
 
 	var presets Presets
+
 	err := xml.Unmarshal([]byte(xmlData), &presets)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -295,6 +303,7 @@ func TestPresets_UnmarshalXML(t *testing.T) {
 
 	// Test empty slots
 	emptySlots := presets.GetEmptyPresetSlots()
+
 	expectedEmpty := []int{4, 5, 6}
 	if len(emptySlots) != len(expectedEmpty) {
 		t.Errorf("Expected %d empty slots, got %d", len(expectedEmpty), len(emptySlots))
@@ -302,6 +311,7 @@ func TestPresets_UnmarshalXML(t *testing.T) {
 
 	// Test used slots
 	usedSlots := presets.GetUsedPresetSlots()
+
 	expectedUsed := []int{1, 2, 3}
 	if len(usedSlots) != len(expectedUsed) {
 		t.Errorf("Expected %d used slots, got %d", len(expectedUsed), len(usedSlots))
@@ -312,15 +322,19 @@ func TestPresets_UnmarshalXML(t *testing.T) {
 	if summary["total"] != 3 {
 		t.Errorf("Expected total 3, got %d", summary["total"])
 	}
+
 	if summary["used"] != 3 {
 		t.Errorf("Expected used 3, got %d", summary["used"])
 	}
+
 	if summary["spotify"] != 2 {
 		t.Errorf("Expected spotify 2, got %d", summary["spotify"])
 	}
+
 	if summary["SPOTIFY"] != 2 {
 		t.Errorf("Expected SPOTIFY 2, got %d", summary["SPOTIFY"])
 	}
+
 	if summary["TUNEIN"] != 1 {
 		t.Errorf("Expected TUNEIN 1, got %d", summary["TUNEIN"])
 	}
@@ -330,6 +344,7 @@ func TestPresets_UnmarshalXML(t *testing.T) {
 	if mostRecent == nil {
 		t.Fatal("Expected to find most recent preset")
 	}
+
 	if mostRecent.ID != 2 {
 		t.Errorf("Expected most recent preset ID 2, got %d", mostRecent.ID)
 	}
@@ -339,6 +354,7 @@ func TestPresets_UnmarshalXML(t *testing.T) {
 	if oldest == nil {
 		t.Fatal("Expected to find oldest preset")
 	}
+
 	if oldest.ID != 2 {
 		t.Errorf("Expected oldest preset ID 2, got %d", oldest.ID)
 	}
@@ -348,6 +364,7 @@ func TestPresets_EmptyPresets(t *testing.T) {
 	xmlData := `<?xml version="1.0" encoding="UTF-8" ?><presets></presets>`
 
 	var presets Presets
+
 	err := xml.Unmarshal([]byte(xmlData), &presets)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -362,6 +379,7 @@ func TestPresets_EmptyPresets(t *testing.T) {
 	}
 
 	emptySlots := presets.GetEmptyPresetSlots()
+
 	expectedSlots := []int{1, 2, 3, 4, 5, 6}
 	if len(emptySlots) != len(expectedSlots) {
 		t.Errorf("Expected %d empty slots, got %d", len(expectedSlots), len(emptySlots))

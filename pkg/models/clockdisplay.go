@@ -40,6 +40,7 @@ func (c *ClockDisplay) GetFormat() string {
 	if c.Format == "" {
 		return "12" // Default to 12-hour format
 	}
+
 	return c.Format
 }
 
@@ -62,9 +63,11 @@ func (c *ClockDisplay) GetBrightness() int {
 	if c.Brightness < 0 {
 		return 0
 	}
+
 	if c.Brightness > 100 {
 		return 100
 	}
+
 	return c.Brightness
 }
 
@@ -137,10 +140,13 @@ func (r *ClockDisplayRequest) SetBrightness(brightness int) *ClockDisplayRequest
 	if brightness < 0 {
 		brightness = 0
 	}
+
 	if brightness > 100 {
 		brightness = 100
 	}
+
 	r.Brightness = &brightness
+
 	return r
 }
 

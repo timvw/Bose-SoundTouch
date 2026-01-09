@@ -65,6 +65,7 @@ func TestVolumeRequestXMLMarshal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			req := NewVolumeRequest(tt.volume)
+
 			xmlData, err := xml.Marshal(req)
 			if err != nil {
 				t.Fatalf("Failed to marshal XML: %v", err)
@@ -118,6 +119,7 @@ func TestVolumeXMLUnmarshal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var volume Volume
+
 			err := xml.Unmarshal([]byte(tt.xmlData), &volume)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -126,12 +128,15 @@ func TestVolumeXMLUnmarshal(t *testing.T) {
 			if volume.DeviceID != tt.want.DeviceID {
 				t.Errorf("DeviceID = %q, want %q", volume.DeviceID, tt.want.DeviceID)
 			}
+
 			if volume.TargetVolume != tt.want.TargetVolume {
 				t.Errorf("TargetVolume = %d, want %d", volume.TargetVolume, tt.want.TargetVolume)
 			}
+
 			if volume.ActualVolume != tt.want.ActualVolume {
 				t.Errorf("ActualVolume = %d, want %d", volume.ActualVolume, tt.want.ActualVolume)
 			}
+
 			if volume.MuteEnabled != tt.want.MuteEnabled {
 				t.Errorf("MuteEnabled = %v, want %v", volume.MuteEnabled, tt.want.MuteEnabled)
 			}
@@ -437,6 +442,7 @@ func BenchmarkNewVolumeRequest(b *testing.B) {
 
 func BenchmarkVolumeXMLMarshal(b *testing.B) {
 	req := NewVolumeRequest(50)
+
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {

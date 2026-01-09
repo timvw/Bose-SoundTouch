@@ -134,6 +134,7 @@ func TestKeyXMLUnmarshal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var key Key
+
 			err := xml.Unmarshal([]byte(tt.xmlData), &key)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -312,6 +313,7 @@ func BenchmarkNewKey(b *testing.B) {
 
 func BenchmarkKeyXMLMarshal(b *testing.B) {
 	key := NewKey(KeyPlay)
+
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
@@ -335,9 +337,11 @@ func TestKeyPressReleasePattern(t *testing.T) {
 	if keyPress.State != KeyStatePress {
 		t.Errorf("Expected press state, got %s", keyPress.State)
 	}
+
 	if keyPress.Value != keyValue {
 		t.Errorf("Expected key value %s, got %s", keyValue, keyPress.Value)
 	}
+
 	if keyPress.Sender != "Gabbo" {
 		t.Errorf("Expected sender 'Gabbo', got %s", keyPress.Sender)
 	}
@@ -347,9 +351,11 @@ func TestKeyPressReleasePattern(t *testing.T) {
 	if keyRelease.State != KeyStateRelease {
 		t.Errorf("Expected release state, got %s", keyRelease.State)
 	}
+
 	if keyRelease.Value != keyValue {
 		t.Errorf("Expected key value %s, got %s", keyValue, keyRelease.Value)
 	}
+
 	if keyRelease.Sender != "Gabbo" {
 		t.Errorf("Expected sender 'Gabbo', got %s", keyRelease.Sender)
 	}
@@ -359,6 +365,7 @@ func TestKeyPressReleasePattern(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to marshal press XML: %v", err)
 	}
+
 	expectedPressXML := `<key state="press" sender="Gabbo">PLAY</key>`
 	if string(pressXML) != expectedPressXML {
 		t.Errorf("Press XML: got %s, want %s", string(pressXML), expectedPressXML)
@@ -368,6 +375,7 @@ func TestKeyPressReleasePattern(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to marshal release XML: %v", err)
 	}
+
 	expectedReleaseXML := `<key state="release" sender="Gabbo">PLAY</key>`
 	if string(releaseXML) != expectedReleaseXML {
 		t.Errorf("Release XML: got %s, want %s", string(releaseXML), expectedReleaseXML)

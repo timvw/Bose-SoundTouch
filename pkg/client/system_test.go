@@ -48,6 +48,7 @@ func TestClient_GetClockTime(t *testing.T) {
 				if r.URL.Path != "/clockTime" {
 					t.Errorf("Expected path '/clockTime', got '%s'", r.URL.Path)
 				}
+
 				if r.Method != "GET" {
 					t.Errorf("Expected GET method, got '%s'", r.Method)
 				}
@@ -64,6 +65,7 @@ func TestClient_GetClockTime(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error, got none")
 				}
+
 				return
 			}
 
@@ -75,6 +77,7 @@ func TestClient_GetClockTime(t *testing.T) {
 			if clockTime.GetUTC() != tt.expectedUTC {
 				t.Errorf("Expected UTC %d, got %d", tt.expectedUTC, clockTime.GetUTC())
 			}
+
 			if clockTime.GetZone() != tt.expectedZone {
 				t.Errorf("Expected Zone %q, got %q", tt.expectedZone, clockTime.GetZone())
 			}
@@ -123,6 +126,7 @@ func TestClient_SetClockTime(t *testing.T) {
 				if r.URL.Path != "/clockTime" {
 					t.Errorf("Expected path '/clockTime', got '%s'", r.URL.Path)
 				}
+
 				if r.Method != "POST" {
 					t.Errorf("Expected POST method, got '%s'", r.Method)
 				}
@@ -138,6 +142,7 @@ func TestClient_SetClockTime(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error, got none")
 				}
+
 				return
 			}
 
@@ -153,6 +158,7 @@ func TestClient_SetClockTimeNow(t *testing.T) {
 		if r.URL.Path != "/clockTime" {
 			t.Errorf("Expected path '/clockTime', got '%s'", r.URL.Path)
 		}
+
 		if r.Method != "POST" {
 			t.Errorf("Expected POST method, got '%s'", r.Method)
 		}
@@ -162,8 +168,8 @@ func TestClient_SetClockTimeNow(t *testing.T) {
 	defer server.Close()
 
 	client := createTestClient(server.URL)
-	err := client.SetClockTimeNow()
 
+	err := client.SetClockTimeNow()
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -211,6 +217,7 @@ func TestClient_GetClockDisplay(t *testing.T) {
 				if r.URL.Path != "/clockDisplay" {
 					t.Errorf("Expected path '/clockDisplay', got '%s'", r.URL.Path)
 				}
+
 				if r.Method != "GET" {
 					t.Errorf("Expected GET method, got '%s'", r.Method)
 				}
@@ -227,6 +234,7 @@ func TestClient_GetClockDisplay(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error, got none")
 				}
+
 				return
 			}
 
@@ -238,9 +246,11 @@ func TestClient_GetClockDisplay(t *testing.T) {
 			if clockDisplay.IsEnabled() != tt.expectedEnabled {
 				t.Errorf("Expected Enabled %v, got %v", tt.expectedEnabled, clockDisplay.IsEnabled())
 			}
+
 			if clockDisplay.GetFormat() != tt.expectedFormat {
 				t.Errorf("Expected Format %q, got %q", tt.expectedFormat, clockDisplay.GetFormat())
 			}
+
 			if clockDisplay.GetBrightness() != tt.expectedBrightness {
 				t.Errorf("Expected Brightness %d, got %d", tt.expectedBrightness, clockDisplay.GetBrightness())
 			}
@@ -290,6 +300,7 @@ func TestClient_SetClockDisplay(t *testing.T) {
 				if r.URL.Path != "/clockDisplay" {
 					t.Errorf("Expected path '/clockDisplay', got '%s'", r.URL.Path)
 				}
+
 				if r.Method != "POST" {
 					t.Errorf("Expected POST method, got '%s'", r.Method)
 				}
@@ -305,6 +316,7 @@ func TestClient_SetClockDisplay(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error, got none")
 				}
+
 				return
 			}
 
@@ -365,16 +377,18 @@ func TestClient_SetClockDisplayBrightness(t *testing.T) {
 		if r.URL.Path != "/clockDisplay" {
 			t.Errorf("Expected path '/clockDisplay', got '%s'", r.URL.Path)
 		}
+
 		if r.Method != "POST" {
 			t.Errorf("Expected POST method, got '%s'", r.Method)
 		}
+
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer server.Close()
 
 	client := createTestClient(server.URL)
-	err := client.SetClockDisplayBrightness(75)
 
+	err := client.SetClockDisplayBrightness(75)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -405,16 +419,18 @@ func TestClient_SetClockDisplayFormat(t *testing.T) {
 				if r.URL.Path != "/clockDisplay" {
 					t.Errorf("Expected path '/clockDisplay', got '%s'", r.URL.Path)
 				}
+
 				if r.Method != "POST" {
 					t.Errorf("Expected POST method, got '%s'", r.Method)
 				}
+
 				w.WriteHeader(http.StatusOK)
 			}))
 			defer server.Close()
 
 			client := createTestClient(server.URL)
-			err := client.SetClockDisplayFormat(tt.format)
 
+			err := client.SetClockDisplayFormat(tt.format)
 			if err != nil {
 				t.Errorf("Unexpected error: %v", err)
 			}
@@ -470,6 +486,7 @@ func TestClient_GetNetworkInfo(t *testing.T) {
 				if r.URL.Path != "/networkInfo" {
 					t.Errorf("Expected path '/networkInfo', got '%s'", r.URL.Path)
 				}
+
 				if r.Method != "GET" {
 					t.Errorf("Expected GET method, got '%s'", r.Method)
 				}
@@ -486,6 +503,7 @@ func TestClient_GetNetworkInfo(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error, got none")
 				}
+
 				return
 			}
 
@@ -497,6 +515,7 @@ func TestClient_GetNetworkInfo(t *testing.T) {
 			if tt.expectedDeviceID != "" && networkInfo.GetWifiProfileCount() == 0 {
 				t.Errorf("Expected non-zero wifi profile count for test %q", tt.name)
 			}
+
 			if len(networkInfo.GetInterfaces()) != tt.expectedInterfaceCount {
 				t.Errorf("Expected %d interfaces, got %d", tt.expectedInterfaceCount, len(networkInfo.GetInterfaces()))
 			}
@@ -509,15 +528,17 @@ func TestClient_SystemEndpoints_Integration(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/clockTime":
-			if r.Method == "GET" {
+			switch r.Method {
+			case "GET":
 				_, _ = w.Write([]byte(`<clockTime zone="UTC" utc="1609459200">2021-01-01 00:00:00</clockTime>`))
-			} else if r.Method == "POST" {
+			case "POST":
 				w.WriteHeader(http.StatusOK)
 			}
 		case "/clockDisplay":
-			if r.Method == "GET" {
+			switch r.Method {
+			case "GET":
 				_, _ = w.Write([]byte(`<clockDisplay enabled="true" format="24" brightness="75"></clockDisplay>`))
-			} else if r.Method == "POST" {
+			case "POST":
 				w.WriteHeader(http.StatusOK)
 			}
 		case "/networkInfo":

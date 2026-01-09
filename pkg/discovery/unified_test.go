@@ -102,12 +102,15 @@ func TestUnifiedDiscoverDevices(t *testing.T) {
 		if device.Host == "" {
 			t.Error("Device host should not be empty")
 		}
+
 		if device.Port == 0 {
 			t.Error("Device port should not be zero")
 		}
+
 		if device.Name == "" {
 			t.Error("Device name should not be empty")
 		}
+
 		if device.Location == "" {
 			t.Error("Device location should not be empty")
 		}
@@ -126,7 +129,6 @@ func TestUnifiedDiscoveryOnlyMDNS(t *testing.T) {
 	defer cancel()
 
 	devices, err := service.DiscoverDevices(ctx)
-
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
@@ -149,7 +151,6 @@ func TestUnifiedDiscoveryOnlySSDP(t *testing.T) {
 	defer cancel()
 
 	devices, err := service.DiscoverDevices(ctx)
-
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
@@ -225,12 +226,14 @@ func TestUnifiedSetMDNSEnabled(t *testing.T) {
 
 	// Disable mDNS
 	service.SetMDNSEnabled(false)
+
 	if service.config.MDNSEnabled {
 		t.Error("Expected mDNS to be disabled after SetMDNSEnabled(false)")
 	}
 
 	// Enable mDNS
 	service.SetMDNSEnabled(true)
+
 	if !service.config.MDNSEnabled {
 		t.Error("Expected mDNS to be enabled after SetMDNSEnabled(true)")
 	}

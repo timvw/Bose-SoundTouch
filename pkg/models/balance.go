@@ -48,9 +48,11 @@ func ClampBalanceLevel(level int) int {
 	if level < BalanceLevelMin {
 		return BalanceLevelMin
 	}
+
 	if level > BalanceLevelMax {
 		return BalanceLevelMax
 	}
+
 	return level
 }
 
@@ -110,6 +112,7 @@ func (b *Balance) String() string {
 func (b *Balance) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	// Use a temporary struct to avoid infinite recursion
 	type TempBalance Balance
+
 	temp := (*TempBalance)(b)
 
 	if err := d.DecodeElement(temp, &start); err != nil {
@@ -131,7 +134,9 @@ func (b *Balance) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 // MarshalXML implements custom XML marshaling
 func (b *Balance) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	type TempBalance Balance
+
 	temp := (*TempBalance)(b)
+
 	return e.EncodeElement(temp, start)
 }
 
@@ -167,5 +172,6 @@ func (b *Balance) GetLeftRightPercentage() (left, right int) {
 		left = 50 - (level / 2)
 		right = 50 + (level / 2)
 	}
+
 	return left, right
 }

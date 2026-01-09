@@ -52,6 +52,7 @@ func (v *Volume) GetVolumeString() string {
 	if v.IsMuted() {
 		return "Muted"
 	}
+
 	return fmt.Sprintf("%d", v.ActualVolume)
 }
 
@@ -65,9 +66,11 @@ func ClampVolumeLevel(level int) int {
 	if level < 0 {
 		return 0
 	}
+
 	if level > 100 {
 		return 100
 	}
+
 	return level
 }
 

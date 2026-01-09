@@ -121,6 +121,7 @@ func TestNetworkInformation_UnmarshalXML(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var networkInfo NetworkInformation
+
 			err := xml.Unmarshal([]byte(tt.xmlData), &networkInfo)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -142,23 +143,29 @@ func TestNetworkInformation_UnmarshalXML(t *testing.T) {
 				if i >= len(expectedInterfaces) {
 					break
 				}
+
 				expectedIface := expectedInterfaces[i]
 
 				if iface.Type != expectedIface.Type {
 					t.Errorf("Interface %d: Expected Type %q, got %q", i, expectedIface.Type, iface.Type)
 				}
+
 				if iface.Name != expectedIface.Name {
 					t.Errorf("Interface %d: Expected Name %q, got %q", i, expectedIface.Name, iface.Name)
 				}
+
 				if iface.MacAddress != expectedIface.MacAddress {
 					t.Errorf("Interface %d: Expected MacAddress %q, got %q", i, expectedIface.MacAddress, iface.MacAddress)
 				}
+
 				if iface.IPAddress != expectedIface.IPAddress {
 					t.Errorf("Interface %d: Expected IPAddress %q, got %q", i, expectedIface.IPAddress, iface.IPAddress)
 				}
+
 				if iface.SSID != expectedIface.SSID {
 					t.Errorf("Interface %d: Expected SSID %q, got %q", i, expectedIface.SSID, iface.SSID)
 				}
+
 				if iface.State != expectedIface.State {
 					t.Errorf("Interface %d: Expected State %q, got %q", i, expectedIface.State, iface.State)
 				}
@@ -217,6 +224,7 @@ func TestNetworkInformation_GetInterfaceByType(t *testing.T) {
 					t.Error("Expected to find interface, got nil")
 					return
 				}
+
 				if iface.MacAddress != tt.expectedMAC {
 					t.Errorf("Expected MAC %q, got %q", tt.expectedMAC, iface.MacAddress)
 				}
@@ -319,6 +327,7 @@ func TestNetworkInformation_HasConnectivity(t *testing.T) {
 			if got := tt.networkInfo.HasWiFi(); got != tt.hasWiFi {
 				t.Errorf("Expected HasWiFi() %v, got %v", tt.hasWiFi, got)
 			}
+
 			if got := tt.networkInfo.HasEthernet(); got != tt.hasEthernet {
 				t.Errorf("Expected HasEthernet() %v, got %v", tt.hasEthernet, got)
 			}
@@ -400,6 +409,7 @@ func TestNetworkInterface_TypeChecks(t *testing.T) {
 			if got := tt.iface.IsWiFi(); got != tt.isWiFi {
 				t.Errorf("Expected IsWiFi() %v, got %v", tt.isWiFi, got)
 			}
+
 			if got := tt.iface.IsEthernet(); got != tt.isEthernet {
 				t.Errorf("Expected IsEthernet() %v, got %v", tt.isEthernet, got)
 			}
@@ -445,9 +455,11 @@ func TestNetworkInterface_WiFiFrequency(t *testing.T) {
 			if got := iface.GetFrequencyGHz(); got != tt.expectedGHz {
 				t.Errorf("Expected GetFrequencyGHz() %v, got %v", tt.expectedGHz, got)
 			}
+
 			if got := iface.GetFrequencyBand(); got != tt.expectedBand {
 				t.Errorf("Expected GetFrequencyBand() %q, got %q", tt.expectedBand, got)
 			}
+
 			if got := iface.FormatFrequency(); got != tt.expectedFmt {
 				t.Errorf("Expected FormatFrequency() %q, got %q", tt.expectedFmt, got)
 			}
@@ -501,6 +513,7 @@ func TestNetworkInterface_SignalQuality(t *testing.T) {
 			if got := iface.GetSignalQuality(); got != tt.expectedQuality {
 				t.Errorf("Expected GetSignalQuality() %d, got %d", tt.expectedQuality, got)
 			}
+
 			if got := iface.GetSignalDescription(); got != tt.expectedDesc {
 				t.Errorf("Expected GetSignalDescription() %q, got %q", tt.expectedDesc, got)
 			}
@@ -621,6 +634,7 @@ func TestNetworkInterface_ValidateAddresses(t *testing.T) {
 			if got := tt.iface.ValidateIP(); got != tt.validIP {
 				t.Errorf("Expected ValidateIP() %v, got %v", tt.validIP, got)
 			}
+
 			if got := tt.iface.ValidateMAC(); got != tt.validMAC {
 				t.Errorf("Expected ValidateMAC() %v, got %v", tt.validMAC, got)
 			}
@@ -675,6 +689,7 @@ func TestNetworkInformation_GetConnectedInterfaces(t *testing.T) {
 	if emptyInfo.GetConnectedWiFiInterface() != nil {
 		t.Error("Expected no connected WiFi interface in empty network info")
 	}
+
 	if emptyInfo.GetConnectedEthernetInterface() != nil {
 		t.Error("Expected no connected Ethernet interface in empty network info")
 	}

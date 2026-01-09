@@ -52,6 +52,7 @@ func TestConnectionState_IsConnected(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cs := &ConnectionState{State: tt.state}
+
 			result := cs.IsConnected()
 			if result != tt.expected {
 				t.Errorf("ConnectionState.IsConnected() = %v, want %v", result, tt.expected)
@@ -63,6 +64,7 @@ func TestConnectionState_IsConnected(t *testing.T) {
 func TestConnectionState_GetSignalStrength(t *testing.T) {
 	cs := &ConnectionState{Signal: "EXCELLENT"}
 	result := cs.GetSignalStrength()
+
 	expected := "EXCELLENT"
 	if result != expected {
 		t.Errorf("ConnectionState.GetSignalStrength() = %v, want %v", result, expected)
@@ -244,6 +246,7 @@ func TestWebSocketEvent_String(t *testing.T) {
 		}
 
 		result := event.String()
+
 		expected := "WebSocket Event [Device: TEST123] - No events"
 		if result != expected {
 			t.Errorf("Expected '%s', got '%s'", expected, result)
@@ -257,6 +260,7 @@ func TestWebSocketEvent_String(t *testing.T) {
 		}
 
 		result := event.String()
+
 		expected := "WebSocket Event [Device: TEST123] - Now Playing Updated"
 		if result != expected {
 			t.Errorf("Expected '%s', got '%s'", expected, result)
@@ -271,6 +275,7 @@ func TestWebSocketEvent_String(t *testing.T) {
 		}
 
 		result := event.String()
+
 		expected := "WebSocket Event [Device: TEST123] - 2 events"
 		if result != expected {
 			t.Errorf("Expected '%s', got '%s'", expected, result)

@@ -78,6 +78,7 @@ func TestZoneRequest_RemoveMember(t *testing.T) {
 
 	// Remove non-existent member (should not change anything)
 	zr.RemoveMember("NONEXISTENT")
+
 	if len(zr.Members) != 2 {
 		t.Errorf("Expected 2 members after removing non-existent, got %d", len(zr.Members))
 	}
@@ -120,11 +121,13 @@ func TestZoneRequest_GetMemberCount(t *testing.T) {
 	}
 
 	zr.AddMember("DEVICE456", "192.168.1.10")
+
 	if zr.GetMemberCount() != 1 {
 		t.Errorf("Expected 1 member, got %d", zr.GetMemberCount())
 	}
 
 	zr.AddMember("DEVICE789", "192.168.1.11")
+
 	if zr.GetMemberCount() != 2 {
 		t.Errorf("Expected 2 members, got %d", zr.GetMemberCount())
 	}
@@ -142,6 +145,7 @@ func TestZoneRequest_Validate(t *testing.T) {
 			setupFunc: func() *ZoneRequest {
 				zr := NewZoneRequest("MASTER123")
 				zr.AddMember("DEVICE456", "192.168.1.10")
+
 				return zr
 			},
 			expectError: false,
@@ -151,6 +155,7 @@ func TestZoneRequest_Validate(t *testing.T) {
 			setupFunc: func() *ZoneRequest {
 				zr := NewZoneRequest("MASTER123")
 				zr.AddMemberByDeviceID("DEVICE456")
+
 				return zr
 			},
 			expectError: false,
@@ -169,6 +174,7 @@ func TestZoneRequest_Validate(t *testing.T) {
 			setupFunc: func() *ZoneRequest {
 				zr := NewZoneRequest("MASTER123")
 				zr.Members = append(zr.Members, MemberEntry{DeviceID: ""})
+
 				return zr
 			},
 			expectError: true,
@@ -180,6 +186,7 @@ func TestZoneRequest_Validate(t *testing.T) {
 				zr := NewZoneRequest("MASTER123")
 				zr.AddMember("DEVICE456", "192.168.1.10")
 				zr.AddMember("DEVICE456", "192.168.1.11")
+
 				return zr
 			},
 			expectError: true,
@@ -190,6 +197,7 @@ func TestZoneRequest_Validate(t *testing.T) {
 			setupFunc: func() *ZoneRequest {
 				zr := NewZoneRequest("MASTER123")
 				zr.AddMember("MASTER123", "192.168.1.10")
+
 				return zr
 			},
 			expectError: true,
@@ -200,6 +208,7 @@ func TestZoneRequest_Validate(t *testing.T) {
 			setupFunc: func() *ZoneRequest {
 				zr := NewZoneRequest("MASTER123")
 				zr.AddMember("DEVICE456", "invalid.ip.address")
+
 				return zr
 			},
 			expectError: true,
@@ -320,6 +329,7 @@ func TestZoneInfo_GetMemberByDeviceID(t *testing.T) {
 	if !found {
 		t.Error("Expected to find member DEVICE456")
 	}
+
 	if member.IP != "192.168.1.10" {
 		t.Errorf("Expected IP 192.168.1.10, got %s", member.IP)
 	}
@@ -343,6 +353,7 @@ func TestZoneInfo_GetMemberByIP(t *testing.T) {
 	if !found {
 		t.Error("Expected to find member by IP 192.168.1.10")
 	}
+
 	if member.DeviceID != "DEVICE456" {
 		t.Errorf("Expected device ID DEVICE456, got %s", member.DeviceID)
 	}
@@ -392,6 +403,7 @@ func TestZoneInfo_GetTotalDeviceCount(t *testing.T) {
 
 	// Test standalone
 	zi.Members = []Member{}
+
 	count = zi.GetTotalDeviceCount()
 	if count != 1 {
 		t.Errorf("Expected 1 device for standalone, got %d", count)
@@ -426,6 +438,7 @@ func TestZoneInfo_GetZoneStatus(t *testing.T) {
 
 	// Test standalone master
 	zi.Members = []Member{}
+
 	status = zi.GetZoneStatus("MASTER123")
 	if status != ZoneStatusStandalone {
 		t.Errorf("Expected ZoneStatusStandalone for standalone master, got %v", status)
@@ -459,6 +472,7 @@ func TestZoneInfo_String(t *testing.T) {
 	}
 
 	result := zi.String()
+
 	expected := "Standalone device: MASTER123"
 	if result != expected {
 		t.Errorf("Expected '%s', got '%s'", expected, result)
@@ -471,6 +485,7 @@ func TestZoneInfo_String(t *testing.T) {
 	}
 
 	result = zi.String()
+
 	expected = "Zone Master: MASTER123, Members: [DEVICE456, DEVICE789] (3 total devices)"
 	if result != expected {
 		t.Errorf("Expected '%s', got '%s'", expected, result)
@@ -500,6 +515,7 @@ func TestZoneInfo_ToZoneRequest(t *testing.T) {
 		if zr.Members[i].DeviceID != member.DeviceID {
 			t.Errorf("Expected member %s, got %s", member.DeviceID, zr.Members[i].DeviceID)
 		}
+
 		if zr.Members[i].IP != member.IP {
 			t.Errorf("Expected IP %s, got %s", member.IP, zr.Members[i].IP)
 		}
@@ -513,7 +529,6 @@ func TestZoneBuilder(t *testing.T) {
 		WithMember("DEVICE456", "192.168.1.10").
 		WithMemberByDeviceID("DEVICE789").
 		Build()
-
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
@@ -643,6 +658,7 @@ func TestZoneCapabilities(t *testing.T) {
 
 	// Test master-only device
 	caps.SupportsMultiroom = true
+
 	caps.CanBeMember = false
 	if caps.CanJoinZone() {
 		t.Error("Expected device that can't be member to not join zones")
@@ -661,6 +677,7 @@ func TestZoneXMLMarshaling(t *testing.T) {
 		</zone>`
 
 		var zi ZoneInfo
+
 		err := xml.Unmarshal([]byte(xmlData), &zi)
 		if err != nil {
 			t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -725,6 +742,7 @@ func TestZoneXMLMarshaling(t *testing.T) {
 		xmlData := `<zone master="MASTER123"></zone>`
 
 		var zi ZoneInfo
+
 		err := xml.Unmarshal([]byte(xmlData), &zi)
 		if err != nil {
 			t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -747,6 +765,7 @@ func TestZoneXMLMarshaling(t *testing.T) {
 func TestZoneEdgeCases(t *testing.T) {
 	t.Run("Zone with many members", func(t *testing.T) {
 		zr := NewZoneRequest("MASTER")
+
 		for i := 1; i <= 10; i++ {
 			deviceID := fmt.Sprintf("DEVICE%03d", i)
 			ip := fmt.Sprintf("192.168.1.%d", i+10)
@@ -803,6 +822,7 @@ func BenchmarkZoneInfo_GetAllDeviceIDs(b *testing.B) {
 	}
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		_ = zi.GetAllDeviceIDs()
 	}
@@ -810,6 +830,7 @@ func BenchmarkZoneInfo_GetAllDeviceIDs(b *testing.B) {
 
 func BenchmarkZoneRequest_Validate(b *testing.B) {
 	zr := NewZoneRequest("MASTER123")
+
 	for i := 0; i < 5; i++ {
 		deviceID := fmt.Sprintf("DEVICE%d", i)
 		ip := fmt.Sprintf("192.168.1.%d", i+10)
@@ -817,6 +838,7 @@ func BenchmarkZoneRequest_Validate(b *testing.B) {
 	}
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		_ = zr.Validate()
 	}

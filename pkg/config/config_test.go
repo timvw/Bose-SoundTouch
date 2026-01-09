@@ -216,6 +216,7 @@ func TestParseDeviceString_EmptyHost(t *testing.T) {
 
 func TestParsePreferredDevices_SingleDevice(t *testing.T) {
 	clearTestEnvVars()
+
 	_ = os.Setenv("PREFERRED_DEVICES", "192.168.1.100")
 
 	defer clearTestEnvVars()
@@ -236,7 +237,9 @@ func TestParsePreferredDevices_SingleDevice(t *testing.T) {
 
 func TestParsePreferredDevices_MultipleDevices(t *testing.T) {
 	clearTestEnvVars()
+
 	_ = os.Setenv("PREFERRED_DEVICES", "Living Room@192.168.1.100:8090;Kitchen@192.168.1.101;192.168.1.102:8091")
+
 	defer clearTestEnvVars()
 
 	devices, err := parsePreferredDevices()
@@ -252,9 +255,11 @@ func TestParsePreferredDevices_MultipleDevices(t *testing.T) {
 	if devices[0].Name != "Living Room" {
 		t.Errorf("Expected first device name 'Living Room', got '%s'", devices[0].Name)
 	}
+
 	if devices[0].Host != "192.168.1.100" {
 		t.Errorf("Expected first device host '192.168.1.100', got '%s'", devices[0].Host)
 	}
+
 	if devices[0].Port != 8090 {
 		t.Errorf("Expected first device port 8090, got %d", devices[0].Port)
 	}
@@ -263,9 +268,11 @@ func TestParsePreferredDevices_MultipleDevices(t *testing.T) {
 	if devices[1].Name != "Kitchen" {
 		t.Errorf("Expected second device name 'Kitchen', got '%s'", devices[1].Name)
 	}
+
 	if devices[1].Host != "192.168.1.101" {
 		t.Errorf("Expected second device host '192.168.1.101', got '%s'", devices[1].Host)
 	}
+
 	if devices[1].Port != 8090 {
 		t.Errorf("Expected second device port 8090, got %d", devices[1].Port)
 	}
@@ -274,9 +281,11 @@ func TestParsePreferredDevices_MultipleDevices(t *testing.T) {
 	if devices[2].Name != "SoundTouch-192.168.1.102" {
 		t.Errorf("Expected third device default name, got '%s'", devices[2].Name)
 	}
+
 	if devices[2].Host != "192.168.1.102" {
 		t.Errorf("Expected third device host '192.168.1.102', got '%s'", devices[2].Host)
 	}
+
 	if devices[2].Port != 8091 {
 		t.Errorf("Expected third device port 8091, got %d", devices[2].Port)
 	}
@@ -284,6 +293,7 @@ func TestParsePreferredDevices_MultipleDevices(t *testing.T) {
 
 func TestParsePreferredDevices_EmptyString(t *testing.T) {
 	clearTestEnvVars()
+
 	_ = os.Setenv("PREFERRED_DEVICES", "")
 
 	defer clearTestEnvVars()
@@ -300,6 +310,7 @@ func TestParsePreferredDevices_EmptyString(t *testing.T) {
 
 func TestParsePreferredDevices_InvalidDevice(t *testing.T) {
 	clearTestEnvVars()
+
 	_ = os.Setenv("PREFERRED_DEVICES", "192.168.1.100:invalid")
 
 	defer clearTestEnvVars()
@@ -328,12 +339,15 @@ func TestGetPreferredDevicesAsDiscovered(t *testing.T) {
 	if devices[0].Name != "Living Room" {
 		t.Errorf("Expected name 'Living Room', got '%s'", devices[0].Name)
 	}
+
 	if devices[0].Host != "192.168.1.100" {
 		t.Errorf("Expected host '192.168.1.100', got '%s'", devices[0].Host)
 	}
+
 	if devices[0].Port != 8090 {
 		t.Errorf("Expected port 8090, got %d", devices[0].Port)
 	}
+
 	expectedLocation := "http://192.168.1.100:8090/info"
 	if devices[0].Location != expectedLocation {
 		t.Errorf("Expected location '%s', got '%s'", expectedLocation, devices[0].Location)

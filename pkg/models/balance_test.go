@@ -70,6 +70,7 @@ func TestNewBalanceRequest(t *testing.T) {
 				if err != nil {
 					t.Errorf("NewBalanceRequest() unexpected error: %v", err)
 				}
+
 				if req.Level != tt.wantLevel {
 					t.Errorf("NewBalanceRequest() level = %d, want %d", req.Level, tt.wantLevel)
 				}
@@ -368,12 +369,15 @@ func TestBalance_BooleanMethods(t *testing.T) {
 			if got := tt.balance.IsLeftBalance(); got != tt.wantLeft {
 				t.Errorf("IsLeftBalance() = %v, want %v", got, tt.wantLeft)
 			}
+
 			if got := tt.balance.IsRightBalance(); got != tt.wantRight {
 				t.Errorf("IsRightBalance() = %v, want %v", got, tt.wantRight)
 			}
+
 			if got := tt.balance.IsBalanced(); got != tt.wantBalanced {
 				t.Errorf("IsBalanced() = %v, want %v", got, tt.wantBalanced)
 			}
+
 			if got := tt.balance.IsAtTarget(); got != tt.wantAtTarget {
 				t.Errorf("IsAtTarget() = %v, want %v", got, tt.wantAtTarget)
 			}
@@ -426,6 +430,7 @@ func TestBalance_GetLeftRightPercentage(t *testing.T) {
 			if left != tt.wantLeft {
 				t.Errorf("GetLeftRightPercentage() left = %v, want %v", left, tt.wantLeft)
 			}
+
 			if right != tt.wantRight {
 				t.Errorf("GetLeftRightPercentage() right = %v, want %v", right, tt.wantRight)
 			}
@@ -517,6 +522,7 @@ func TestBalance_UnmarshalXML(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var balance Balance
+
 			err := xml.Unmarshal([]byte(tt.xmlData), &balance)
 
 			if tt.wantError {
@@ -527,12 +533,15 @@ func TestBalance_UnmarshalXML(t *testing.T) {
 				if err != nil {
 					t.Errorf("UnmarshalXML() unexpected error: %v", err)
 				}
+
 				if balance.DeviceID != tt.want.DeviceID {
 					t.Errorf("DeviceID = %v, want %v", balance.DeviceID, tt.want.DeviceID)
 				}
+
 				if balance.TargetBalance != tt.want.TargetBalance {
 					t.Errorf("TargetBalance = %v, want %v", balance.TargetBalance, tt.want.TargetBalance)
 				}
+
 				if balance.ActualBalance != tt.want.ActualBalance {
 					t.Errorf("ActualBalance = %v, want %v", balance.ActualBalance, tt.want.ActualBalance)
 				}
@@ -613,9 +622,11 @@ func TestBalanceConstants(t *testing.T) {
 	if BalanceLevelMin != -50 {
 		t.Errorf("BalanceLevelMin = %v, want %v", BalanceLevelMin, -50)
 	}
+
 	if BalanceLevelMax != 50 {
 		t.Errorf("BalanceLevelMax = %v, want %v", BalanceLevelMax, 50)
 	}
+
 	if BalanceLevelDefault != 0 {
 		t.Errorf("BalanceLevelDefault = %v, want %v", BalanceLevelDefault, 0)
 	}
@@ -627,6 +638,7 @@ func TestBalanceLevelEdgeCases(t *testing.T) {
 		if !ValidateBalanceLevel(-50) {
 			t.Error("ValidateBalanceLevel(-50) should be true")
 		}
+
 		if ValidateBalanceLevel(-51) {
 			t.Error("ValidateBalanceLevel(-51) should be false")
 		}
@@ -636,6 +648,7 @@ func TestBalanceLevelEdgeCases(t *testing.T) {
 		if !ValidateBalanceLevel(50) {
 			t.Error("ValidateBalanceLevel(50) should be true")
 		}
+
 		if ValidateBalanceLevel(51) {
 			t.Error("ValidateBalanceLevel(51) should be false")
 		}

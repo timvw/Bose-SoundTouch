@@ -72,9 +72,11 @@ func TestSourceStatus_Methods(t *testing.T) {
 			if tt.status.IsReady() != tt.isReady {
 				t.Errorf("IsReady() = %v, want %v", tt.status.IsReady(), tt.isReady)
 			}
+
 			if tt.status.IsUnavailable() != tt.isUnavailable {
 				t.Errorf("IsUnavailable() = %v, want %v", tt.status.IsUnavailable(), tt.isUnavailable)
 			}
+
 			if tt.status.String() != tt.toString {
 				t.Errorf("String() = %v, want %v", tt.status.String(), tt.toString)
 			}
@@ -169,21 +171,27 @@ func TestSourceItem_Methods(t *testing.T) {
 			if tt.sourceItem.GetDisplayName() != tt.expectedDisplayName {
 				t.Errorf("GetDisplayName() = %v, want %v", tt.sourceItem.GetDisplayName(), tt.expectedDisplayName)
 			}
+
 			if tt.sourceItem.IsSpotify() != tt.isSpotify {
 				t.Errorf("IsSpotify() = %v, want %v", tt.sourceItem.IsSpotify(), tt.isSpotify)
 			}
+
 			if tt.sourceItem.IsBluetoothSource() != tt.isBluetooth {
 				t.Errorf("IsBluetoothSource() = %v, want %v", tt.sourceItem.IsBluetoothSource(), tt.isBluetooth)
 			}
+
 			if tt.sourceItem.IsAuxSource() != tt.isAux {
 				t.Errorf("IsAuxSource() = %v, want %v", tt.sourceItem.IsAuxSource(), tt.isAux)
 			}
+
 			if tt.sourceItem.IsStreamingService() != tt.isStreaming {
 				t.Errorf("IsStreamingService() = %v, want %v", tt.sourceItem.IsStreamingService(), tt.isStreaming)
 			}
+
 			if tt.sourceItem.IsLocalSource() != tt.isLocal {
 				t.Errorf("IsLocalSource() = %v, want %v", tt.sourceItem.IsLocalSource(), tt.isLocal)
 			}
+
 			if tt.sourceItem.SupportsMultiroom() != tt.supportsMultiroom {
 				t.Errorf("SupportsMultiroom() = %v, want %v", tt.sourceItem.SupportsMultiroom(), tt.supportsMultiroom)
 			}
@@ -201,6 +209,7 @@ func TestSources_UnmarshalXML(t *testing.T) {
 </sources>`
 
 	var sources Sources
+
 	err := xml.Unmarshal([]byte(xmlData), &sources)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -220,12 +229,15 @@ func TestSources_UnmarshalXML(t *testing.T) {
 	if auxSource.Source != "AUX" {
 		t.Errorf("Expected first source 'AUX', got '%s'", auxSource.Source)
 	}
+
 	if auxSource.Status != SourceStatusReady {
 		t.Errorf("Expected first source status Ready, got %v", auxSource.Status)
 	}
+
 	if !auxSource.IsLocal {
 		t.Error("Expected first source to be local")
 	}
+
 	if auxSource.DisplayName != "AUX IN" {
 		t.Errorf("Expected first source display name 'AUX IN', got '%s'", auxSource.DisplayName)
 	}
@@ -235,6 +247,7 @@ func TestSources_UnmarshalXML(t *testing.T) {
 	if spotifySource.Source != "SPOTIFY" {
 		t.Errorf("Expected second source 'SPOTIFY', got '%s'", spotifySource.Source)
 	}
+
 	if spotifySource.SourceAccount != "user@example.com" {
 		t.Errorf("Expected Spotify source account 'user@example.com', got '%s'", spotifySource.SourceAccount)
 	}

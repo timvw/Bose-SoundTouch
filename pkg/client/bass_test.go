@@ -75,10 +75,12 @@ func TestClient_GetBass(t *testing.T) {
 					t.Errorf("Expected GET request, got %s", r.Method)
 					return
 				}
+
 				if r.URL.Path != "/bass" {
 					t.Errorf("Expected path /bass, got %s", r.URL.Path)
 					return
 				}
+
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(http.StatusOK)
 				_, _ = w.Write([]byte(tt.serverResponse))
@@ -104,12 +106,15 @@ func TestClient_GetBass(t *testing.T) {
 				if err != nil {
 					t.Errorf("Unexpected error: %v", err)
 				}
+
 				if bass.TargetBass != tt.wantTargetBass {
 					t.Errorf("Expected target bass %d, got %d", tt.wantTargetBass, bass.TargetBass)
 				}
+
 				if bass.ActualBass != tt.wantActualBass {
 					t.Errorf("Expected actual bass %d, got %d", tt.wantActualBass, bass.ActualBass)
 				}
+
 				if bass.DeviceID != tt.wantDeviceID {
 					t.Errorf("Expected device ID %s, got %s", tt.wantDeviceID, bass.DeviceID)
 				}
@@ -174,6 +179,7 @@ func TestClient_SetBass(t *testing.T) {
 						t.Errorf("Expected POST request, got %s", r.Method)
 						return
 					}
+
 					if r.URL.Path != "/bass" {
 						t.Errorf("Expected path /bass, got %s", r.URL.Path)
 						return
@@ -187,6 +193,7 @@ func TestClient_SetBass(t *testing.T) {
 
 					// Parse and validate request body
 					var bassReq models.BassRequest
+
 					err := xml.NewDecoder(r.Body).Decode(&bassReq)
 					if err != nil {
 						t.Errorf("Failed to decode request XML: %v", err)
@@ -262,6 +269,7 @@ func TestClient_SetBassSafe(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Parse request body to verify clamped level
 				var bassReq models.BassRequest
+
 				err := xml.NewDecoder(r.Body).Decode(&bassReq)
 				if err != nil {
 					t.Errorf("Failed to decode request XML: %v", err)
@@ -354,27 +362,31 @@ func TestClient_IncreaseBass(t *testing.T) {
 </bass>`
 						}
 						// For simplicity in testing, let's use a different approach
-						if tt.currentBass == 0 {
+						switch tt.currentBass {
+						case 0:
 							response = `<bass deviceID="1234567890AB"><targetbass>0</targetbass><actualbass>0</actualbass></bass>`
-						} else if tt.currentBass == 8 {
+						case 8:
 							response = `<bass deviceID="1234567890AB"><targetbass>8</targetbass><actualbass>8</actualbass></bass>`
-						} else if tt.currentBass == -3 {
+						case -3:
 							response = `<bass deviceID="1234567890AB"><targetbass>-3</targetbass><actualbass>-3</actualbass></bass>`
 						}
 					} else {
 						// Second call - return new bass level
-						if tt.expectedNewBass == 3 {
+						switch tt.expectedNewBass {
+						case 3:
 							response = `<bass deviceID="1234567890AB"><targetbass>3</targetbass><actualbass>3</actualbass></bass>`
-						} else if tt.expectedNewBass == 9 {
+						case 9:
 							response = `<bass deviceID="1234567890AB"><targetbass>9</targetbass><actualbass>9</actualbass></bass>`
-						} else if tt.expectedNewBass == -1 {
+						case -1:
 							response = `<bass deviceID="1234567890AB"><targetbass>-1</targetbass><actualbass>-1</actualbass></bass>`
 						}
 					}
+
 					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write([]byte(response))
 				} else if r.Method == "POST" && r.URL.Path == "/bass" {
 					postCallCount++
+
 					w.WriteHeader(http.StatusOK)
 				}
 			}))
@@ -402,6 +414,7 @@ func TestClient_IncreaseBass(t *testing.T) {
 			if getCallCount != 2 {
 				t.Errorf("Expected 2 GET calls, got %d", getCallCount)
 			}
+
 			if postCallCount != 1 {
 				t.Errorf("Expected 1 POST call, got %d", postCallCount)
 			}
@@ -446,31 +459,36 @@ func TestClient_DecreaseBass(t *testing.T) {
 
 				if r.Method == "GET" && r.URL.Path == "/bass" {
 					getCallCount++
+
 					var response string
 
 					if getCallCount == 1 {
 						// First call - return current bass
-						if tt.currentBass == 3 {
+						switch tt.currentBass {
+						case 3:
 							response = `<bass deviceID="1234567890AB"><targetbass>3</targetbass><actualbass>3</actualbass></bass>`
-						} else if tt.currentBass == -7 {
+						case -7:
 							response = `<bass deviceID="1234567890AB"><targetbass>-7</targetbass><actualbass>-7</actualbass></bass>`
-						} else if tt.currentBass == 2 {
+						case 2:
 							response = `<bass deviceID="1234567890AB"><targetbass>2</targetbass><actualbass>2</actualbass></bass>`
 						}
 					} else {
 						// Second call - return new bass level
-						if tt.expectedNewBass == 1 {
+						switch tt.expectedNewBass {
+						case 1:
 							response = `<bass deviceID="1234567890AB"><targetbass>1</targetbass><actualbass>1</actualbass></bass>`
-						} else if tt.expectedNewBass == -9 {
+						case -9:
 							response = `<bass deviceID="1234567890AB"><targetbass>-9</targetbass><actualbass>-9</actualbass></bass>`
-						} else if tt.expectedNewBass == -2 {
+						case -2:
 							response = `<bass deviceID="1234567890AB"><targetbass>-2</targetbass><actualbass>-2</actualbass></bass>`
 						}
 					}
+
 					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write([]byte(response))
 				} else if r.Method == "POST" && r.URL.Path == "/bass" {
 					postCallCount++
+
 					w.WriteHeader(http.StatusOK)
 				}
 			}))
@@ -498,6 +516,7 @@ func TestClient_DecreaseBass(t *testing.T) {
 			if getCallCount != 2 {
 				t.Errorf("Expected 2 GET calls, got %d", getCallCount)
 			}
+
 			if postCallCount != 1 {
 				t.Errorf("Expected 1 POST call, got %d", postCallCount)
 			}
@@ -589,6 +608,7 @@ func TestClient_Bass_RequestFormat(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Read and parse the raw request body
 		var bassReq models.BassRequest
+
 		err := xml.NewDecoder(r.Body).Decode(&bassReq)
 		if err != nil {
 			t.Errorf("Failed to decode request XML: %v", err)

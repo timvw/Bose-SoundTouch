@@ -96,36 +96,47 @@ func (e *WebSocketEvent) GetEvents() []interface{} {
 	if e.NowPlayingUpdated != nil {
 		events = append(events, e.NowPlayingUpdated)
 	}
+
 	if e.VolumeUpdated != nil {
 		events = append(events, e.VolumeUpdated)
 	}
+
 	if e.ConnectionStateUpdated != nil {
 		events = append(events, e.ConnectionStateUpdated)
 	}
+
 	if e.PresetUpdated != nil {
 		events = append(events, e.PresetUpdated)
 	}
+
 	if e.ZoneUpdated != nil {
 		events = append(events, e.ZoneUpdated)
 	}
+
 	if e.BassUpdated != nil {
 		events = append(events, e.BassUpdated)
 	}
+
 	if e.ClockTimeUpdated != nil {
 		events = append(events, e.ClockTimeUpdated)
 	}
+
 	if e.ClockDisplayUpdated != nil {
 		events = append(events, e.ClockDisplayUpdated)
 	}
+
 	if e.NameUpdated != nil {
 		events = append(events, e.NameUpdated)
 	}
+
 	if e.ErrorUpdated != nil {
 		events = append(events, e.ErrorUpdated)
 	}
+
 	if e.RecentsUpdated != nil {
 		events = append(events, e.RecentsUpdated)
 	}
+
 	if e.LanguageUpdated != nil {
 		events = append(events, e.LanguageUpdated)
 	}
@@ -434,6 +445,7 @@ func (e *WebSocketEvent) HasEventType(eventType WebSocketEventType) bool {
 	case EventTypeLanguageUpdated:
 		return e.LanguageUpdated != nil
 	}
+
 	return false
 }
 
@@ -444,36 +456,47 @@ func (e *WebSocketEvent) GetEventTypes() []WebSocketEventType {
 	if e.NowPlayingUpdated != nil {
 		types = append(types, EventTypeNowPlaying)
 	}
+
 	if e.VolumeUpdated != nil {
 		types = append(types, EventTypeVolumeUpdated)
 	}
+
 	if e.ConnectionStateUpdated != nil {
 		types = append(types, EventTypeConnectionState)
 	}
+
 	if e.PresetUpdated != nil {
 		types = append(types, EventTypePresetUpdated)
 	}
+
 	if e.ZoneUpdated != nil {
 		types = append(types, EventTypeZoneUpdated)
 	}
+
 	if e.BassUpdated != nil {
 		types = append(types, EventTypeBassUpdated)
 	}
+
 	if e.ClockTimeUpdated != nil {
 		types = append(types, EventTypeClockTimeUpdated)
 	}
+
 	if e.ClockDisplayUpdated != nil {
 		types = append(types, EventTypeClockDisplayUpdated)
 	}
+
 	if e.NameUpdated != nil {
 		types = append(types, EventTypeNameUpdated)
 	}
+
 	if e.ErrorUpdated != nil {
 		types = append(types, EventTypeErrorUpdated)
 	}
+
 	if e.RecentsUpdated != nil {
 		types = append(types, EventTypeRecentsUpdated)
 	}
+
 	if e.LanguageUpdated != nil {
 		types = append(types, EventTypeLanguageUpdated)
 	}

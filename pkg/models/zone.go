@@ -108,6 +108,7 @@ func (zr *ZoneRequest) HasMember(deviceID string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -134,6 +135,7 @@ func (zr *ZoneRequest) Validate() error {
 		if seen[member.DeviceID] {
 			return fmt.Errorf("duplicate device ID found: %s", member.DeviceID)
 		}
+
 		seen[member.DeviceID] = true
 
 		// Validate IP address if provided
@@ -164,6 +166,7 @@ func (zi *ZoneInfo) IsMember(deviceID string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -179,6 +182,7 @@ func (zi *ZoneInfo) GetMemberByDeviceID(deviceID string) (*Member, bool) {
 			return &member, true
 		}
 	}
+
 	return nil, false
 }
 
@@ -189,6 +193,7 @@ func (zi *ZoneInfo) GetMemberByIP(ipAddress string) (*Member, bool) {
 			return &member, true
 		}
 	}
+
 	return nil, false
 }
 
@@ -198,6 +203,7 @@ func (zi *ZoneInfo) GetAllDeviceIDs() []string {
 	for _, member := range zi.Members {
 		devices = append(devices, member.DeviceID)
 	}
+
 	return devices
 }
 
@@ -212,11 +218,14 @@ func (zi *ZoneInfo) GetZoneStatus(deviceID string) ZoneStatus {
 		if zi.IsStandalone() {
 			return ZoneStatusStandalone
 		}
+
 		return ZoneStatusMaster
 	}
+
 	if zi.IsMember(deviceID) {
 		return ZoneStatusSlave
 	}
+
 	return ZoneStatusStandalone // Device not in zone
 }
 
@@ -241,6 +250,7 @@ func (zi *ZoneInfo) ToZoneRequest() *ZoneRequest {
 	for _, member := range zi.Members {
 		request.AddMember(member.DeviceID, member.IP)
 	}
+
 	return request
 }
 
@@ -307,6 +317,7 @@ func (zb *ZoneBuilder) Build() (*ZoneRequest, error) {
 	if err := zb.request.Validate(); err != nil {
 		return nil, err
 	}
+
 	return zb.request, nil
 }
 
@@ -323,6 +334,7 @@ func (ze *ZoneError) Error() string {
 		return fmt.Sprintf("zone %s failed for device %s: %s",
 			ze.Operation.String(), ze.DeviceID, ze.Reason)
 	}
+
 	return fmt.Sprintf("zone %s failed: %s", ze.Operation.String(), ze.Reason)
 }
 

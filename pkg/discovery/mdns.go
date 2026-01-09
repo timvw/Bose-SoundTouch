@@ -97,8 +97,10 @@ func (m *MDNSDiscoveryService) serviceEntryToDevice(entry *mdns.ServiceEntry) *m
 	}
 
 	// Get the IP address - prefer IPv4
-	var host string
-	var ipSource string
+	var (
+		host     string
+		ipSource string
+	)
 
 	switch {
 	case entry.AddrV4 != nil:
@@ -114,6 +116,7 @@ func (m *MDNSDiscoveryService) serviceEntryToDevice(entry *mdns.ServiceEntry) *m
 	default:
 		// Try to resolve from hostname
 		log.Printf("mDNS: No direct IP address, trying to resolve hostname: %s", entry.Host)
+
 		ips, err := net.LookupIP(entry.Host)
 		if err != nil || len(ips) == 0 {
 			log.Printf("mDNS: Failed to resolve hostname '%s': %v", entry.Host, err)
@@ -140,6 +143,7 @@ func (m *MDNSDiscoveryService) serviceEntryToDevice(entry *mdns.ServiceEntry) *m
 			} else {
 				ipSource = "resolved IPv6 (fallback)"
 			}
+
 			log.Printf("mDNS: Using fallback address (%s): %s", ipSource, host)
 		}
 	}
@@ -175,5 +179,6 @@ func (m *MDNSDiscoveryService) serviceEntryToDevice(entry *mdns.ServiceEntry) *m
 	}
 
 	log.Printf("mDNS: Created device '%s' at %s:%d (IP source: %s)", name, host, port, ipSource)
+
 	return device
 }

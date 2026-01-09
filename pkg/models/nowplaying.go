@@ -140,6 +140,7 @@ func (ps *PlayStatus) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 	default:
 		*ps = PlayStatusStopped // Default fallback for unknown states
 	}
+
 	return nil
 }
 
@@ -183,6 +184,7 @@ func (ss *ShuffleSetting) UnmarshalXML(d *xml.Decoder, start xml.StartElement) e
 	default:
 		*ss = ShuffleOff // Default fallback
 	}
+
 	return nil
 }
 
@@ -230,6 +232,7 @@ func (rs *RepeatSetting) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 	default:
 		*rs = RepeatOff // Default fallback
 	}
+
 	return nil
 }
 
@@ -256,12 +259,15 @@ func (np *NowPlaying) GetDisplayTitle() string {
 	if np.Track != "" {
 		return np.Track
 	}
+
 	if np.StationName != "" {
 		return np.StationName
 	}
+
 	if np.ContentItem != nil && np.ContentItem.ItemName != "" {
 		return np.ContentItem.ItemName
 	}
+
 	return "Unknown"
 }
 
@@ -270,9 +276,11 @@ func (np *NowPlaying) GetDisplayArtist() string {
 	if np.Artist != "" {
 		return np.Artist
 	}
+
 	if np.Description != "" {
 		return np.Description
 	}
+
 	return ""
 }
 
@@ -281,9 +289,11 @@ func (np *NowPlaying) GetArtworkURL() string {
 	if np.Art != nil && np.Art.URL != "" {
 		return np.Art.URL
 	}
+
 	if np.ContentItem != nil && np.ContentItem.ContainerArt != "" {
 		return np.ContentItem.ContainerArt
 	}
+
 	return ""
 }
 
@@ -292,9 +302,11 @@ func (np *NowPlaying) GetPositionDuration() time.Duration {
 	if np.Time != nil {
 		return time.Duration(np.Time.Position) * time.Second
 	}
+
 	if np.Position != nil {
 		return time.Duration(np.Position.Position) * time.Second
 	}
+
 	return 0
 }
 
@@ -303,6 +315,7 @@ func (np *NowPlaying) GetTotalDuration() time.Duration {
 	if np.Time != nil {
 		return time.Duration(np.Time.Total) * time.Second
 	}
+
 	return 0
 }
 

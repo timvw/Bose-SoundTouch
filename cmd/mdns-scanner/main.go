@@ -38,6 +38,7 @@ func main() {
 
 	// Create a channel to collect service entries
 	entries := make(chan *mdns.ServiceEntry, 1000)
+
 	var services []ServiceInfo
 
 	// Create context with timeout
@@ -95,6 +96,7 @@ func main() {
 
 done:
 	duration := time.Since(start)
+
 	fmt.Printf("Scan completed in %v\n", duration)
 	fmt.Printf("Found %d services:\n", len(services))
 	fmt.Println()
@@ -116,6 +118,7 @@ done:
 	} else {
 		// Group services by type for better display
 		serviceGroups := make(map[string][]ServiceInfo)
+
 		for _, service := range services {
 			serviceType := service.ServiceType
 			serviceGroups[serviceType] = append(serviceGroups[serviceType], service)
@@ -128,15 +131,19 @@ done:
 
 			for i, service := range serviceList {
 				fmt.Printf("  %d. %s\n", i+1, service.Name)
+
 				if service.Host != "" {
 					fmt.Printf("     Host: %s\n", service.Host)
 				}
+
 				if service.IPv4 != "" {
 					fmt.Printf("     IPv4: %s\n", service.IPv4)
 				}
+
 				if service.IPv6 != "" {
 					fmt.Printf("     IPv6: %s\n", service.IPv6)
 				}
+
 				if service.Port > 0 {
 					fmt.Printf("     Port: %d\n", service.Port)
 				}

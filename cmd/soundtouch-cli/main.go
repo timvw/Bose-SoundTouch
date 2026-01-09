@@ -119,8 +119,11 @@ func main() {
 	}
 
 	// Parse host:port if provided
-	var finalHost string
-	var finalPort int
+	var (
+		finalHost string
+		finalPort int
+	)
+
 	if *host != "" {
 		finalHost, finalPort = parseHostPort(*host, *port)
 	}
@@ -130,6 +133,7 @@ func main() {
 		if err := handleDiscovery(*discoverAll, *timeout); err != nil {
 			log.Fatalf("Discovery failed: %v", err)
 		}
+
 		return
 	}
 
@@ -138,9 +142,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for info command. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleDeviceInfo(finalHost, finalPort, *timeout); err != nil {
 			log.Fatalf("Failed to get device info: %v", err)
 		}
+
 		return
 	}
 
@@ -149,9 +155,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for nowplaying command. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleNowPlaying(finalHost, finalPort, *timeout); err != nil {
 			log.Fatalf("Failed to get now playing: %v", err)
 		}
+
 		return
 	}
 
@@ -160,9 +168,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for sources command. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleSources(finalHost, finalPort, *timeout); err != nil {
 			log.Fatalf("Failed to get sources: %v", err)
 		}
+
 		return
 	}
 
@@ -171,9 +181,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for name command. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleName(finalHost, finalPort, *timeout); err != nil {
 			log.Fatalf("Failed to get device name: %v", err)
 		}
+
 		return
 	}
 
@@ -182,9 +194,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for capabilities command. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleCapabilities(finalHost, finalPort, *timeout); err != nil {
 			log.Fatalf("Failed to get device capabilities: %v", err)
 		}
+
 		return
 	}
 
@@ -193,9 +207,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for presets command. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handlePresets(finalHost, finalPort, *timeout); err != nil {
 			log.Fatalf("Failed to get presets: %v", err)
 		}
+
 		return
 	}
 
@@ -204,9 +220,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for key commands. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleKeyCommands(finalHost, finalPort, *timeout, *key, *play, *pause, *stop, *next, *prev, *volumeUp, *volumeDown, *power, *mute, *thumbsUp, *thumbsDown, *preset); err != nil {
 			log.Fatalf("Failed to send key command: %v", err)
 		}
+
 		return
 	}
 
@@ -215,9 +233,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for volume commands. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleVolumeCommands(finalHost, finalPort, *timeout, *volume, *setVolume, *incVolume, *decVolume); err != nil {
 			log.Fatalf("Failed to execute volume command: %v", err)
 		}
+
 		return
 	}
 
@@ -226,9 +246,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for bass commands. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleBassCommands(finalHost, finalPort, *timeout, *bass, *setBass, *incBass, *decBass); err != nil {
 			log.Fatalf("Failed to execute bass command: %v", err)
 		}
+
 		return
 	}
 
@@ -237,9 +259,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for balance commands. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleBalanceCommands(finalHost, finalPort, *timeout, *balance, *setBalance, *incBalance, *decBalance); err != nil {
 			log.Fatalf("Failed to execute balance command: %v", err)
 		}
+
 		return
 	}
 
@@ -248,9 +272,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for source selection. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleSourceCommands(finalHost, finalPort, *timeout, *selectSource, *sourceAccount, *spotify, *bluetooth, *aux); err != nil {
 			log.Fatalf("Failed to select source: %v", err)
 		}
+
 		return
 	}
 
@@ -259,9 +285,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for clock/time commands. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleClockCommands(finalHost, finalPort, *timeout, *clockTime, *setClockTime, *clockDisplay, *enableClock, *disableClock, *clockFormat, *clockBright); err != nil {
 			log.Fatalf("Failed to execute clock command: %v", err)
 		}
+
 		return
 	}
 
@@ -270,9 +298,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for network info command. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleNetworkInfo(finalHost, finalPort, *timeout); err != nil {
 			log.Fatalf("Failed to get network info: %v", err)
 		}
+
 		return
 	}
 
@@ -281,9 +311,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for zone commands. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleZoneCommands(finalHost, finalPort, *timeout, *zone, *zoneStatus, *zoneMembers, *createZone, *addToZone, *removeFromZone, *dissolveZone); err != nil {
 			log.Fatalf("Failed to execute zone command: %v", err)
 		}
+
 		return
 	}
 
@@ -292,9 +324,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for set-name command. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleSetName(finalHost, finalPort, *timeout, *setName); err != nil {
 			log.Fatalf("Failed to set device name: %v", err)
 		}
+
 		return
 	}
 
@@ -303,9 +337,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for bass-capabilities command. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleBassCapabilities(finalHost, finalPort, *timeout); err != nil {
 			log.Fatalf("Failed to get bass capabilities: %v", err)
 		}
+
 		return
 	}
 
@@ -314,9 +350,11 @@ func main() {
 		if *host == "" {
 			log.Fatal("Host is required for track-info command. Use -host flag or -discover to find devices.")
 		}
+
 		if err := handleTrackInfo(finalHost, finalPort, *timeout); err != nil {
 			log.Fatalf("Failed to get track info: %v", err)
 		}
+
 		return
 	}
 }
@@ -338,6 +376,7 @@ func handleSetName(host string, port int, timeout time.Duration, name string) er
 	}
 
 	fmt.Println("✅ Device name set successfully")
+
 	return nil
 }
 
@@ -357,6 +396,7 @@ func handleBassCapabilities(host string, port int, timeout time.Duration) error 
 	}
 
 	fmt.Printf("Bass Capabilities:\n")
+
 	if capabilities.IsBassSupported() {
 		fmt.Printf("  Bass Control: ✅ Supported\n")
 		fmt.Printf("  Range: %d to %d\n", capabilities.GetMinLevel(), capabilities.GetMaxLevel())
@@ -385,18 +425,23 @@ func handleTrackInfo(host string, port int, timeout time.Duration) error {
 
 	fmt.Printf("Track Information:\n")
 	fmt.Printf("  Source: %s\n", trackInfo.Source)
+
 	if trackInfo.Track != "" {
 		fmt.Printf("  Track: %s\n", trackInfo.Track)
 	}
+
 	if trackInfo.Artist != "" {
 		fmt.Printf("  Artist: %s\n", trackInfo.Artist)
 	}
+
 	if trackInfo.Album != "" {
 		fmt.Printf("  Album: %s\n", trackInfo.Album)
 	}
+
 	if trackInfo.StationName != "" {
 		fmt.Printf("  Station: %s\n", trackInfo.StationName)
 	}
+
 	fmt.Printf("  Play Status: %s\n", trackInfo.PlayStatus)
 
 	return nil
@@ -547,6 +592,7 @@ func handleDiscovery(showInfo bool, timeout time.Duration) error {
 	cfg, err := config.LoadFromEnv()
 	if err != nil {
 		fmt.Printf("Warning: Failed to load configuration: %v\n", err)
+
 		cfg = config.DefaultConfig()
 	}
 
@@ -571,6 +617,7 @@ func handleDiscovery(showInfo bool, timeout time.Duration) error {
 	}
 
 	fmt.Printf("Found %d SoundTouch device(s):\n", len(devices))
+
 	for i, device := range devices {
 		fmt.Printf("  %d. %s\n", i+1, device.Name)
 		fmt.Printf("     Host: %s:%d\n", device.Host, device.Port)
@@ -591,10 +638,12 @@ func handleDiscovery(showInfo bool, timeout time.Duration) error {
 
 		if showInfo {
 			fmt.Printf("     Getting device info...\n")
+
 			if err := showDeviceInfoWithConfig(device.Host, device.Port, cfg); err != nil {
 				fmt.Printf("     Error getting info: %v\n", err)
 			}
 		}
+
 		fmt.Println()
 	}
 
@@ -671,9 +720,11 @@ func showDeviceInfoWithConfig(host string, port int, cfg *config.Config) error {
 
 		for _, component := range deviceInfo.Components {
 			fmt.Printf("    - Category: %s\n", component.ComponentCategory)
+
 			if component.SoftwareVersion != "" {
 				fmt.Printf("      Software Version: %s\n", component.SoftwareVersion)
 			}
+
 			if component.SerialNumber != "" {
 				fmt.Printf("      Serial Number: %s\n", component.SerialNumber)
 			}
@@ -727,9 +778,11 @@ func handleNowPlaying(host string, port int, timeout time.Duration) error {
 		artist := nowPlaying.GetDisplayArtist()
 
 		fmt.Printf("  Title: %s\n", title)
+
 		if artist != "" {
 			fmt.Printf("  Artist: %s\n", artist)
 		}
+
 		if nowPlaying.Album != "" {
 			fmt.Printf("  Album: %s\n", nowPlaying.Album)
 		}
@@ -752,6 +805,7 @@ func handleNowPlaying(host string, port int, timeout time.Duration) error {
 		if nowPlaying.ShuffleSetting != "" {
 			fmt.Printf("  Shuffle: %s\n", nowPlaying.ShuffleSetting.String())
 		}
+
 		if nowPlaying.RepeatSetting != "" {
 			fmt.Printf("  Repeat: %s\n", nowPlaying.RepeatSetting.String())
 		}
@@ -765,6 +819,7 @@ func handleNowPlaying(host string, port int, timeout time.Duration) error {
 		if nowPlaying.Description != "" {
 			fmt.Printf("  Description: %s\n", nowPlaying.Description)
 		}
+
 		if nowPlaying.StationLocation != "" {
 			fmt.Printf("  Station Location: %s\n", nowPlaying.StationLocation)
 		}
@@ -774,15 +829,19 @@ func handleNowPlaying(host string, port int, timeout time.Duration) error {
 		if nowPlaying.CanSkip() {
 			capabilities = append(capabilities, "Skip")
 		}
+
 		if nowPlaying.CanSkipPrevious() {
 			capabilities = append(capabilities, "Skip Previous")
 		}
+
 		if nowPlaying.IsSeekSupported() {
 			capabilities = append(capabilities, "Seek")
 		}
+
 		if nowPlaying.CanFavorite() {
 			capabilities = append(capabilities, "Favorite")
 		}
+
 		if len(capabilities) > 0 {
 			fmt.Printf("  Capabilities: %s\n", strings.Join(capabilities, ", "))
 		}
@@ -833,6 +892,7 @@ func handleSources(host string, port int, timeout time.Duration) error {
 
 		for _, source := range availableSources {
 			fmt.Printf("  • %s", source.GetDisplayName())
+
 			if source.SourceAccount != "" && source.SourceAccount != source.Source {
 				fmt.Printf(" (%s)", source.SourceAccount)
 			}
@@ -843,9 +903,11 @@ func handleSources(host string, port int, timeout time.Duration) error {
 			} else {
 				attributes = append(attributes, "Remote")
 			}
+
 			if source.SupportsMultiroom() {
 				attributes = append(attributes, "Multiroom")
 			}
+
 			if source.IsStreamingService() {
 				attributes = append(attributes, "Streaming")
 			}
@@ -853,13 +915,16 @@ func handleSources(host string, port int, timeout time.Duration) error {
 			if len(attributes) > 0 {
 				fmt.Printf(" [%s]", strings.Join(attributes, ", "))
 			}
+
 			fmt.Println()
 		}
+
 		fmt.Println()
 	}
 
 	// Display unavailable sources
 	var unavailableSources []models.SourceItem
+
 	for _, source := range sources.SourceItem {
 		if source.Status.IsUnavailable() {
 			unavailableSources = append(unavailableSources, source)
@@ -868,37 +933,46 @@ func handleSources(host string, port int, timeout time.Duration) error {
 
 	if len(unavailableSources) > 0 {
 		fmt.Printf("Unavailable Sources:\n")
+
 		for _, source := range unavailableSources {
 			fmt.Printf("  • %s", source.GetDisplayName())
+
 			if source.SourceAccount != "" && source.SourceAccount != source.Source {
 				fmt.Printf(" (%s)", source.SourceAccount)
 			}
+
 			fmt.Printf(" [%s]", source.Status.String())
 			fmt.Println()
 		}
+
 		fmt.Println()
 	}
 
 	// Summary by category
 	fmt.Printf("Categories:\n")
+
 	if sources.HasSpotify() {
 		spotifySources := sources.GetReadySpotifySources()
 		fmt.Printf("  Spotify: %d account(s) ready\n", len(spotifySources))
 	}
+
 	if sources.HasBluetooth() {
 		fmt.Printf("  Bluetooth: Ready\n")
 	}
+
 	if sources.HasAux() {
 		fmt.Printf("  AUX Input: Ready\n")
 	}
 
 	streamingSources := sources.GetStreamingSources()
 	readyStreaming := 0
+
 	for _, source := range streamingSources {
 		if source.Status.IsReady() {
 			readyStreaming++
 		}
 	}
+
 	if readyStreaming > 0 {
 		fmt.Printf("  Streaming Services: %d ready\n", readyStreaming)
 	}
@@ -981,9 +1055,11 @@ func handleCapabilities(host string, port int, timeout time.Duration) error {
 	systemCaps := capabilities.GetSystemCapabilities()
 	if len(systemCaps) > 0 {
 		fmt.Printf("System Features:\n")
+
 		for _, cap := range systemCaps {
 			fmt.Printf("  • %s\n", cap)
 		}
+
 		fmt.Println()
 	}
 
@@ -991,9 +1067,11 @@ func handleCapabilities(host string, port int, timeout time.Duration) error {
 	audioCaps := capabilities.GetAudioCapabilities()
 	if len(audioCaps) > 0 {
 		fmt.Printf("Audio Features:\n")
+
 		for _, cap := range audioCaps {
 			fmt.Printf("  • %s\n", cap)
 		}
+
 		fmt.Println()
 	}
 
@@ -1001,6 +1079,7 @@ func handleCapabilities(host string, port int, timeout time.Duration) error {
 	networkCaps := capabilities.GetNetworkCapabilities()
 	if len(networkCaps) > 0 {
 		fmt.Printf("Network Features:\n")
+
 		for _, cap := range networkCaps {
 			fmt.Printf("  • %s\n", cap)
 		}
@@ -1011,6 +1090,7 @@ func handleCapabilities(host string, port int, timeout time.Duration) error {
 			fmt.Printf("    • Port: %s\n", capabilities.GetHostedWifiPort())
 			fmt.Printf("    • Hosted by: %s\n", capabilities.GetHostedWifiHostedBy())
 		}
+
 		fmt.Println()
 	}
 
@@ -1022,9 +1102,11 @@ func handleCapabilities(host string, port int, timeout time.Duration) error {
 		for _, capName := range capNames {
 			capability := capabilities.GetCapabilityByName(capName)
 			fmt.Printf("  • %s", capName)
+
 			if capability.URL != "" {
 				fmt.Printf(" (%s)", capability.URL)
 			}
+
 			fmt.Println()
 		}
 	}
@@ -1081,9 +1163,11 @@ func handlePresets(host string, port int, timeout time.Duration) error {
 
 		fmt.Printf("Preset %d: %s\n", preset.ID, preset.GetDisplayName())
 		fmt.Printf("  Source: %s", preset.GetSource())
+
 		if preset.GetSourceAccount() != "" {
 			fmt.Printf(" (%s)", preset.GetSourceAccount())
 		}
+
 		fmt.Println()
 
 		if preset.GetContentType() != "" {
@@ -1094,6 +1178,7 @@ func handlePresets(host string, port int, timeout time.Duration) error {
 			if !preset.GetCreatedTime().IsZero() {
 				fmt.Printf("  Created: %s\n", preset.GetCreatedTime().Format("2006-01-02 15:04:05"))
 			}
+
 			if !preset.GetUpdatedTime().IsZero() {
 				fmt.Printf("  Updated: %s\n", preset.GetUpdatedTime().Format("2006-01-02 15:04:05"))
 			}
@@ -1142,56 +1227,69 @@ func handleKeyCommands(host string, port int, timeout time.Duration, key string,
 
 	// Count how many commands are requested
 	commandCount := 0
+
 	var commandName string
 
 	if key != "" {
 		commandCount++
 		commandName = fmt.Sprintf("key %s", key)
 	}
+
 	if play {
 		commandCount++
 		commandName = "PLAY"
 	}
+
 	if pause {
 		commandCount++
 		commandName = "PAUSE"
 	}
+
 	if stop {
 		commandCount++
 		commandName = "STOP"
 	}
+
 	if next {
 		commandCount++
 		commandName = "NEXT_TRACK"
 	}
+
 	if prev {
 		commandCount++
 		commandName = "PREV_TRACK"
 	}
+
 	if volumeUp {
 		commandCount++
 		commandName = "VOLUME_UP"
 	}
+
 	if volumeDown {
 		commandCount++
 		commandName = "VOLUME_DOWN"
 	}
+
 	if power {
 		commandCount++
 		commandName = "POWER"
 	}
+
 	if mute {
 		commandCount++
 		commandName = "MUTE"
 	}
+
 	if thumbsUp {
 		commandCount++
 		commandName = "THUMBS_UP"
 	}
+
 	if thumbsDown {
 		commandCount++
 		commandName = "THUMBS_DOWN"
 	}
+
 	if preset > 0 {
 		commandCount++
 		commandName = fmt.Sprintf("PRESET_%d", preset)
@@ -1201,6 +1299,7 @@ func handleKeyCommands(host string, port int, timeout time.Duration, key string,
 	if commandCount > 1 {
 		return fmt.Errorf("only one key command can be sent at a time")
 	}
+
 	if commandCount == 0 {
 		return fmt.Errorf("no key command specified")
 	}
@@ -1242,6 +1341,7 @@ func handleKeyCommands(host string, port int, timeout time.Duration, key string,
 	}
 
 	fmt.Printf("✓ %s command sent successfully\n", commandName)
+
 	return nil
 }
 
@@ -1268,6 +1368,7 @@ func handleVolumeCommands(host string, port int, timeout time.Duration, getVolum
 	// Handle get volume
 	if getVolume {
 		fmt.Printf("Getting current volume from %s:%d...\n", host, port)
+
 		volume, err := soundtouchClient.GetVolume()
 		if err != nil {
 			return fmt.Errorf("failed to get volume: %w", err)
@@ -1278,9 +1379,11 @@ func handleVolumeCommands(host string, port int, timeout time.Duration, getVolum
 		fmt.Printf("  Current Level: %d (%s)\n", volume.GetLevel(), models.GetVolumeLevelName(volume.GetLevel()))
 		fmt.Printf("  Target Level: %d\n", volume.GetTargetLevel())
 		fmt.Printf("  Muted: %v\n", volume.IsMuted())
+
 		if !volume.IsVolumeSync() {
 			fmt.Printf("  Note: Volume is adjusting (target: %d, actual: %d)\n", volume.GetTargetLevel(), volume.GetLevel())
 		}
+
 		return nil
 	}
 
@@ -1293,6 +1396,7 @@ func handleVolumeCommands(host string, port int, timeout time.Duration, getVolum
 		}
 
 		fmt.Printf("Setting volume to %d on %s:%d...\n", setVolume, host, port)
+
 		err := soundtouchClient.SetVolume(setVolume)
 		if err != nil {
 			return fmt.Errorf("failed to set volume: %w", err)
@@ -1305,6 +1409,7 @@ func handleVolumeCommands(host string, port int, timeout time.Duration, getVolum
 		} else {
 			fmt.Printf("✓ Volume set to %d (%s)\n", volume.GetLevel(), models.GetVolumeLevelName(volume.GetLevel()))
 		}
+
 		return nil
 	}
 
@@ -1313,17 +1418,20 @@ func handleVolumeCommands(host string, port int, timeout time.Duration, getVolum
 		if incVolume > 10 {
 			incVolume = 10 // Safety limit
 		}
+
 		if incVolume == 0 {
 			incVolume = 2 // Default increment
 		}
 
 		fmt.Printf("Increasing volume by %d on %s:%d...\n", incVolume, host, port)
+
 		volume, err := soundtouchClient.IncreaseVolume(incVolume)
 		if err != nil {
 			return fmt.Errorf("failed to increase volume: %w", err)
 		}
 
 		fmt.Printf("✓ Volume increased to %d (%s)\n", volume.GetLevel(), models.GetVolumeLevelName(volume.GetLevel()))
+
 		return nil
 	}
 
@@ -1332,17 +1440,20 @@ func handleVolumeCommands(host string, port int, timeout time.Duration, getVolum
 		if decVolume > 20 {
 			decVolume = 20 // Safety limit for decrease
 		}
+
 		if decVolume == 0 {
 			decVolume = 2 // Default decrement
 		}
 
 		fmt.Printf("Decreasing volume by %d on %s:%d...\n", decVolume, host, port)
+
 		volume, err := soundtouchClient.DecreaseVolume(decVolume)
 		if err != nil {
 			return fmt.Errorf("failed to decrease volume: %w", err)
 		}
 
 		fmt.Printf("✓ Volume decreased to %d (%s)\n", volume.GetLevel(), models.GetVolumeLevelName(volume.GetLevel()))
+
 		return nil
 	}
 
@@ -1373,46 +1484,58 @@ func handleSourceCommands(host string, port int, timeout time.Duration, selectSo
 	// Handle convenience flags first
 	if spotify {
 		fmt.Printf("Selecting Spotify source...\n")
+
 		err := c.SelectSpotify(sourceAccount)
 		if err != nil {
 			return fmt.Errorf("failed to select Spotify: %w", err)
 		}
+
 		fmt.Println("✓ Spotify source selected successfully")
+
 		return nil
 	}
 
 	if bluetooth {
 		fmt.Printf("Selecting Bluetooth source...\n")
+
 		err := c.SelectBluetooth()
 		if err != nil {
 			return fmt.Errorf("failed to select Bluetooth: %w", err)
 		}
+
 		fmt.Println("✓ Bluetooth source selected successfully")
+
 		return nil
 	}
 
 	if aux {
 		fmt.Printf("Selecting AUX input source...\n")
+
 		err := c.SelectAux()
 		if err != nil {
 			return fmt.Errorf("failed to select AUX: %w", err)
 		}
+
 		fmt.Println("✓ AUX input source selected successfully")
+
 		return nil
 	}
 
 	// Handle generic source selection
 	if selectSource != "" {
 		fmt.Printf("Selecting source: %s", selectSource)
+
 		if sourceAccount != "" {
 			fmt.Printf(" (account: %s)", sourceAccount)
 		}
+
 		fmt.Printf("...\n")
 
 		err := c.SelectSource(selectSource, sourceAccount)
 		if err != nil {
 			return fmt.Errorf("failed to select source %s: %w", selectSource, err)
 		}
+
 		fmt.Printf("✓ Source %s selected successfully\n", selectSource)
 	}
 
@@ -1443,6 +1566,7 @@ func handleBassCommands(host string, port int, timeout time.Duration, getBass bo
 	// Handle get bass
 	if getBass {
 		fmt.Printf("Getting current bass level from %s:%d...\n", host, port)
+
 		bass, err := soundtouchClient.GetBass()
 		if err != nil {
 			return fmt.Errorf("failed to get bass: %w", err)
@@ -1450,9 +1574,11 @@ func handleBassCommands(host string, port int, timeout time.Duration, getBass bo
 
 		fmt.Printf("Bass Level: %d (%s)\n", bass.GetLevel(), models.GetBassLevelName(bass.GetLevel()))
 		fmt.Printf("Category: %s\n", models.GetBassLevelCategory(bass.GetLevel()))
+
 		if !bass.IsAtTarget() {
 			fmt.Printf("Target: %d, Actual: %d (adjusting...)\n", bass.TargetBass, bass.ActualBass)
 		}
+
 		return nil
 	}
 
@@ -1463,6 +1589,7 @@ func handleBassCommands(host string, port int, timeout time.Duration, getBass bo
 		}
 
 		fmt.Printf("Setting bass to %d on %s:%d...\n", setBass, host, port)
+
 		err := soundtouchClient.SetBass(setBass)
 		if err != nil {
 			return fmt.Errorf("failed to set bass: %w", err)
@@ -1475,6 +1602,7 @@ func handleBassCommands(host string, port int, timeout time.Duration, getBass bo
 		} else {
 			fmt.Printf("✓ Bass set to %d (%s)\n", bass.GetLevel(), models.GetBassLevelName(bass.GetLevel()))
 		}
+
 		return nil
 	}
 
@@ -1483,17 +1611,20 @@ func handleBassCommands(host string, port int, timeout time.Duration, getBass bo
 		if incBass > 3 {
 			incBass = 3 // Safety limit
 		}
+
 		if incBass == 0 {
 			incBass = 1 // Default increment
 		}
 
 		fmt.Printf("Increasing bass by %d on %s:%d...\n", incBass, host, port)
+
 		bass, err := soundtouchClient.IncreaseBass(incBass)
 		if err != nil {
 			return fmt.Errorf("failed to increase bass: %w", err)
 		}
 
 		fmt.Printf("✓ Bass increased to %d (%s)\n", bass.GetLevel(), models.GetBassLevelName(bass.GetLevel()))
+
 		return nil
 	}
 
@@ -1502,17 +1633,20 @@ func handleBassCommands(host string, port int, timeout time.Duration, getBass bo
 		if decBass > 3 {
 			decBass = 3 // Safety limit for decrease
 		}
+
 		if decBass == 0 {
 			decBass = 1 // Default decrement
 		}
 
 		fmt.Printf("Decreasing bass by %d on %s:%d...\n", decBass, host, port)
+
 		bass, err := soundtouchClient.DecreaseBass(decBass)
 		if err != nil {
 			return fmt.Errorf("failed to decrease bass: %w", err)
 		}
 
 		fmt.Printf("✓ Bass decreased to %d (%s)\n", bass.GetLevel(), models.GetBassLevelName(bass.GetLevel()))
+
 		return nil
 	}
 
@@ -1543,6 +1677,7 @@ func handleBalanceCommands(host string, port int, timeout time.Duration, getBala
 	// Handle get balance
 	if getBalance {
 		fmt.Printf("Getting current balance level from %s:%d...\n", host, port)
+
 		balance, err := soundtouchClient.GetBalance()
 		if err != nil {
 			return fmt.Errorf("failed to get balance: %w", err)
@@ -1552,9 +1687,11 @@ func handleBalanceCommands(host string, port int, timeout time.Duration, getBala
 		fmt.Printf("Category: %s\n", models.GetBalanceLevelCategory(balance.GetLevel()))
 		left, right := balance.GetLeftRightPercentage()
 		fmt.Printf("Left/Right: %d%%/%d%%\n", left, right)
+
 		if !balance.IsAtTarget() {
 			fmt.Printf("Target: %d, Actual: %d (adjusting...)\n", balance.TargetBalance, balance.ActualBalance)
 		}
+
 		return nil
 	}
 
@@ -1565,6 +1702,7 @@ func handleBalanceCommands(host string, port int, timeout time.Duration, getBala
 		}
 
 		fmt.Printf("Setting balance to %d on %s:%d...\n", setBalance, host, port)
+
 		err := soundtouchClient.SetBalance(setBalance)
 		if err != nil {
 			return fmt.Errorf("failed to set balance: %w", err)
@@ -1577,6 +1715,7 @@ func handleBalanceCommands(host string, port int, timeout time.Duration, getBala
 		} else {
 			fmt.Printf("✓ Balance set to %d (%s)\n", balance.GetLevel(), models.GetBalanceLevelName(balance.GetLevel()))
 		}
+
 		return nil
 	}
 
@@ -1585,17 +1724,20 @@ func handleBalanceCommands(host string, port int, timeout time.Duration, getBala
 		if incBalance > 10 {
 			incBalance = 10 // Safety limit
 		}
+
 		if incBalance == 0 {
 			incBalance = 5 // Default increment
 		}
 
 		fmt.Printf("Increasing balance by %d on %s:%d...\n", incBalance, host, port)
+
 		balance, err := soundtouchClient.IncreaseBalance(incBalance)
 		if err != nil {
 			return fmt.Errorf("failed to increase balance: %w", err)
 		}
 
 		fmt.Printf("✓ Balance increased to %d (%s)\n", balance.GetLevel(), models.GetBalanceLevelName(balance.GetLevel()))
+
 		return nil
 	}
 
@@ -1604,17 +1746,20 @@ func handleBalanceCommands(host string, port int, timeout time.Duration, getBala
 		if decBalance > 10 {
 			decBalance = 10 // Safety limit for decrease
 		}
+
 		if decBalance == 0 {
 			decBalance = 5 // Default decrement
 		}
 
 		fmt.Printf("Decreasing balance by %d on %s:%d...\n", decBalance, host, port)
+
 		balance, err := soundtouchClient.DecreaseBalance(decBalance)
 		if err != nil {
 			return fmt.Errorf("failed to decrease balance: %w", err)
 		}
 
 		fmt.Printf("✓ Balance decreased to %d (%s)\n", balance.GetLevel(), models.GetBalanceLevelName(balance.GetLevel()))
+
 		return nil
 	}
 
@@ -1646,29 +1791,35 @@ func handleClockCommands(host string, port int, timeout time.Duration, getClockT
 	// Get clock time
 	if getClockTime {
 		fmt.Printf("Getting clock time from %s:%d...\n", host, port)
+
 		clockTime, clockErr := soundtouchClient.GetClockTime()
 		if clockErr != nil {
 			return fmt.Errorf("failed to get clock time: %w", clockErr)
 		}
 
 		fmt.Printf("Device Clock Time:\n")
+
 		if !clockTime.IsEmpty() {
 			fmt.Printf("  Time: %s\n", clockTime.GetTimeString())
+
 			if clockTime.GetUTC() > 0 {
 				fmt.Printf("  UTC Timestamp: %d\n", clockTime.GetUTC())
 			}
+
 			if clockTime.GetZone() != "" {
 				fmt.Printf("  Timezone: %s\n", clockTime.GetZone())
 			}
 		} else {
 			fmt.Printf("  No time data available\n")
 		}
+
 		return nil
 	}
 
 	// Set clock time
 	if setClockTime != "" {
 		fmt.Printf("Setting clock time on %s:%d...\n", host, port)
+
 		if setClockTime == "now" {
 			err = soundtouchClient.SetClockTimeNow()
 		} else {
@@ -1686,50 +1837,62 @@ func handleClockCommands(host string, port int, timeout time.Duration, getClockT
 		}
 
 		fmt.Printf("✓ Clock time set successfully\n")
+
 		return nil
 	}
 
 	// Get clock display settings
 	if getClockDisplay {
 		fmt.Printf("Getting clock display settings from %s:%d...\n", host, port)
+
 		clockDisplay, displayErr := soundtouchClient.GetClockDisplay()
 		if displayErr != nil {
 			return fmt.Errorf("failed to get clock display settings: %w", displayErr)
 		}
 
 		fmt.Printf("Clock Display Settings:\n")
+
 		if clockDisplay.GetDeviceID() != "" {
 			fmt.Printf("  Device ID: %s\n", clockDisplay.GetDeviceID())
 		}
+
 		fmt.Printf("  Enabled: %v\n", clockDisplay.IsEnabled())
 		fmt.Printf("  Format: %s\n", clockDisplay.GetFormatDescription())
 		fmt.Printf("  Brightness: %d%% (%s)\n", clockDisplay.GetBrightness(), clockDisplay.GetBrightnessLevel())
 		fmt.Printf("  Auto-Dim: %v\n", clockDisplay.IsAutoDimEnabled())
+
 		if clockDisplay.GetTimeZone() != "" {
 			fmt.Printf("  Timezone: %s\n", clockDisplay.GetTimeZone())
 		}
+
 		return nil
 	}
 
 	// Enable clock display
 	if enableClock {
 		fmt.Printf("Enabling clock display on %s:%d...\n", host, port)
+
 		err = soundtouchClient.EnableClockDisplay()
 		if err != nil {
 			return fmt.Errorf("failed to enable clock display: %w", err)
 		}
+
 		fmt.Printf("✓ Clock display enabled\n")
+
 		return nil
 	}
 
 	// Disable clock display
 	if disableClock {
 		fmt.Printf("Disabling clock display on %s:%d...\n", host, port)
+
 		err = soundtouchClient.DisableClockDisplay()
 		if err != nil {
 			return fmt.Errorf("failed to disable clock display: %w", err)
 		}
+
 		fmt.Printf("✓ Clock display disabled\n")
+
 		return nil
 	}
 
@@ -1754,7 +1917,9 @@ func handleClockCommands(host string, port int, timeout time.Duration, getClockT
 		if err != nil {
 			return fmt.Errorf("failed to set clock format: %w", err)
 		}
+
 		fmt.Printf("✓ Clock format set to %s\n", clockFormat)
+
 		return nil
 	}
 
@@ -1765,11 +1930,14 @@ func handleClockCommands(host string, port int, timeout time.Duration, getClockT
 		}
 
 		fmt.Printf("Setting clock brightness to %d%% on %s:%d...\n", clockBright, host, port)
+
 		err = soundtouchClient.SetClockDisplayBrightness(clockBright)
 		if err != nil {
 			return fmt.Errorf("failed to set clock brightness: %w", err)
 		}
+
 		fmt.Printf("✓ Clock brightness set to %d%%\n", clockBright)
+
 		return nil
 	}
 
@@ -1799,6 +1967,7 @@ func handleNetworkInfo(host string, port int, timeout time.Duration) error {
 	soundtouchClient := client.NewClient(clientConfig)
 
 	fmt.Printf("Getting network information from %s:%d...\n", host, port)
+
 	networkInfo, err := soundtouchClient.GetNetworkInfo()
 	if err != nil {
 		return fmt.Errorf("failed to get network info: %w", err)
@@ -1821,31 +1990,39 @@ func handleNetworkInfo(host string, port int, timeout time.Duration) error {
 			iface := &interfaces[i]
 			fmt.Printf("Interface %d:\n", i+1)
 			fmt.Printf("  • Type: %s", iface.GetType())
+
 			if iface.GetName() != "" {
 				fmt.Printf(" (%s)", iface.GetName())
 			}
+
 			fmt.Printf("\n")
 
 			if iface.GetMacAddress() != "" {
 				fmt.Printf("  • MAC Address: %s", iface.GetMacAddress())
+
 				if !iface.ValidateMAC() {
 					fmt.Printf(" (invalid)")
 				}
+
 				fmt.Printf("\n")
 			}
 
 			if iface.GetIPAddress() != "" {
 				fmt.Printf("  • IP Address: %s", iface.GetIPAddress())
+
 				if !iface.ValidateIP() {
 					fmt.Printf(" (invalid)")
 				}
+
 				fmt.Printf("\n")
 			}
 
 			fmt.Printf("  • State: %s", iface.GetStateDescription())
+
 			if iface.IsConnected() {
 				fmt.Printf(" ✓")
 			}
+
 			fmt.Printf("\n")
 
 			// WiFi-specific information
@@ -1901,11 +2078,14 @@ func handleNetworkInfo(host string, port int, timeout time.Duration) error {
 
 	// Connectivity Summary
 	fmt.Printf("Connectivity Summary:\n")
+
 	if networkInfo.HasWiFi() {
 		fmt.Printf("  ✓ WiFi Available")
+
 		if networkInfo.GetConnectedWiFiInterface() != nil {
 			fmt.Printf(" (Connected)")
 		}
+
 		fmt.Printf("\n")
 	} else {
 		fmt.Printf("  ✗ No WiFi\n")
@@ -1913,9 +2093,11 @@ func handleNetworkInfo(host string, port int, timeout time.Duration) error {
 
 	if networkInfo.HasEthernet() {
 		fmt.Printf("  ✓ Ethernet Available")
+
 		if networkInfo.GetConnectedEthernetInterface() != nil {
 			fmt.Printf(" (Connected)")
 		}
+
 		fmt.Printf("\n")
 	} else {
 		fmt.Printf("  ✗ No Ethernet\n")
@@ -2003,9 +2185,11 @@ func handleGetZone(client *client.Client) error {
 
 		for i, member := range zone.Members {
 			fmt.Printf("    %d. %s", i+1, member.DeviceID)
+
 			if member.IP != "" {
 				fmt.Printf(" (%s)", member.IP)
 			}
+
 			fmt.Printf("\n")
 		}
 	}
@@ -2057,6 +2241,7 @@ func handleGetZoneMembers(client *client.Client) error {
 	}
 
 	fmt.Printf("Zone Members:\n")
+
 	if len(members) == 1 {
 		fmt.Printf("  Device is standalone (not in a zone)\n")
 		fmt.Printf("  Device: %s\n", members[0])
@@ -2074,10 +2259,13 @@ func handleGetZoneMembers(client *client.Client) error {
 				if member, found := zone.GetMemberByDeviceID(memberID); found {
 					ip = member.IP
 				}
+
 				fmt.Printf("    %d. %s", i+1, memberID)
+
 				if ip != "" {
 					fmt.Printf(" (%s)", ip)
 				}
+
 				fmt.Printf("\n")
 			}
 		}
@@ -2125,6 +2313,7 @@ func handleAddToZone(client *client.Client, deviceSpec string) error {
 		if len(parts) != 2 {
 			return fmt.Errorf("invalid device specification. Use format: deviceID@ip or deviceID")
 		}
+
 		deviceID = strings.TrimSpace(parts[0])
 		ipAddress = strings.TrimSpace(parts[1])
 	} else {
@@ -2136,9 +2325,11 @@ func handleAddToZone(client *client.Client, deviceSpec string) error {
 	}
 
 	fmt.Printf("Adding device %s to zone", deviceID)
+
 	if ipAddress != "" {
 		fmt.Printf(" (IP: %s)", ipAddress)
 	}
+
 	fmt.Printf("...\n")
 
 	err := client.AddToZone(deviceID, ipAddress)

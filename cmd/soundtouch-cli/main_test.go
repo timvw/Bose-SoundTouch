@@ -153,6 +153,7 @@ func TestParseHostPort(t *testing.T) {
 			if gotHost != tt.wantHost {
 				t.Errorf("parseHostPort() host = %v, want %v", gotHost, tt.wantHost)
 			}
+
 			if gotPort != tt.wantPort {
 				t.Errorf("parseHostPort() port = %v, want %v", gotPort, tt.wantPort)
 			}
@@ -238,6 +239,7 @@ func TestParseHostPortSoundTouchScenarios(t *testing.T) {
 			if gotHost != tt.wantHost {
 				t.Errorf("parseHostPort() host = %v, want %v (scenario: %s)", gotHost, tt.wantHost, tt.description)
 			}
+
 			if gotPort != tt.wantPort {
 				t.Errorf("parseHostPort() port = %v, want %v (scenario: %s)", gotPort, tt.wantPort, tt.description)
 			}

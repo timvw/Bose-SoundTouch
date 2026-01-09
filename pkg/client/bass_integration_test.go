@@ -67,6 +67,7 @@ func TestClient_Bass_Integration(t *testing.T) {
 			t.Errorf("Failed to get original bass level: %v", err)
 			return
 		}
+
 		t.Logf("Original bass level: %d", originalBass.GetLevel())
 
 		// Try setting to 0 (neutral)
@@ -75,6 +76,7 @@ func TestClient_Bass_Integration(t *testing.T) {
 			t.Errorf("Failed to set bass to 0: %v", err)
 			return
 		}
+
 		t.Log("✓ SetBass(0) completed successfully")
 
 		// Give device time to process
@@ -86,6 +88,7 @@ func TestClient_Bass_Integration(t *testing.T) {
 			t.Errorf("Failed to get bass after setting: %v", err)
 			return
 		}
+
 		t.Logf("Bass after setting to 0: %d", newBass.GetLevel())
 
 		// Restore original bass level
@@ -109,6 +112,7 @@ func TestClient_Bass_Integration(t *testing.T) {
 			} else {
 				t.Logf("✓ SetBass(%d) accepted", level)
 			}
+
 			time.Sleep(200 * time.Millisecond) // Brief pause between commands
 		}
 
@@ -144,6 +148,7 @@ func TestClient_Bass_Integration(t *testing.T) {
 			} else {
 				t.Logf("✓ SetBassSafe(%d) completed (should clamp to %d)", test.input, test.expected)
 			}
+
 			time.Sleep(200 * time.Millisecond)
 		}
 	})
@@ -176,6 +181,7 @@ func TestClient_Bass_IncrementDecrement_Integration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to get original bass level: %v", err)
 	}
+
 	t.Logf("Original bass level: %d", originalBass.GetLevel())
 
 	// Ensure we restore original level at the end
@@ -195,6 +201,7 @@ func TestClient_Bass_IncrementDecrement_Integration(t *testing.T) {
 			t.Errorf("Failed to set bass to starting point: %v", err)
 			return
 		}
+
 		time.Sleep(300 * time.Millisecond)
 
 		// Test increasing by 1
@@ -221,6 +228,7 @@ func TestClient_Bass_IncrementDecrement_Integration(t *testing.T) {
 			t.Errorf("Failed to set bass to starting point: %v", err)
 			return
 		}
+
 		time.Sleep(300 * time.Millisecond)
 
 		// Test decreasing by 1
@@ -247,6 +255,7 @@ func TestClient_Bass_IncrementDecrement_Integration(t *testing.T) {
 			t.Errorf("Failed to set bass to 8: %v", err)
 			return
 		}
+
 		time.Sleep(300 * time.Millisecond)
 
 		bass, err := client.IncreaseBass(3) // Should clamp to 9
@@ -254,6 +263,7 @@ func TestClient_Bass_IncrementDecrement_Integration(t *testing.T) {
 			t.Errorf("IncreaseBass(3) from 8 failed: %v", err)
 			return
 		}
+
 		t.Logf("✓ IncreaseBass(3) from 8 result: %d (should be clamped)", bass.GetLevel())
 
 		// Test decrease near minimum
@@ -262,6 +272,7 @@ func TestClient_Bass_IncrementDecrement_Integration(t *testing.T) {
 			t.Errorf("Failed to set bass to -8: %v", err)
 			return
 		}
+
 		time.Sleep(300 * time.Millisecond)
 
 		bass, err = client.DecreaseBass(3) // Should clamp to -9
@@ -269,6 +280,7 @@ func TestClient_Bass_IncrementDecrement_Integration(t *testing.T) {
 			t.Errorf("DecreaseBass(3) from -8 failed: %v", err)
 			return
 		}
+
 		t.Logf("✓ DecreaseBass(3) from -8 result: %d (should be clamped)", bass.GetLevel())
 	})
 }
@@ -377,10 +389,12 @@ func BenchmarkClient_Bass_Integration(b *testing.B) {
 
 	b.Run("SetBass", func(b *testing.B) {
 		bassLevels := []int{-3, 0, 3, -1, 1} // Cycle through different levels
+
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
 			level := bassLevels[i%len(bassLevels)]
+
 			err := client.SetBass(level)
 			if err != nil {
 				b.Fatalf("SetBass(%d) failed: %v", level, err)
@@ -391,7 +405,9 @@ func BenchmarkClient_Bass_Integration(b *testing.B) {
 	b.Run("IncreaseBass", func(b *testing.B) {
 		// Set to a safe starting point
 		_ = client.SetBass(-3)
+
 		b.ResetTimer()
+
 		for i := 0; i < b.N; i++ {
 			// Keep increments small to avoid hitting limits
 			_, err := client.IncreaseBass(1)
@@ -416,6 +432,7 @@ func parseBassHostPort(hostPort string, defaultPort int) (string, int) {
 	// Simple parsing - in real use, we'd use net.SplitHostPort
 	parts := make([]string, 0, 2)
 	current := ""
+
 	for _, char := range hostPort {
 		if char == ':' {
 			parts = append(parts, current)
@@ -424,6 +441,7 @@ func parseBassHostPort(hostPort string, defaultPort int) (string, int) {
 			current += string(char)
 		}
 	}
+
 	if current != "" {
 		parts = append(parts, current)
 	}
@@ -433,6 +451,7 @@ func parseBassHostPort(hostPort string, defaultPort int) (string, int) {
 		port := defaultPort
 		portStr := parts[1]
 		portInt := 0
+
 		for _, char := range portStr {
 			if char >= '0' && char <= '9' {
 				portInt = portInt*10 + int(char-'0')
@@ -441,9 +460,11 @@ func parseBassHostPort(hostPort string, defaultPort int) (string, int) {
 				break
 			}
 		}
+
 		if portInt > 0 && portInt <= 65535 {
 			port = portInt
 		}
+
 		return parts[0], port
 	}
 

@@ -70,6 +70,7 @@ func TestNewBassRequest(t *testing.T) {
 				if err != nil {
 					t.Errorf("NewBassRequest() unexpected error: %v", err)
 				}
+
 				if req.Level != tt.wantLevel {
 					t.Errorf("NewBassRequest() level = %d, want %d", req.Level, tt.wantLevel)
 				}
@@ -368,12 +369,15 @@ func TestBass_BooleanMethods(t *testing.T) {
 			if got := tt.bass.IsBassBoost(); got != tt.wantBoost {
 				t.Errorf("IsBassBoost() = %v, want %v", got, tt.wantBoost)
 			}
+
 			if got := tt.bass.IsBassCut(); got != tt.wantCut {
 				t.Errorf("IsBassCut() = %v, want %v", got, tt.wantCut)
 			}
+
 			if got := tt.bass.IsFlat(); got != tt.wantFlat {
 				t.Errorf("IsFlat() = %v, want %v", got, tt.wantFlat)
 			}
+
 			if got := tt.bass.IsAtTarget(); got != tt.wantAtTarget {
 				t.Errorf("IsAtTarget() = %v, want %v", got, tt.wantAtTarget)
 			}
@@ -465,6 +469,7 @@ func TestBass_UnmarshalXML(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var bass Bass
+
 			err := xml.Unmarshal([]byte(tt.xmlData), &bass)
 
 			if tt.wantError {
@@ -475,12 +480,15 @@ func TestBass_UnmarshalXML(t *testing.T) {
 				if err != nil {
 					t.Errorf("UnmarshalXML() unexpected error: %v", err)
 				}
+
 				if bass.DeviceID != tt.want.DeviceID {
 					t.Errorf("DeviceID = %v, want %v", bass.DeviceID, tt.want.DeviceID)
 				}
+
 				if bass.TargetBass != tt.want.TargetBass {
 					t.Errorf("TargetBass = %v, want %v", bass.TargetBass, tt.want.TargetBass)
 				}
+
 				if bass.ActualBass != tt.want.ActualBass {
 					t.Errorf("ActualBass = %v, want %v", bass.ActualBass, tt.want.ActualBass)
 				}
@@ -561,9 +569,11 @@ func TestBassConstants(t *testing.T) {
 	if BassLevelMin != -9 {
 		t.Errorf("BassLevelMin = %v, want %v", BassLevelMin, -9)
 	}
+
 	if BassLevelMax != 9 {
 		t.Errorf("BassLevelMax = %v, want %v", BassLevelMax, 9)
 	}
+
 	if BassLevelDefault != 0 {
 		t.Errorf("BassLevelDefault = %v, want %v", BassLevelDefault, 0)
 	}
@@ -575,6 +585,7 @@ func TestBassLevelEdgeCases(t *testing.T) {
 		if !ValidateBassLevel(-9) {
 			t.Error("ValidateBassLevel(-9) should be true")
 		}
+
 		if ValidateBassLevel(-10) {
 			t.Error("ValidateBassLevel(-10) should be false")
 		}
@@ -584,6 +595,7 @@ func TestBassLevelEdgeCases(t *testing.T) {
 		if !ValidateBassLevel(9) {
 			t.Error("ValidateBassLevel(9) should be true")
 		}
+
 		if ValidateBassLevel(10) {
 			t.Error("ValidateBassLevel(10) should be false")
 		}

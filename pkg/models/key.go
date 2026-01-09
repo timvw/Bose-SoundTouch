@@ -128,6 +128,7 @@ func IsValidKey(keyValue string) bool {
 		KeyRepeatOne: true,
 		KeyRepeatAll: true,
 	}
+
 	return validKeys[keyValue]
 }
 

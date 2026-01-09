@@ -48,6 +48,7 @@ func TestClockTime_UnmarshalXML(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var clockTime ClockTime
+
 			err := xml.Unmarshal([]byte(tt.xmlData), &clockTime)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -56,9 +57,11 @@ func TestClockTime_UnmarshalXML(t *testing.T) {
 			if clockTime.Zone != tt.expected.Zone {
 				t.Errorf("Expected Zone %q, got %q", tt.expected.Zone, clockTime.Zone)
 			}
+
 			if clockTime.UTC != tt.expected.UTC {
 				t.Errorf("Expected UTC %d, got %d", tt.expected.UTC, clockTime.UTC)
 			}
+
 			if clockTime.Value != tt.expected.Value {
 				t.Errorf("Expected Value %q, got %q", tt.expected.Value, clockTime.Value)
 			}
@@ -127,6 +130,7 @@ func TestClockTime_GetTime(t *testing.T) {
 				if err == nil {
 					t.Errorf("Expected error, got none")
 				}
+
 				return
 			}
 
@@ -249,9 +253,11 @@ func TestClockTime_SetTime(t *testing.T) {
 	if clockTime.UTC != testTime.Unix() {
 		t.Errorf("Expected UTC %d, got %d", testTime.Unix(), clockTime.UTC)
 	}
+
 	if clockTime.Value != "2021-01-01 12:00:00" {
 		t.Errorf("Expected Value %q, got %q", "2021-01-01 12:00:00", clockTime.Value)
 	}
+
 	if clockTime.Zone != "UTC" {
 		t.Errorf("Expected Zone %q, got %q", "UTC", clockTime.Zone)
 	}
@@ -266,6 +272,7 @@ func TestClockTime_SetUTC(t *testing.T) {
 	if clockTime.UTC != utcTimestamp {
 		t.Errorf("Expected UTC %d, got %d", utcTimestamp, clockTime.UTC)
 	}
+
 	expectedValue := time.Unix(utcTimestamp, 0).UTC().Format("2006-01-02 15:04:05")
 	if clockTime.Value != expectedValue {
 		t.Errorf("Expected Value %q, got %q", expectedValue, clockTime.Value)
@@ -280,9 +287,11 @@ func TestNewClockTimeRequest(t *testing.T) {
 	if request.UTC != testTime.Unix() {
 		t.Errorf("Expected UTC %d, got %d", testTime.Unix(), request.UTC)
 	}
+
 	if request.Value != "2021-01-01 12:00:00" {
 		t.Errorf("Expected Value %q, got %q", "2021-01-01 12:00:00", request.Value)
 	}
+
 	if request.Zone != "UTC" {
 		t.Errorf("Expected Zone %q, got %q", "UTC", request.Zone)
 	}
@@ -296,6 +305,7 @@ func TestNewClockTimeRequestUTC(t *testing.T) {
 	if request.UTC != utcTimestamp {
 		t.Errorf("Expected UTC %d, got %d", utcTimestamp, request.UTC)
 	}
+
 	expectedValue := time.Unix(utcTimestamp, 0).UTC().Format("2006-01-02 15:04:05")
 	if request.Value != expectedValue {
 		t.Errorf("Expected Value %q, got %q", expectedValue, request.Value)
@@ -358,6 +368,7 @@ func TestClockTimeRequest_Validate(t *testing.T) {
 			if tt.wantErr && err == nil {
 				t.Error("Expected error, got none")
 			}
+
 			if !tt.wantErr && err != nil {
 				t.Errorf("Unexpected error: %v", err)
 			}

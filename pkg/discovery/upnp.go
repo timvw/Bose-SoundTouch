@@ -65,6 +65,7 @@ func NewDiscoveryServiceWithConfig(cfg *config.Config) *DiscoveryService {
 func (d *DiscoveryService) DiscoverDevices(ctx context.Context) ([]*models.DiscoveredDevice, error) {
 	// Check cache first
 	d.cleanupCache()
+
 	cached := d.getCachedDevices()
 	if len(cached) > 0 {
 		return cached, nil
@@ -99,10 +100,12 @@ func (d *DiscoveryService) DiscoverDevices(ctx context.Context) ([]*models.Disco
 func (d *DiscoveryService) DiscoverDevice(ctx context.Context, host string) (*models.DiscoveredDevice, error) {
 	// Check cache first
 	d.mutex.RLock()
+
 	if device, exists := d.cache[host]; exists && time.Since(device.LastSeen) < d.cacheTTL {
 		d.mutex.RUnlock()
 		return device, nil
 	}
+
 	d.mutex.RUnlock()
 
 	// Try to discover all devices and find the specific one
@@ -130,6 +133,7 @@ func (d *DiscoveryService) GetCachedDevices() []*models.DiscoveredDevice {
 func (d *DiscoveryService) ClearCache() {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
+
 	d.cache = make(map[string]*models.DiscoveredDevice)
 }
 
@@ -143,6 +147,7 @@ func (d *DiscoveryService) performDiscovery(ctx context.Context) ([]*models.Disc
 		log.Printf("UPnP: Failed to create UDP connection to %s: %v", ssdpAddr, err)
 		return nil, fmt.Errorf("failed to create UDP connection: %w", err)
 	}
+
 	defer func() {
 		_ = conn.Close()
 	}()
@@ -158,6 +163,7 @@ func (d *DiscoveryService) performDiscovery(ctx context.Context) ([]*models.Disc
 		log.Printf("UPnP: Failed to send M-SEARCH request: %v", err)
 		return nil, fmt.Errorf("failed to send M-SEARCH: %w", err)
 	}
+
 	log.Printf("UPnP: Successfully sent M-SEARCH request (%d bytes)", bytesWritten)
 
 	// Listen for responses
@@ -170,6 +176,7 @@ func (d *DiscoveryService) performDiscovery(ctx context.Context) ([]*models.Disc
 		log.Printf("UPnP: Failed to set read deadline: %v", err)
 		return nil, fmt.Errorf("failed to set read deadline: %w", err)
 	}
+
 	log.Printf("UPnP: Set read deadline to %v, now listening for responses...", deadline.Format("15:04:05.000"))
 
 	buffer := make([]byte, 4096)
@@ -187,7 +194,9 @@ func (d *DiscoveryService) performDiscovery(ctx context.Context) ([]*models.Disc
 					log.Printf("UPnP: Read timeout reached after %v, stopping discovery", d.timeout)
 					break // Timeout reached, stop reading
 				}
+
 				log.Printf("UPnP: Error reading response: %v", err)
+
 				return nil, fmt.Errorf("failed to read response: %w", err)
 			}
 
@@ -217,6 +226,7 @@ func (d *DiscoveryService) performDiscovery(ctx context.Context) ([]*models.Disc
 	}
 
 	log.Printf("UPnP: Discovery completed. Processed %d responses, found %d unique devices", responseCount, len(result))
+
 	for i, device := range result {
 		log.Printf("UPnP: Device #%d: %s at %s:%d (Location: %s)", i+1, device.Name, device.Host, device.Port, device.Location)
 	}
@@ -256,9 +266,11 @@ func (d *DiscoveryService) parseResponse(response string) (*models.DiscoveredDev
 		log.Printf("UPnP: Invalid HTTP response, first line: '%s'", lines[0])
 		return nil, fmt.Errorf("invalid HTTP response")
 	}
+
 	log.Printf("UPnP: Valid HTTP response detected")
 
 	headers := make(map[string]string)
+
 	for _, line := range lines[1:] {
 		line = strings.TrimSpace(line)
 		if line == "" {
@@ -274,6 +286,7 @@ func (d *DiscoveryService) parseResponse(response string) (*models.DiscoveredDev
 	}
 
 	log.Printf("UPnP: Parsed %d headers from response", len(headers))
+
 	for key, value := range headers {
 		log.Printf("UPnP: Header: %s = %s", key, value)
 	}
@@ -284,6 +297,7 @@ func (d *DiscoveryService) parseResponse(response string) (*models.DiscoveredDev
 		log.Printf("UPnP: No ST header found in response")
 		return nil, fmt.Errorf("no ST header found")
 	}
+
 	log.Printf("UPnP: Found ST header: %s", st)
 
 	// Accept both MediaRenderer and any device type for now - we'll validate it's a SoundTouch later
@@ -291,6 +305,7 @@ func (d *DiscoveryService) parseResponse(response string) (*models.DiscoveredDev
 		log.Printf("UPnP: Device type '%s' is not a MediaRenderer, skipping", st)
 		return nil, fmt.Errorf("not a MediaRenderer device")
 	}
+
 	log.Printf("UPnP: Device type '%s' is acceptable", st)
 
 	location, exists := headers["location"]
@@ -298,6 +313,7 @@ func (d *DiscoveryService) parseResponse(response string) (*models.DiscoveredDev
 		log.Printf("UPnP: No Location header found in response")
 		return nil, fmt.Errorf("no location header found")
 	}
+
 	log.Printf("UPnP: Found Location header: %s", location)
 
 	// Extract device information from location URL
@@ -306,6 +322,7 @@ func (d *DiscoveryService) parseResponse(response string) (*models.DiscoveredDev
 		log.Printf("UPnP: Failed to parse location URL '%s': %v", location, err)
 		return nil, fmt.Errorf("failed to parse location URL: %w", err)
 	}
+
 	log.Printf("UPnP: Successfully parsed device from location: %s at %s:%d", device.Name, device.Host, device.Port)
 
 	// Try to get more device info from the location URL
@@ -361,6 +378,7 @@ func (d *DiscoveryService) enrichDeviceInfo(_ *models.DiscoveredDevice, location
 		log.Printf("UPnP: Failed to fetch device description from %s: %v", location, err)
 		return err
 	}
+
 	defer func() {
 		_ = resp.Body.Close()
 	}()

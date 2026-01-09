@@ -61,6 +61,7 @@ func TestClockDisplay_UnmarshalXML(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var clockDisplay ClockDisplay
+
 			err := xml.Unmarshal([]byte(tt.xmlData), &clockDisplay)
 			if err != nil {
 				t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -69,21 +70,27 @@ func TestClockDisplay_UnmarshalXML(t *testing.T) {
 			if clockDisplay.DeviceID != tt.expected.DeviceID {
 				t.Errorf("Expected DeviceID %q, got %q", tt.expected.DeviceID, clockDisplay.DeviceID)
 			}
+
 			if clockDisplay.Enabled != tt.expected.Enabled {
 				t.Errorf("Expected Enabled %v, got %v", tt.expected.Enabled, clockDisplay.Enabled)
 			}
+
 			if clockDisplay.Format != tt.expected.Format {
 				t.Errorf("Expected Format %q, got %q", tt.expected.Format, clockDisplay.Format)
 			}
+
 			if clockDisplay.Brightness != tt.expected.Brightness {
 				t.Errorf("Expected Brightness %d, got %d", tt.expected.Brightness, clockDisplay.Brightness)
 			}
+
 			if clockDisplay.AutoDim != tt.expected.AutoDim {
 				t.Errorf("Expected AutoDim %v, got %v", tt.expected.AutoDim, clockDisplay.AutoDim)
 			}
+
 			if clockDisplay.TimeZone != tt.expected.TimeZone {
 				t.Errorf("Expected TimeZone %q, got %q", tt.expected.TimeZone, clockDisplay.TimeZone)
 			}
+
 			if clockDisplay.Value != tt.expected.Value {
 				t.Errorf("Expected Value %q, got %q", tt.expected.Value, clockDisplay.Value)
 			}
@@ -385,15 +392,19 @@ func TestNewClockDisplayRequest(t *testing.T) {
 	if request.Enabled != nil {
 		t.Error("Expected Enabled to be nil")
 	}
+
 	if request.Format != "" {
 		t.Error("Expected Format to be empty")
 	}
+
 	if request.Brightness != nil {
 		t.Error("Expected Brightness to be nil")
 	}
+
 	if request.AutoDim != nil {
 		t.Error("Expected AutoDim to be nil")
 	}
+
 	if request.TimeZone != "" {
 		t.Error("Expected TimeZone to be empty")
 	}
@@ -416,15 +427,19 @@ func TestClockDisplayRequest_SetMethods(t *testing.T) {
 	if request.Enabled == nil || *request.Enabled != true {
 		t.Error("Expected Enabled to be true")
 	}
+
 	if request.Format != "24" {
 		t.Errorf("Expected Format to be '24', got %q", request.Format)
 	}
+
 	if request.Brightness == nil || *request.Brightness != 75 {
 		t.Error("Expected Brightness to be 75")
 	}
+
 	if request.AutoDim == nil || *request.AutoDim != true {
 		t.Error("Expected AutoDim to be true")
 	}
+
 	if request.TimeZone != "UTC" {
 		t.Errorf("Expected TimeZone to be 'UTC', got %q", request.TimeZone)
 	}
@@ -556,6 +571,7 @@ func TestClockDisplayRequest_Validate(t *testing.T) {
 			if tt.wantErr && err == nil {
 				t.Error("Expected error, got none")
 			}
+
 			if !tt.wantErr && err != nil {
 				t.Errorf("Unexpected error: %v", err)
 			}

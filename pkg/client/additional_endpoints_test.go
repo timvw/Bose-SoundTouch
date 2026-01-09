@@ -64,6 +64,7 @@ func TestClient_SetName(t *testing.T) {
 				if r.Method != "POST" {
 					t.Errorf("Expected POST request, got %s", r.Method)
 				}
+
 				if r.URL.Path != "/name" {
 					t.Errorf("Expected path /name, got %s", r.URL.Path)
 				}
@@ -181,6 +182,7 @@ func TestClient_GetBassCapabilities(t *testing.T) {
 				if r.Method != "GET" {
 					t.Errorf("Expected GET request, got %s", r.Method)
 				}
+
 				if r.URL.Path != "/bassCapabilities" {
 					t.Errorf("Expected path /bassCapabilities, got %s", r.URL.Path)
 				}
@@ -385,6 +387,7 @@ func TestClient_GetTrackInfo(t *testing.T) {
 				if r.Method != "GET" {
 					t.Errorf("Expected GET request, got %s", r.Method)
 				}
+
 				if r.URL.Path != "/trackInfo" {
 					t.Errorf("Expected path /trackInfo, got %s", r.URL.Path)
 				}
@@ -499,5 +502,6 @@ func findSubstring(str, substr string) bool {
 			return true
 		}
 	}
+
 	return false
 }

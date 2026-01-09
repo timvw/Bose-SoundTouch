@@ -81,12 +81,15 @@ func TestPlayStatus_Methods(t *testing.T) {
 			if tt.status.IsPlaying() != tt.isPlaying {
 				t.Errorf("IsPlaying() = %v, want %v", tt.status.IsPlaying(), tt.isPlaying)
 			}
+
 			if tt.status.IsPaused() != tt.isPaused {
 				t.Errorf("IsPaused() = %v, want %v", tt.status.IsPaused(), tt.isPaused)
 			}
+
 			if tt.status.IsStopped() != tt.isStopped {
 				t.Errorf("IsStopped() = %v, want %v", tt.status.IsStopped(), tt.isStopped)
 			}
+
 			if tt.status.String() != tt.toString {
 				t.Errorf("String() = %v, want %v", tt.status.String(), tt.toString)
 			}
@@ -201,6 +204,7 @@ func TestNowPlaying_UnmarshalXML(t *testing.T) {
 </nowPlaying>`
 
 	var nowPlaying NowPlaying
+
 	err := xml.Unmarshal([]byte(xmlData), &nowPlaying)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -314,6 +318,7 @@ func TestNowPlaying_RadioStation(t *testing.T) {
 </nowPlaying>`
 
 	var nowPlaying NowPlaying
+
 	err := xml.Unmarshal([]byte(xmlData), &nowPlaying)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -343,6 +348,7 @@ func TestNowPlaying_EmptyState(t *testing.T) {
 </nowPlaying>`
 
 	var nowPlaying NowPlaying
+
 	err := xml.Unmarshal([]byte(xmlData), &nowPlaying)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)

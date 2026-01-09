@@ -184,6 +184,7 @@ func TestParseResponse_InvalidHTTP(t *testing.T) {
 		if err == nil && response != "" {
 			t.Errorf("Expected error for invalid response, got nil for: %s", response)
 		}
+
 		if device != nil {
 			t.Errorf("Expected nil device for invalid response, got device for: %s", response)
 		}
@@ -250,6 +251,7 @@ func TestCacheOperations(t *testing.T) {
 
 	// Test cache clear
 	service.ClearCache()
+
 	devices = service.GetCachedDevices()
 	if len(devices) != 0 {
 		t.Errorf("Expected empty cache after clear, got %d devices", len(devices))

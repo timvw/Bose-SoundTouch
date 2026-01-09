@@ -76,10 +76,12 @@ func TestClient_GetBalance(t *testing.T) {
 					t.Errorf("Expected GET request, got %s", r.Method)
 					return
 				}
+
 				if r.URL.Path != "/balance" {
 					t.Errorf("Expected path /balance, got %s", r.URL.Path)
 					return
 				}
+
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(http.StatusOK)
 				_, _ = w.Write([]byte(tt.serverResponse))
@@ -105,12 +107,15 @@ func TestClient_GetBalance(t *testing.T) {
 				if err != nil {
 					t.Errorf("Unexpected error: %v", err)
 				}
+
 				if balance.TargetBalance != tt.wantTargetBalance {
 					t.Errorf("Expected target balance %d, got %d", tt.wantTargetBalance, balance.TargetBalance)
 				}
+
 				if balance.ActualBalance != tt.wantActualBalance {
 					t.Errorf("Expected actual balance %d, got %d", tt.wantActualBalance, balance.ActualBalance)
 				}
+
 				if balance.DeviceID != tt.wantDeviceID {
 					t.Errorf("Expected device ID %s, got %s", tt.wantDeviceID, balance.DeviceID)
 				}
@@ -175,6 +180,7 @@ func TestClient_SetBalance(t *testing.T) {
 						t.Errorf("Expected POST request, got %s", r.Method)
 						return
 					}
+
 					if r.URL.Path != "/balance" {
 						t.Errorf("Expected path /balance, got %s", r.URL.Path)
 						return
@@ -188,6 +194,7 @@ func TestClient_SetBalance(t *testing.T) {
 
 					// Parse and validate request body
 					var balanceReq models.BalanceRequest
+
 					err := xml.NewDecoder(r.Body).Decode(&balanceReq)
 					if err != nil {
 						t.Errorf("Failed to decode request XML: %v", err)
@@ -263,6 +270,7 @@ func TestClient_SetBalanceSafe(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Parse request body to verify clamped level
 				var balanceReq models.BalanceRequest
+
 				err := xml.NewDecoder(r.Body).Decode(&balanceReq)
 				if err != nil {
 					t.Errorf("Failed to decode request XML: %v", err)
@@ -332,6 +340,7 @@ func TestClient_IncreaseBalance(t *testing.T) {
 
 				if r.Method == "GET" && r.URL.Path == "/balance" {
 					getCallCount++
+
 					var response string
 					if getCallCount == 1 {
 						// First call - return current balance
@@ -344,10 +353,12 @@ func TestClient_IncreaseBalance(t *testing.T) {
 							fmt.Sprintf("%d", tt.expectedNewBalance) + `</targetbalance><actualbalance>` +
 							fmt.Sprintf("%d", tt.expectedNewBalance) + `</actualbalance></balance>`
 					}
+
 					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write([]byte(response))
 				} else if r.Method == "POST" && r.URL.Path == "/balance" {
 					postCallCount++
+
 					w.WriteHeader(http.StatusOK)
 				}
 			}))
@@ -376,6 +387,7 @@ func TestClient_IncreaseBalance(t *testing.T) {
 			if getCallCount != 2 {
 				t.Errorf("Expected 2 GET calls, got %d", getCallCount)
 			}
+
 			if postCallCount != 1 {
 				t.Errorf("Expected 1 POST call, got %d", postCallCount)
 			}
@@ -420,6 +432,7 @@ func TestClient_DecreaseBalance(t *testing.T) {
 
 				if r.Method == "GET" && r.URL.Path == "/balance" {
 					getCallCount++
+
 					var response string
 					if getCallCount == 1 {
 						// First call - return current balance
@@ -432,10 +445,12 @@ func TestClient_DecreaseBalance(t *testing.T) {
 							fmt.Sprintf("%d", tt.expectedNewBalance) + `</targetbalance><actualbalance>` +
 							fmt.Sprintf("%d", tt.expectedNewBalance) + `</actualbalance></balance>`
 					}
+
 					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write([]byte(response))
 				} else if r.Method == "POST" && r.URL.Path == "/balance" {
 					postCallCount++
+
 					w.WriteHeader(http.StatusOK)
 				}
 			}))
@@ -464,6 +479,7 @@ func TestClient_DecreaseBalance(t *testing.T) {
 			if getCallCount != 2 {
 				t.Errorf("Expected 2 GET calls, got %d", getCallCount)
 			}
+
 			if postCallCount != 1 {
 				t.Errorf("Expected 1 POST call, got %d", postCallCount)
 			}
@@ -555,6 +571,7 @@ func TestClient_Balance_RequestFormat(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Read and parse the raw request body
 		var balanceReq models.BalanceRequest
+
 		err := xml.NewDecoder(r.Body).Decode(&balanceReq)
 		if err != nil {
 			t.Errorf("Failed to decode request XML: %v", err)

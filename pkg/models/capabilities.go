@@ -107,6 +107,7 @@ func (c *Capabilities) GetHostedWifiPort() string {
 	if c.HasHostedWifiConfig() {
 		return c.NetworkConfig.HostedWifiConfig.Port
 	}
+
 	return ""
 }
 
@@ -115,6 +116,7 @@ func (c *Capabilities) GetHostedWifiHostedBy() string {
 	if c.HasHostedWifiConfig() {
 		return c.NetworkConfig.HostedWifiConfig.HostedBy
 	}
+
 	return ""
 }
 
@@ -132,6 +134,7 @@ func (c *Capabilities) GetCapabilityByName(name string) *Capability {
 			return &cap
 		}
 	}
+
 	return nil
 }
 
@@ -146,6 +149,7 @@ func (c *Capabilities) GetCapabilityNames() []string {
 	for i, cap := range c.Capability {
 		names[i] = cap.Name
 	}
+
 	return names
 }
 
@@ -156,9 +160,11 @@ func (c *Capabilities) GetNetworkCapabilities() []string {
 	if c.HasDualModeNetwork() {
 		capabilities = append(capabilities, "Dual Mode")
 	}
+
 	if c.HasWSAPIProxy() {
 		capabilities = append(capabilities, "WSAPI Proxy")
 	}
+
 	if c.HasHostedWifiConfig() {
 		capabilities = append(capabilities, "Hosted WiFi Config")
 	}
@@ -173,6 +179,7 @@ func (c *Capabilities) GetAudioCapabilities() []string {
 	if c.HasLRStereoCapability() {
 		capabilities = append(capabilities, "L/R Stereo")
 	}
+
 	if c.HasDSPMonoStereo() {
 		capabilities = append(capabilities, "DSP Mono/Stereo")
 	}
@@ -187,12 +194,15 @@ func (c *Capabilities) GetSystemCapabilities() []string {
 	if c.HasLightswitch() {
 		capabilities = append(capabilities, "Light Switch")
 	}
+
 	if c.HasClockDisplay() {
 		capabilities = append(capabilities, "Clock Display")
 	}
+
 	if c.HasBCOResetCapability() {
 		capabilities = append(capabilities, "BCO Reset")
 	}
+
 	if c.HasPowerSavingDisabled() {
 		capabilities = append(capabilities, "Power Saving Disabled")
 	}

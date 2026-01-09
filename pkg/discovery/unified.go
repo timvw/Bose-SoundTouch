@@ -46,6 +46,7 @@ func NewUnifiedDiscoveryService(cfg *config.Config) *UnifiedDiscoveryService {
 func (u *UnifiedDiscoveryService) DiscoverDevices(ctx context.Context) ([]*models.DiscoveredDevice, error) {
 	// Check cache first
 	u.cleanupCache()
+
 	cached := u.getCachedDevices()
 	if len(cached) > 0 && u.config.CacheEnabled {
 		return cached, nil
@@ -67,8 +68,10 @@ func (u *UnifiedDiscoveryService) DiscoverDevices(ctx context.Context) ([]*model
 	// Start SSDP discovery if enabled
 	if u.config.UPnPEnabled {
 		wg.Add(1)
+
 		go func() {
 			defer wg.Done()
+
 			devices, err := u.ssdpService.DiscoverDevices(ctx)
 			if err == nil {
 				ssdpChan <- devices
@@ -83,8 +86,10 @@ func (u *UnifiedDiscoveryService) DiscoverDevices(ctx context.Context) ([]*model
 	// Start mDNS discovery if enabled
 	if u.config.MDNSEnabled {
 		wg.Add(1)
+
 		go func() {
 			defer wg.Done()
+
 			devices, err := u.mdnsService.DiscoverDevices(ctx)
 			if err == nil {
 				mdnsChan <- devices
@@ -123,10 +128,12 @@ func (u *UnifiedDiscoveryService) DiscoverDevices(ctx context.Context) ([]*model
 func (u *UnifiedDiscoveryService) DiscoverDevice(ctx context.Context, host string) (*models.DiscoveredDevice, error) {
 	// Check cache first
 	u.mutex.RLock()
+
 	if device, exists := u.cache[host]; exists && time.Since(device.LastSeen) < u.cacheTTL {
 		u.mutex.RUnlock()
 		return device, nil
 	}
+
 	u.mutex.RUnlock()
 
 	// Try to discover all devices and find the specific one
@@ -154,6 +161,7 @@ func (u *UnifiedDiscoveryService) GetCachedDevices() []*models.DiscoveredDevice 
 func (u *UnifiedDiscoveryService) ClearCache() {
 	u.mutex.Lock()
 	defer u.mutex.Unlock()
+
 	u.cache = make(map[string]*models.DiscoveredDevice)
 }
 

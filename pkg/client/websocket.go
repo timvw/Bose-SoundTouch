@@ -93,6 +93,7 @@ func (c *Client) NewWebSocketClient(config *WebSocketConfig) *WebSocketClient {
 func (ws *WebSocketClient) SetHandlers(handlers *models.WebSocketEventHandlers) {
 	ws.mu.Lock()
 	defer ws.mu.Unlock()
+
 	ws.handlers = handlers
 }
 
@@ -100,6 +101,7 @@ func (ws *WebSocketClient) SetHandlers(handlers *models.WebSocketEventHandlers) 
 func (ws *WebSocketClient) OnNowPlaying(handler models.TypedEventHandler[*models.NowPlayingUpdatedEvent]) {
 	ws.mu.Lock()
 	defer ws.mu.Unlock()
+
 	ws.handlers.OnNowPlaying = handler
 }
 
@@ -107,6 +109,7 @@ func (ws *WebSocketClient) OnNowPlaying(handler models.TypedEventHandler[*models
 func (ws *WebSocketClient) OnVolumeUpdated(handler models.TypedEventHandler[*models.VolumeUpdatedEvent]) {
 	ws.mu.Lock()
 	defer ws.mu.Unlock()
+
 	ws.handlers.OnVolumeUpdated = handler
 }
 
@@ -114,6 +117,7 @@ func (ws *WebSocketClient) OnVolumeUpdated(handler models.TypedEventHandler[*mod
 func (ws *WebSocketClient) OnConnectionState(handler models.TypedEventHandler[*models.ConnectionStateUpdatedEvent]) {
 	ws.mu.Lock()
 	defer ws.mu.Unlock()
+
 	ws.handlers.OnConnectionState = handler
 }
 
@@ -121,6 +125,7 @@ func (ws *WebSocketClient) OnConnectionState(handler models.TypedEventHandler[*m
 func (ws *WebSocketClient) OnPresetUpdated(handler models.TypedEventHandler[*models.PresetUpdatedEvent]) {
 	ws.mu.Lock()
 	defer ws.mu.Unlock()
+
 	ws.handlers.OnPresetUpdated = handler
 }
 
@@ -128,6 +133,7 @@ func (ws *WebSocketClient) OnPresetUpdated(handler models.TypedEventHandler[*mod
 func (ws *WebSocketClient) OnZoneUpdated(handler models.TypedEventHandler[*models.ZoneUpdatedEvent]) {
 	ws.mu.Lock()
 	defer ws.mu.Unlock()
+
 	ws.handlers.OnZoneUpdated = handler
 }
 
@@ -135,6 +141,7 @@ func (ws *WebSocketClient) OnZoneUpdated(handler models.TypedEventHandler[*model
 func (ws *WebSocketClient) OnBassUpdated(handler models.TypedEventHandler[*models.BassUpdatedEvent]) {
 	ws.mu.Lock()
 	defer ws.mu.Unlock()
+
 	ws.handlers.OnBassUpdated = handler
 }
 
@@ -142,6 +149,7 @@ func (ws *WebSocketClient) OnBassUpdated(handler models.TypedEventHandler[*model
 func (ws *WebSocketClient) OnUnknownEvent(handler models.EventHandler) {
 	ws.mu.Lock()
 	defer ws.mu.Unlock()
+
 	ws.handlers.OnUnknownEvent = handler
 }
 
@@ -184,6 +192,7 @@ func (ws *WebSocketClient) connectWithConfig(config *WebSocketConfig) error {
 	if resp != nil && resp.Body != nil {
 		defer func() { _ = resp.Body.Close() }()
 	}
+
 	if err != nil {
 		return fmt.Errorf("failed to connect to WebSocket: %w", err)
 	}
@@ -196,6 +205,7 @@ func (ws *WebSocketClient) connectWithConfig(config *WebSocketConfig) error {
 	go ws.pingLoop(config)
 
 	ws.logger.Printf("Connected to %s", wsURL.String())
+
 	return nil
 }
 
@@ -216,10 +226,12 @@ func (ws *WebSocketClient) Disconnect() error {
 		ws.conn = nil
 		ws.connected = false
 		ws.logger.Printf("Disconnected")
+
 		return err
 	}
 
 	ws.connected = false
+
 	return nil
 }
 
@@ -227,6 +239,7 @@ func (ws *WebSocketClient) Disconnect() error {
 func (ws *WebSocketClient) IsConnected() bool {
 	ws.mu.RLock()
 	defer ws.mu.RUnlock()
+
 	return ws.connected
 }
 
@@ -234,11 +247,13 @@ func (ws *WebSocketClient) IsConnected() bool {
 func (ws *WebSocketClient) readLoop(config *WebSocketConfig) {
 	defer func() {
 		ws.mu.Lock()
+
 		ws.connected = false
 		if ws.conn != nil {
 			_ = ws.conn.Close()
 			ws.conn = nil
 		}
+
 		ws.mu.Unlock()
 
 		// Attempt reconnection if enabled
@@ -271,6 +286,7 @@ func (ws *WebSocketClient) readLoop(config *WebSocketConfig) {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				ws.logger.Printf("WebSocket read error: %v", err)
 			}
+
 			return
 		}
 
@@ -332,6 +348,7 @@ func (ws *WebSocketClient) attemptReconnect(config *WebSocketConfig) {
 		}
 
 		ws.logger.Printf("Reconnected successfully")
+
 		return
 	}
 
@@ -419,6 +436,7 @@ func (ws *WebSocketClient) SendMessage(message []byte) error {
 	}
 
 	_ = conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+
 	return conn.WriteMessage(websocket.TextMessage, message)
 }
 

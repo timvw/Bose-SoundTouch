@@ -67,6 +67,7 @@ func TestClient_GetZone(t *testing.T) {
 				if r.URL.Path != "/getZone" {
 					t.Errorf("Expected path /getZone, got %s", r.URL.Path)
 				}
+
 				if r.Method != http.MethodGet {
 					t.Errorf("Expected GET method, got %s", r.Method)
 				}
@@ -84,6 +85,7 @@ func TestClient_GetZone(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error, but got none")
 				}
+
 				return
 			}
 
@@ -116,6 +118,7 @@ func TestClient_SetZone(t *testing.T) {
 			zoneRequest: func() *models.ZoneRequest {
 				zr := models.NewZoneRequest("ABCD1234EFGH")
 				zr.AddMember("EFGH5678IJKL", "192.168.1.11")
+
 				return zr
 			}(),
 			responseStatus: http.StatusOK,
@@ -138,6 +141,7 @@ func TestClient_SetZone(t *testing.T) {
 			zoneRequest: func() *models.ZoneRequest {
 				zr := models.NewZoneRequest("ABCD1234EFGH")
 				zr.AddMember("ABCD1234EFGH", "192.168.1.10") // Same as master
+
 				return zr
 			}(),
 			expectError:  true,
@@ -157,6 +161,7 @@ func TestClient_SetZone(t *testing.T) {
 				if r.URL.Path != "/setZone" {
 					t.Errorf("Expected path /setZone, got %s", r.URL.Path)
 				}
+
 				if r.Method != http.MethodPost {
 					t.Errorf("Expected POST method, got %s", r.Method)
 				}
@@ -169,6 +174,7 @@ func TestClient_SetZone(t *testing.T) {
 
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(tt.responseStatus)
+
 				if tt.responseStatus != http.StatusOK {
 					_, _ = w.Write([]byte(`<error>Server Error</error>`))
 				}
@@ -184,6 +190,7 @@ func TestClient_SetZone(t *testing.T) {
 				} else if tt.errorMessage != "" && err.Error() != tt.errorMessage {
 					t.Errorf("Expected error message '%s', got '%s'", tt.errorMessage, err.Error())
 				}
+
 				return
 			}
 
@@ -255,10 +262,12 @@ func TestClient_AddToZone(t *testing.T) {
 <zone master="ABCD1234EFGH">
 	<member ipaddress="192.168.1.11">EFGH5678IJKL</member>
 </zone>`
+
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte(response))
 		} else if r.URL.Path == "/setZone" && r.Method == http.MethodPost {
 			setZoneCalled = true
+
 			w.WriteHeader(http.StatusOK)
 		} else {
 			w.WriteHeader(http.StatusNotFound)
@@ -276,6 +285,7 @@ func TestClient_AddToZone(t *testing.T) {
 	if !getZoneCalled {
 		t.Error("Expected GetZone to be called")
 	}
+
 	if !setZoneCalled {
 		t.Error("Expected SetZone to be called")
 	}
@@ -296,10 +306,12 @@ func TestClient_RemoveFromZone(t *testing.T) {
 	<member ipaddress="192.168.1.11">EFGH5678IJKL</member>
 	<member ipaddress="192.168.1.12">IJKL9012MNOP</member>
 </zone>`
+
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte(response))
 		} else if r.URL.Path == "/setZone" && r.Method == http.MethodPost {
 			setZoneCalled = true
+
 			w.WriteHeader(http.StatusOK)
 		} else {
 			w.WriteHeader(http.StatusNotFound)
@@ -317,6 +329,7 @@ func TestClient_RemoveFromZone(t *testing.T) {
 	if !getZoneCalled {
 		t.Error("Expected GetZone to be called")
 	}
+
 	if !setZoneCalled {
 		t.Error("Expected SetZone to be called")
 	}
@@ -337,10 +350,12 @@ func TestClient_DissolveZone(t *testing.T) {
 	<member ipaddress="192.168.1.11">EFGH5678IJKL</member>
 	<member ipaddress="192.168.1.12">IJKL9012MNOP</member>
 </zone>`
+
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte(response))
 		} else if r.URL.Path == "/setZone" && r.Method == http.MethodPost {
 			setZoneCalled = true
+
 			w.WriteHeader(http.StatusOK)
 		} else {
 			w.WriteHeader(http.StatusNotFound)
@@ -358,6 +373,7 @@ func TestClient_DissolveZone(t *testing.T) {
 	if !getZoneCalled {
 		t.Error("Expected GetZone to be called")
 	}
+
 	if !setZoneCalled {
 		t.Error("Expected SetZone to be called")
 	}
@@ -408,6 +424,7 @@ func TestClient_IsInZone(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error, but got none")
 				}
+
 				return
 			}
 
@@ -479,11 +496,12 @@ func TestClient_GetZoneStatus(t *testing.T) {
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(http.StatusOK)
 
-				if r.URL.Path == "/getZone" {
+				switch r.URL.Path {
+				case "/getZone":
 					_, _ = w.Write([]byte(tt.zoneXML))
-				} else if r.URL.Path == "/info" {
+				case "/info":
 					_, _ = w.Write([]byte(tt.deviceInfoXML))
-				} else {
+				default:
 					w.WriteHeader(http.StatusNotFound)
 				}
 			}))
@@ -496,6 +514,7 @@ func TestClient_GetZoneStatus(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error, but got none")
 				}
+
 				return
 			}
 
@@ -557,6 +576,7 @@ func TestClient_GetZoneMembers(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error, but got none")
 				}
+
 				return
 			}
 
@@ -595,6 +615,7 @@ func TestClient_Zone_ErrorHandling(t *testing.T) {
 		client.timeout = 100 * time.Millisecond
 
 		zr := models.NewZoneRequest("DEVICE123")
+
 		err := client.SetZone(zr)
 		if err == nil {
 			t.Error("Expected network error, but got none")
@@ -611,8 +632,8 @@ func TestClient_Zone_ErrorHandling(t *testing.T) {
 		defer server.Close()
 
 		client := createTestClient(server.URL)
-		err := client.AddToZone("DEVICE456", "192.168.1.10")
 
+		err := client.AddToZone("DEVICE456", "192.168.1.10")
 		if err == nil {
 			t.Error("Expected error when GetZone fails, but got none")
 		}
@@ -632,6 +653,7 @@ func BenchmarkClient_GetZone(b *testing.B) {
 	<member ipaddress="192.168.1.11">EFGH5678IJKL</member>
 	<member ipaddress="192.168.1.12">IJKL9012MNOP</member>
 </zone>`
+
 		w.Header().Set("Content-Type", "application/xml")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(response))
@@ -641,6 +663,7 @@ func BenchmarkClient_GetZone(b *testing.B) {
 	client := createTestClient(server.URL)
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		_, err := client.GetZone()
 		if err != nil {
@@ -661,6 +684,7 @@ func BenchmarkClient_SetZone(b *testing.B) {
 	zoneRequest.AddMember("EFGH5678IJKL", "192.168.1.11")
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		err := client.SetZone(zoneRequest)
 		if err != nil {

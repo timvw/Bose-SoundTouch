@@ -43,9 +43,11 @@ func NewClient(config *Config) *Client {
 	if config.Timeout == 0 {
 		config.Timeout = 10 * time.Second
 	}
+
 	if config.UserAgent == "" {
 		config.UserAgent = "Bose-SoundTouch-Go-Client/1.0"
 	}
+
 	if config.Port == 0 {
 		config.Port = 8090
 	}
@@ -64,66 +66,79 @@ func NewClient(config *Config) *Client {
 func NewClientFromHost(host string) *Client {
 	config := DefaultConfig()
 	config.Host = host
+
 	return NewClient(config)
 }
 
 // GetDeviceInfo retrieves device information from the /info endpoint
 func (c *Client) GetDeviceInfo() (*models.DeviceInfo, error) {
 	var deviceInfo models.DeviceInfo
+
 	err := c.get("/info", &deviceInfo)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get device info: %w", err)
 	}
+
 	return &deviceInfo, nil
 }
 
 // GetNowPlaying retrieves current playback information from the /now_playing endpoint
 func (c *Client) GetNowPlaying() (*models.NowPlaying, error) {
 	var nowPlaying models.NowPlaying
+
 	err := c.get("/now_playing", &nowPlaying)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get now playing: %w", err)
 	}
+
 	return &nowPlaying, nil
 }
 
 // GetSources retrieves available audio sources from the /sources endpoint
 func (c *Client) GetSources() (*models.Sources, error) {
 	var sources models.Sources
+
 	err := c.get("/sources", &sources)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get sources: %w", err)
 	}
+
 	return &sources, nil
 }
 
 // GetName retrieves the device name from the /name endpoint
 func (c *Client) GetName() (*models.Name, error) {
 	var name models.Name
+
 	err := c.get("/name", &name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get device name: %w", err)
 	}
+
 	return &name, nil
 }
 
 // GetCapabilities retrieves device capabilities from the /capabilities endpoint
 func (c *Client) GetCapabilities() (*models.Capabilities, error) {
 	var capabilities models.Capabilities
+
 	err := c.get("/capabilities", &capabilities)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get device capabilities: %w", err)
 	}
+
 	return &capabilities, nil
 }
 
 // GetPresets retrieves configured presets from the /presets endpoint
 func (c *Client) GetPresets() (*models.Presets, error) {
 	var presets models.Presets
+
 	err := c.get("/presets", &presets)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get presets: %w", err)
 	}
+
 	return &presets, nil
 }
 
@@ -165,6 +180,7 @@ func (c *Client) SendKey(keyValue string) error {
 
 	// Send press state
 	keyPress := models.NewKey(keyValue)
+
 	err := c.post("/key", keyPress, nil)
 	if err != nil {
 		return fmt.Errorf("failed to send key press: %w", err)
@@ -172,6 +188,7 @@ func (c *Client) SendKey(keyValue string) error {
 
 	// Send release state
 	keyRelease := models.NewKeyRelease(keyValue)
+
 	err = c.post("/key", keyRelease, nil)
 	if err != nil {
 		return fmt.Errorf("failed to send key release: %w", err)
@@ -192,6 +209,7 @@ func (c *Client) SendKeyPressOnly(keyValue string) error {
 	}
 
 	key := models.NewKey(keyValue)
+
 	return c.post("/key", key, nil)
 }
 
@@ -202,6 +220,7 @@ func (c *Client) SendKeyRelease(keyValue string) error {
 	}
 
 	key := models.NewKeyRelease(keyValue)
+
 	return c.post("/key", key, nil)
 }
 
@@ -265,16 +284,19 @@ func (c *Client) SelectPreset(presetNumber int) error {
 	default:
 		return fmt.Errorf("invalid preset number: %d (must be 1-6)", presetNumber)
 	}
+
 	return c.SendKey(keyValue)
 }
 
 // GetVolume retrieves the current volume level from the /volume endpoint
 func (c *Client) GetVolume() (*models.Volume, error) {
 	var volume models.Volume
+
 	err := c.get("/volume", &volume)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get volume: %w", err)
 	}
+
 	return &volume, nil
 }
 
@@ -285,6 +307,7 @@ func (c *Client) SetVolume(level int) error {
 	}
 
 	volumeReq := models.NewVolumeRequest(level)
+
 	return c.post("/volume", volumeReq, nil)
 }
 
@@ -302,6 +325,7 @@ func (c *Client) IncreaseVolume(amount int) (*models.Volume, error) {
 	}
 
 	newLevel := models.ClampVolumeLevel(currentVolume.GetLevel() + amount)
+
 	err = c.SetVolume(newLevel)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set volume: %w", err)
@@ -319,6 +343,7 @@ func (c *Client) DecreaseVolume(amount int) (*models.Volume, error) {
 	}
 
 	newLevel := models.ClampVolumeLevel(currentVolume.GetLevel() - amount)
+
 	err = c.SetVolume(newLevel)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set volume: %w", err)
@@ -331,10 +356,12 @@ func (c *Client) DecreaseVolume(amount int) (*models.Volume, error) {
 // GetBass retrieves the current bass level from the /bass endpoint
 func (c *Client) GetBass() (*models.Bass, error) {
 	var bass models.Bass
+
 	err := c.get("/bass", &bass)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get bass: %w", err)
 	}
+
 	return &bass, nil
 }
 
@@ -366,6 +393,7 @@ func (c *Client) IncreaseBass(amount int) (*models.Bass, error) {
 	}
 
 	newLevel := models.ClampBassLevel(currentBass.GetLevel() + amount)
+
 	err = c.SetBass(newLevel)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set bass: %w", err)
@@ -383,6 +411,7 @@ func (c *Client) DecreaseBass(amount int) (*models.Bass, error) {
 	}
 
 	newLevel := models.ClampBassLevel(currentBass.GetLevel() - amount)
+
 	err = c.SetBass(newLevel)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set bass: %w", err)
@@ -395,10 +424,12 @@ func (c *Client) DecreaseBass(amount int) (*models.Bass, error) {
 // GetBalance retrieves the current balance level from the /balance endpoint
 func (c *Client) GetBalance() (*models.Balance, error) {
 	var balance models.Balance
+
 	err := c.get("/balance", &balance)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get balance: %w", err)
 	}
+
 	return &balance, nil
 }
 
@@ -430,6 +461,7 @@ func (c *Client) IncreaseBalance(amount int) (*models.Balance, error) {
 	}
 
 	newLevel := models.ClampBalanceLevel(currentBalance.GetLevel() + amount)
+
 	err = c.SetBalance(newLevel)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set balance: %w", err)
@@ -447,6 +479,7 @@ func (c *Client) DecreaseBalance(amount int) (*models.Balance, error) {
 	}
 
 	newLevel := models.ClampBalanceLevel(currentBalance.GetLevel() - amount)
+
 	err = c.SetBalance(newLevel)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set balance: %w", err)
@@ -530,10 +563,12 @@ func (c *Client) SelectPandora(sourceAccount string) error {
 // GetClockTime retrieves the device's current time from the /clockTime endpoint
 func (c *Client) GetClockTime() (*models.ClockTime, error) {
 	var clockTime models.ClockTime
+
 	err := c.get("/clockTime", &clockTime)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get clock time: %w", err)
 	}
+
 	return &clockTime, nil
 }
 
@@ -547,6 +582,7 @@ func (c *Client) SetClockTime(request *models.ClockTimeRequest) error {
 	if err != nil {
 		return fmt.Errorf("failed to set clock time: %w", err)
 	}
+
 	return nil
 }
 
@@ -559,10 +595,12 @@ func (c *Client) SetClockTimeNow() error {
 // GetClockDisplay retrieves clock display settings from the /clockDisplay endpoint
 func (c *Client) GetClockDisplay() (*models.ClockDisplay, error) {
 	var clockDisplay models.ClockDisplay
+
 	err := c.get("/clockDisplay", &clockDisplay)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get clock display settings: %w", err)
 	}
+
 	return &clockDisplay, nil
 }
 
@@ -580,6 +618,7 @@ func (c *Client) SetClockDisplay(request *models.ClockDisplayRequest) error {
 	if err != nil {
 		return fmt.Errorf("failed to set clock display: %w", err)
 	}
+
 	return nil
 }
 
@@ -610,10 +649,12 @@ func (c *Client) SetClockDisplayFormat(format models.ClockFormat) error {
 // GetNetworkInfo retrieves network information from the /networkInfo endpoint
 func (c *Client) GetNetworkInfo() (*models.NetworkInformation, error) {
 	var networkInfo models.NetworkInformation
+
 	err := c.get("/networkInfo", &networkInfo)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get network info: %w", err)
 	}
+
 	return &networkInfo, nil
 }
 
@@ -674,6 +715,7 @@ func (c *Client) get(endpoint string, result interface{}) error {
 		if xmlErr := xml.Unmarshal(body, &apiError); xmlErr == nil && apiError.Message != "" {
 			return &apiError
 		}
+
 		return fmt.Errorf("failed to unmarshal XML response: %w", err)
 	}
 
@@ -685,11 +727,13 @@ func (c *Client) post(endpoint string, payload, result interface{}) error {
 	url := c.baseURL + endpoint
 
 	var body io.Reader
+
 	if payload != nil {
 		xmlData, err := xml.Marshal(payload)
 		if err != nil {
 			return fmt.Errorf("failed to marshal XML request: %w", err)
 		}
+
 		body = bytes.NewReader(xmlData)
 	}
 
@@ -732,6 +776,7 @@ func (c *Client) post(endpoint string, payload, result interface{}) error {
 			if xmlErr := xml.Unmarshal(responseBody, &apiError); xmlErr == nil && apiError.Message != "" {
 				return &apiError
 			}
+
 			return fmt.Errorf("failed to unmarshal XML response: %w", err)
 		}
 	}
@@ -742,7 +787,9 @@ func (c *Client) post(endpoint string, payload, result interface{}) error {
 // GetZone gets the current multiroom zone configuration
 func (c *Client) GetZone() (*models.ZoneInfo, error) {
 	var zone models.ZoneInfo
+
 	err := c.get("/getZone", &zone)
+
 	return &zone, err
 }
 
@@ -870,13 +917,17 @@ func (c *Client) SetName(name string) error {
 // GetBassCapabilities retrieves the bass capabilities for the device
 func (c *Client) GetBassCapabilities() (*models.BassCapabilities, error) {
 	var bassCapabilities models.BassCapabilities
+
 	err := c.get("/bassCapabilities", &bassCapabilities)
+
 	return &bassCapabilities, err
 }
 
 // GetTrackInfo retrieves track information (duplicate of GetNowPlaying per official API)
 func (c *Client) GetTrackInfo() (*models.NowPlaying, error) {
 	var nowPlaying models.NowPlaying
+
 	err := c.get("/trackInfo", &nowPlaying)
+
 	return &nowPlaying, err
 }
