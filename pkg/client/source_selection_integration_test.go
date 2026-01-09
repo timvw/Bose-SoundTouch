@@ -302,6 +302,7 @@ func TestClient_ConvenienceSourceMethods_Integration(t *testing.T) {
 					} else {
 						t.Log("✓ SelectTuneIn succeeded")
 					}
+
 					break
 				}
 			}
@@ -321,6 +322,7 @@ func TestClient_ConvenienceSourceMethods_Integration(t *testing.T) {
 					} else {
 						t.Log("✓ SelectPandora succeeded")
 					}
+
 					break
 				}
 			}

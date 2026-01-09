@@ -431,7 +431,6 @@ func TestClient_GetNowPlaying_ServerError(t *testing.T) {
 	})
 
 	_, err := client.GetNowPlaying()
-
 	if err == nil {
 		t.Error("Expected error for server error response")
 	}
@@ -622,7 +621,6 @@ func TestClient_GetSources_ServerError(t *testing.T) {
 	})
 
 	_, err := client.GetSources()
-
 	if err == nil {
 		t.Error("Expected error for server error response")
 	}

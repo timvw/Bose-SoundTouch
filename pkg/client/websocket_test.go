@@ -49,6 +49,7 @@ func setupMockWebSocketServer(t *testing.T) (*httptest.Server, chan []byte) {
 			t.Errorf("Failed to upgrade connection: %v", err)
 			return
 		}
+
 		defer func() {
 			_ = conn.Close()
 		}()

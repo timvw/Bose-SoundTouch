@@ -830,6 +830,7 @@ func handleSources(host string, port int, timeout time.Duration) error {
 	availableSources := sources.GetAvailableSources()
 	if len(availableSources) > 0 {
 		fmt.Printf("Ready Sources:\n")
+
 		for _, source := range availableSources {
 			fmt.Printf("  • %s", source.GetDisplayName())
 			if source.SourceAccount != "" && source.SourceAccount != source.Source {
@@ -1017,6 +1018,7 @@ func handleCapabilities(host string, port int, timeout time.Duration) error {
 	capNames := capabilities.GetCapabilityNames()
 	if len(capNames) > 0 {
 		fmt.Printf("Extended Capabilities:\n")
+
 		for _, capName := range capNames {
 			capability := capabilities.GetCapabilityByName(capName)
 			fmt.Printf("  • %s", capName)
@@ -2062,6 +2064,7 @@ func handleGetZoneMembers(client *client.Client) error {
 		fmt.Printf("  Total Devices: %d\n", len(members))
 		fmt.Printf("  Master: %s\n", zone.Master)
 		fmt.Printf("  Members:\n")
+
 		for i, memberID := range members {
 			if memberID == zone.Master {
 				fmt.Printf("    %d. %s (Master)\n", i+1, memberID)

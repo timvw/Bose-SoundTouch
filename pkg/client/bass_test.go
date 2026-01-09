@@ -447,6 +447,7 @@ func TestClient_DecreaseBass(t *testing.T) {
 				if r.Method == "GET" && r.URL.Path == "/bass" {
 					getCallCount++
 					var response string
+
 					if getCallCount == 1 {
 						// First call - return current bass
 						if tt.currentBass == 3 {

@@ -385,6 +385,7 @@ func BenchmarkParseWebSocketEvent(b *testing.B) {
 </updates>`
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		_, err := ParseWebSocketEvent([]byte(xmlData))
 		if err != nil {
@@ -402,6 +403,7 @@ func BenchmarkWebSocketEventGetEventTypes(b *testing.B) {
 	}
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		_ = event.GetEventTypes()
 	}

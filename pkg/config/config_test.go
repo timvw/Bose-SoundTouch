@@ -217,6 +217,7 @@ func TestParseDeviceString_EmptyHost(t *testing.T) {
 func TestParsePreferredDevices_SingleDevice(t *testing.T) {
 	clearTestEnvVars()
 	_ = os.Setenv("PREFERRED_DEVICES", "192.168.1.100")
+
 	defer clearTestEnvVars()
 
 	devices, err := parsePreferredDevices()
@@ -284,6 +285,7 @@ func TestParsePreferredDevices_MultipleDevices(t *testing.T) {
 func TestParsePreferredDevices_EmptyString(t *testing.T) {
 	clearTestEnvVars()
 	_ = os.Setenv("PREFERRED_DEVICES", "")
+
 	defer clearTestEnvVars()
 
 	devices, err := parsePreferredDevices()
@@ -299,6 +301,7 @@ func TestParsePreferredDevices_EmptyString(t *testing.T) {
 func TestParsePreferredDevices_InvalidDevice(t *testing.T) {
 	clearTestEnvVars()
 	_ = os.Setenv("PREFERRED_DEVICES", "192.168.1.100:invalid")
+
 	defer clearTestEnvVars()
 
 	_, err := parsePreferredDevices()

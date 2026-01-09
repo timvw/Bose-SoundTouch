@@ -359,6 +359,7 @@ func TestClient_ConvenienceSourceMethods(t *testing.T) {
 
 			// Call the appropriate convenience method
 			var err error
+
 			switch tt.method {
 			case "spotify":
 				err = client.SelectSpotify(tt.sourceAccount)

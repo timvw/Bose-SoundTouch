@@ -55,7 +55,6 @@ func (m *MDNSDiscoveryService) DiscoverDevices(ctx context.Context) ([]*models.D
 			Timeout: m.timeout,
 			Entries: entries,
 		})
-
 		if err != nil {
 			log.Printf("mDNS query completed with error: %v", err)
 		} else {
@@ -105,10 +104,12 @@ func (m *MDNSDiscoveryService) serviceEntryToDevice(entry *mdns.ServiceEntry) *m
 	case entry.AddrV4 != nil:
 		host = entry.AddrV4.String()
 		ipSource = "IPv4"
+
 		log.Printf("mDNS: Using IPv4 address: %s", host)
 	case entry.AddrV6 != nil:
 		host = entry.AddrV6.String()
 		ipSource = "IPv6"
+
 		log.Printf("mDNS: Using IPv6 address: %s", host)
 	default:
 		// Try to resolve from hostname
@@ -124,7 +125,9 @@ func (m *MDNSDiscoveryService) serviceEntryToDevice(entry *mdns.ServiceEntry) *m
 			if ip.To4() != nil {
 				host = ip.String()
 				ipSource = "resolved IPv4"
+
 				log.Printf("mDNS: Resolved to IPv4 address: %s", host)
+
 				break
 			}
 		}
