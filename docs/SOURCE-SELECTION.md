@@ -145,7 +145,7 @@ soundtouch-cli -host 192.168.1.100 -aux
 soundtouch-cli -host 192.168.1.100 -sources
 
 # Select Spotify with account
-soundtouch-cli -host 192.168.1.100 -spotify -source-account "user_account"
+soundtouch-cli -host 192.168.1.100 -spotify -source-account "your_account"
 
 # Select TuneIn
 soundtouch-cli -host 192.168.1.100 -select-source TUNEIN
@@ -185,12 +185,12 @@ soundtouch-cli -host 192.168.1.100 -sources
 This shows account names for each source:
 ```
 Ready Sources:
-  • user+spotify@example.com (user_account) [Remote, Multiroom, Streaming]
+  • user+spotify@example.com (user) [Remote, Multiroom, Streaming]
 ```
 
 In this example:
 - Full account: `user+spotify@example.com`
-- Short account: `user_account` (often works better)
+- Short account: `user` (often works better)
 
 ## Integration Examples
 
