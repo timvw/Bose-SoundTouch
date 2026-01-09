@@ -10,6 +10,7 @@ import (
 // listSources handles listing available audio sources
 func listSources(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -32,6 +33,7 @@ func listSources(c *cli.Context) error {
 
 		for _, source := range availableSources {
 			fmt.Printf("    • %s", source.GetDisplayName())
+
 			if source.SourceAccount != "" && source.SourceAccount != source.Source {
 				fmt.Printf(" (%s)", source.SourceAccount)
 			}
@@ -40,18 +42,22 @@ func listSources(c *cli.Context) error {
 			if source.IsLocalSource() {
 				attributes = append(attributes, "Local")
 			}
+
 			if source.IsLocalSource() {
 				attributes = append(attributes, "Available")
 			}
+
 			if len(attributes) > 0 {
 				fmt.Printf(" [%s]", strings.Join(attributes, ", "))
 			}
+
 			fmt.Println()
 		}
 	}
 
 	// Show all configured sources
 	fmt.Printf("  All Sources:\n")
+
 	for _, source := range sources.SourceItem {
 		status := "Available"
 		if !source.IsLocalSource() {
@@ -59,6 +65,7 @@ func listSources(c *cli.Context) error {
 		}
 
 		fmt.Printf("    • %s (%s)\n", source.GetDisplayName(), status)
+
 		if source.SourceAccount != "" && source.SourceAccount != source.Source {
 			fmt.Printf("      Account: %s\n", source.SourceAccount)
 		}
@@ -68,11 +75,14 @@ func listSources(c *cli.Context) error {
 	streamingSources := sources.GetStreamingSources()
 	if len(streamingSources) > 0 {
 		fmt.Printf("  Streaming Services:\n")
+
 		for _, source := range streamingSources {
 			fmt.Printf("    • %s", source.GetDisplayName())
+
 			if source.SourceAccount != "" {
 				fmt.Printf(" (%s)", source.SourceAccount)
 			}
+
 			fmt.Println()
 		}
 	}
@@ -83,6 +93,7 @@ func listSources(c *cli.Context) error {
 // selectSource handles selecting an audio source
 func selectSource(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -110,6 +121,7 @@ func selectSource(c *cli.Context) error {
 // selectSpotify handles selecting Spotify source
 func selectSpotify(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -123,12 +135,14 @@ func selectSpotify(c *cli.Context) error {
 	}
 
 	PrintSuccess("Spotify source selected")
+
 	return nil
 }
 
 // selectBluetooth handles selecting Bluetooth source
 func selectBluetooth(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -142,12 +156,14 @@ func selectBluetooth(c *cli.Context) error {
 	}
 
 	PrintSuccess("Bluetooth source selected")
+
 	return nil
 }
 
 // selectAux handles selecting AUX input source
 func selectAux(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -161,5 +177,6 @@ func selectAux(c *cli.Context) error {
 	}
 
 	PrintSuccess("AUX input source selected")
+
 	return nil
 }

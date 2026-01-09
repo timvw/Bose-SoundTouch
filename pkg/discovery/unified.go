@@ -12,7 +12,7 @@ import (
 
 // UnifiedDiscoveryService combines SSDP and mDNS discovery methods
 type UnifiedDiscoveryService struct {
-	ssdpService *DiscoveryService
+	ssdpService *Service
 	mdnsService *MDNSDiscoveryService
 	config      *config.Config
 	cache       map[string]*models.DiscoveredDevice
@@ -33,7 +33,7 @@ func NewUnifiedDiscoveryService(cfg *config.Config) *UnifiedDiscoveryService {
 	}
 
 	return &UnifiedDiscoveryService{
-		ssdpService: NewDiscoveryServiceWithConfig(cfg),
+		ssdpService: NewServiceWithConfig(cfg),
 		mdnsService: NewMDNSDiscoveryService(timeout),
 		config:      cfg,
 		cache:       make(map[string]*models.DiscoveredDevice),

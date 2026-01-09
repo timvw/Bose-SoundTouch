@@ -11,6 +11,7 @@ import (
 // getVolume handles getting the current volume level
 func getVolume(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -39,6 +40,7 @@ func getVolume(c *cli.Context) error {
 // setVolume handles setting the volume level
 func setVolume(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -77,6 +79,7 @@ func setVolume(c *cli.Context) error {
 // volumeUp handles increasing the volume
 func volumeUp(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -95,12 +98,14 @@ func volumeUp(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Volume increased to %d (%s)", volume.GetLevel(), models.GetVolumeLevelName(volume.GetLevel())))
+
 	return nil
 }
 
 // volumeDown handles decreasing the volume
 func volumeDown(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -119,5 +124,6 @@ func volumeDown(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Volume decreased to %d (%s)", volume.GetLevel(), models.GetVolumeLevelName(volume.GetLevel())))
+
 	return nil
 }

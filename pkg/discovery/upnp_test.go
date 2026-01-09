@@ -12,7 +12,7 @@ import (
 
 func TestNewDiscoveryService(t *testing.T) {
 	timeout := 5 * time.Second
-	service := NewDiscoveryService(timeout)
+	service := NewService(timeout)
 
 	if service.timeout != timeout {
 		t.Errorf("Expected timeout %v, got %v", timeout, service.timeout)
@@ -28,7 +28,7 @@ func TestNewDiscoveryService(t *testing.T) {
 }
 
 func TestNewDiscoveryServiceWithDefaultTimeout(t *testing.T) {
-	service := NewDiscoveryService(0)
+	service := NewService(0)
 
 	if service.timeout != defaultTimeout {
 		t.Errorf("Expected default timeout %v, got %v", defaultTimeout, service.timeout)
@@ -36,7 +36,7 @@ func TestNewDiscoveryServiceWithDefaultTimeout(t *testing.T) {
 }
 
 func TestBuildMSearchRequest(t *testing.T) {
-	service := NewDiscoveryService(5 * time.Second)
+	service := NewService(5 * time.Second)
 	request := service.buildMSearchRequest()
 
 	expectedLines := []string{
@@ -60,7 +60,7 @@ func TestBuildMSearchRequest(t *testing.T) {
 }
 
 func TestParseLocationURL_Valid(t *testing.T) {
-	service := NewDiscoveryService(5 * time.Second)
+	service := NewService(1 * time.Second)
 	location := "http://192.168.1.100:8090/device.xml"
 
 	device, err := service.parseLocationURL(location)
@@ -91,7 +91,7 @@ func TestParseLocationURL_Valid(t *testing.T) {
 }
 
 func TestParseLocationURL_Invalid(t *testing.T) {
-	service := NewDiscoveryService(5 * time.Second)
+	service := NewService(1 * time.Second)
 
 	invalidURLs := []string{
 		"not-a-url",
@@ -109,7 +109,7 @@ func TestParseLocationURL_Invalid(t *testing.T) {
 }
 
 func TestParseResponse_ValidMediaRenderer(t *testing.T) {
-	service := NewDiscoveryService(5 * time.Second)
+	service := NewService(1 * time.Second)
 
 	validResponse := `HTTP/1.1 200 OK
 Cache-Control: max-age=1800
@@ -141,7 +141,7 @@ USN: uuid:12345678-1234-5678-9012-123456789012::urn:schemas-upnp-org:device:Medi
 }
 
 func TestParseResponse_NotMediaRenderer(t *testing.T) {
-	service := NewDiscoveryService(5 * time.Second)
+	service := NewService(1 * time.Second)
 
 	nonMediaRendererResponse := `HTTP/1.1 200 OK
 Cache-Control: max-age=1800
@@ -170,7 +170,7 @@ USN: uuid:12345678-1234-5678-9012-123456789012::urn:schemas-upnp-org:device:Some
 }
 
 func TestParseResponse_InvalidHTTP(t *testing.T) {
-	service := NewDiscoveryService(5 * time.Second)
+	service := NewService(1 * time.Second)
 
 	invalidResponses := []string{
 		"not http response",
@@ -192,7 +192,7 @@ func TestParseResponse_InvalidHTTP(t *testing.T) {
 }
 
 func TestParseResponse_NoLocation(t *testing.T) {
-	service := NewDiscoveryService(5 * time.Second)
+	service := NewService(1 * time.Second)
 
 	responseWithoutLocation := `HTTP/1.1 200 OK
 Cache-Control: max-age=1800
@@ -217,7 +217,7 @@ ST: urn:schemas-upnp-org:device:MediaRenderer:1
 }
 
 func TestCacheOperations(t *testing.T) {
-	service := NewDiscoveryService(5 * time.Second)
+	service := NewService(1 * time.Second)
 
 	// Test empty cache
 	devices := service.GetCachedDevices()
@@ -259,7 +259,7 @@ func TestCacheOperations(t *testing.T) {
 }
 
 func TestCacheExpiration(t *testing.T) {
-	service := NewDiscoveryService(5 * time.Second)
+	service := NewService(5 * time.Second)
 	service.cacheTTL = 100 * time.Millisecond // Short TTL for testing
 
 	// Add device with old timestamp
@@ -295,7 +295,7 @@ func TestCacheExpiration(t *testing.T) {
 }
 
 func TestDiscoverDevices_UseCache(t *testing.T) {
-	service := NewDiscoveryService(5 * time.Second)
+	service := NewService(5 * time.Second)
 
 	// Add fresh device to cache
 	freshDevice := &models.DiscoveredDevice{
@@ -326,7 +326,7 @@ func TestDiscoverDevices_UseCache(t *testing.T) {
 }
 
 func TestDiscoverDevice_FromCache(t *testing.T) {
-	service := NewDiscoveryService(5 * time.Second)
+	service := NewService(5 * time.Second)
 
 	// Add device to cache
 	device := &models.DiscoveredDevice{
@@ -357,7 +357,7 @@ func TestDiscoverDevice_FromCache(t *testing.T) {
 }
 
 func TestDiscoverDevice_NotFound(t *testing.T) {
-	service := NewDiscoveryService(100 * time.Millisecond) // Short timeout
+	service := NewService(100 * time.Millisecond) // Short timeout
 
 	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 	defer cancel()
@@ -384,7 +384,7 @@ func TestNewDiscoveryServiceWithConfig(t *testing.T) {
 		},
 	}
 
-	service := NewDiscoveryServiceWithConfig(cfg)
+	service := NewServiceWithConfig(cfg)
 
 	if service.timeout != 15*time.Second {
 		t.Errorf("Expected timeout 15s, got %v", service.timeout)
@@ -407,7 +407,7 @@ func TestGetConfiguredDevices(t *testing.T) {
 		},
 	}
 
-	service := NewDiscoveryServiceWithConfig(cfg)
+	service := NewServiceWithConfig(cfg)
 	devices := service.getConfiguredDevices()
 
 	if len(devices) != 2 {
@@ -428,7 +428,7 @@ func TestGetConfiguredDevices(t *testing.T) {
 }
 
 func TestMergeDevices(t *testing.T) {
-	service := NewDiscoveryService(5 * time.Second)
+	service := NewService(5 * time.Second)
 
 	existing := []*models.DiscoveredDevice{
 		{Host: "192.168.1.100", Name: "Device 1", Port: 8090},
@@ -475,7 +475,7 @@ func TestDiscoverDevices_ConfiguredOnly(t *testing.T) {
 		},
 	}
 
-	service := NewDiscoveryServiceWithConfig(cfg)
+	service := NewServiceWithConfig(cfg)
 	ctx := context.Background()
 
 	devices, err := service.DiscoverDevices(ctx)

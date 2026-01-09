@@ -62,6 +62,7 @@ func setBalance(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Balance level set to %d", level))
+
 	return nil
 }
 
@@ -85,6 +86,7 @@ func balanceLeft(c *cli.Context) error {
 	}
 
 	newLevel := currentBalance.ActualBalance - amount
+
 	err = client.SetBalanceSafe(newLevel)
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to shift balance left: %v", err))
@@ -92,6 +94,7 @@ func balanceLeft(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Balance shifted from %d to %d (left)", currentBalance.ActualBalance, newLevel))
+
 	return nil
 }
 
@@ -115,6 +118,7 @@ func balanceRight(c *cli.Context) error {
 	}
 
 	newLevel := currentBalance.ActualBalance + amount
+
 	err = client.SetBalanceSafe(newLevel)
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to shift balance right: %v", err))
@@ -122,6 +126,7 @@ func balanceRight(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Balance shifted from %d to %d (right)", currentBalance.ActualBalance, newLevel))
+
 	return nil
 }
 
@@ -143,5 +148,6 @@ func balanceCenter(c *cli.Context) error {
 	}
 
 	PrintSuccess("Balance centered")
+
 	return nil
 }

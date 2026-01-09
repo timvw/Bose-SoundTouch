@@ -36,11 +36,14 @@ func getZone(c *cli.Context) error {
 
 	if len(zone.Members) > 0 {
 		fmt.Printf("  Members (%d):\n", len(zone.Members))
+
 		for _, member := range zone.Members {
 			fmt.Printf("    - %s", member.DeviceID)
+
 			if member.IP != "" {
 				fmt.Printf(" (IP: %s)", member.IP)
 			}
+
 			fmt.Println()
 		}
 	} else {
@@ -102,11 +105,14 @@ func getZoneMembers(c *cli.Context) error {
 	}
 
 	fmt.Printf("Zone Members (%d):\n", len(members))
+
 	for i, member := range members {
 		fmt.Printf("  %d. %s", i+1, member)
+
 		if member == clientConfig.Host {
 			fmt.Print(" (this device)")
 		}
+
 		fmt.Println()
 	}
 
@@ -133,12 +139,14 @@ func createZone(c *cli.Context) error {
 
 	// Parse and validate member IPs
 	var memberIPs []net.IP
+
 	for _, member := range members {
 		ip := net.ParseIP(member)
 		if ip == nil {
 			PrintError(fmt.Sprintf("Invalid IP address: %s", member))
 			return fmt.Errorf("invalid IP address: %s", member)
 		}
+
 		memberIPs = append(memberIPs, ip)
 	}
 
@@ -146,6 +154,7 @@ func createZone(c *cli.Context) error {
 	// In a real scenario, you might want to specify the master separately
 	masterDeviceID := "master" // This would need to be a real device ID
 	memberMap := make(map[string]string)
+
 	for i, ip := range memberIPs {
 		deviceID := fmt.Sprintf("device_%d", i+1)
 		memberMap[deviceID] = ip.String()
@@ -158,6 +167,7 @@ func createZone(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Zone created with members: %s", strings.Join(members, ", ")))
+
 	return nil
 }
 
@@ -189,6 +199,7 @@ func addToZone(c *cli.Context) error {
 	// For this example, we'll use the IP as the device ID
 	// In practice, you'd need the actual device ID
 	deviceID := memberIP
+
 	err = client.AddToZone(deviceID, memberIP)
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to add to zone: %v", err))
@@ -196,6 +207,7 @@ func addToZone(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Added %s to zone", memberIP))
+
 	return nil
 }
 
@@ -227,6 +239,7 @@ func removeFromZone(c *cli.Context) error {
 	// For this example, we'll use the IP as the device ID
 	// In practice, you'd need the actual device ID
 	deviceID := memberIP
+
 	err = client.RemoveFromZone(deviceID)
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to remove from zone: %v", err))
@@ -234,6 +247,7 @@ func removeFromZone(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Removed %s from zone", memberIP))
+
 	return nil
 }
 
@@ -255,6 +269,7 @@ func dissolveZone(c *cli.Context) error {
 	}
 
 	PrintSuccess("Zone dissolved")
+
 	return nil
 }
 

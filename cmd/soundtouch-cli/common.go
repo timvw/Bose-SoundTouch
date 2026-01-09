@@ -66,6 +66,7 @@ func RequireHost(c *cli.Context) error {
 	if c.String("host") == "" {
 		return fmt.Errorf("host is required. Use --host flag or set SOUNDTOUCH_HOST environment variable")
 	}
+
 	return nil
 }
 

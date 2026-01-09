@@ -11,6 +11,7 @@ import (
 // getNowPlaying handles getting the current playback status
 func getNowPlaying(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -48,6 +49,7 @@ func getNowPlaying(c *cli.Context) error {
 
 	if nowPlaying.HasTimeInfo() {
 		fmt.Printf("  Duration: %s\n", nowPlaying.FormatDuration())
+
 		if nowPlaying.Position != nil {
 			fmt.Printf("  Position: %s\n", nowPlaying.FormatPosition())
 		}
@@ -67,6 +69,7 @@ func getNowPlaying(c *cli.Context) error {
 // playCommand handles play command
 func playCommand(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -80,12 +83,14 @@ func playCommand(c *cli.Context) error {
 	}
 
 	PrintSuccess("Play command sent")
+
 	return nil
 }
 
 // pauseCommand handles pause command
 func pauseCommand(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -99,12 +104,14 @@ func pauseCommand(c *cli.Context) error {
 	}
 
 	PrintSuccess("Pause command sent")
+
 	return nil
 }
 
 // stopCommand handles stop command
 func stopCommand(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -118,12 +125,14 @@ func stopCommand(c *cli.Context) error {
 	}
 
 	PrintSuccess("Stop command sent")
+
 	return nil
 }
 
 // nextCommand handles next track command
 func nextCommand(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -137,12 +146,14 @@ func nextCommand(c *cli.Context) error {
 	}
 
 	PrintSuccess("Next track command sent")
+
 	return nil
 }
 
 // prevCommand handles previous track command
 func prevCommand(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -156,6 +167,7 @@ func prevCommand(c *cli.Context) error {
 	}
 
 	PrintSuccess("Previous track command sent")
+
 	return nil
 }
 
@@ -178,6 +190,7 @@ func sendKey(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("%s key command sent", key))
+
 	return nil
 }
 
@@ -199,6 +212,7 @@ func powerCommand(c *cli.Context) error {
 	}
 
 	PrintSuccess("Power command sent")
+
 	return nil
 }
 
@@ -220,6 +234,7 @@ func muteCommand(c *cli.Context) error {
 	}
 
 	PrintSuccess("Mute command sent")
+
 	return nil
 }
 
@@ -241,6 +256,7 @@ func thumbsUpCommand(c *cli.Context) error {
 	}
 
 	PrintSuccess("Thumbs up command sent")
+
 	return nil
 }
 
@@ -262,6 +278,7 @@ func thumbsDownCommand(c *cli.Context) error {
 	}
 
 	PrintSuccess("Thumbs down command sent")
+
 	return nil
 }
 
@@ -283,6 +300,7 @@ func volumeUpKey(c *cli.Context) error {
 	}
 
 	PrintSuccess("Volume up command sent")
+
 	return nil
 }
 
@@ -304,5 +322,6 @@ func volumeDownKey(c *cli.Context) error {
 	}
 
 	PrintSuccess("Volume down command sent")
+
 	return nil
 }

@@ -53,6 +53,7 @@ func setClockTime(c *cli.Context) error {
 
 	// Parse time string (HH:MM format)
 	var hour, minute int
+
 	var err error
 
 	if timeStr == "now" {
@@ -74,6 +75,7 @@ func setClockTime(c *cli.Context) error {
 				PrintError(fmt.Sprintf("Invalid time format. Use HH:MM, Unix timestamp, or 'now': %v", err))
 				return err
 			}
+
 			PrintDeviceHeader(fmt.Sprintf("Setting clock time to %02d:%02d", hour, minute), clientConfig.Host, clientConfig.Port)
 		}
 	}
@@ -89,6 +91,7 @@ func setClockTime(c *cli.Context) error {
 	targetTime := time.Date(now.Year(), now.Month(), now.Day(), hour, minute, 0, 0, now.Location())
 
 	clockTimeRequest := models.NewClockTimeRequest(targetTime)
+
 	err = client.SetClockTime(clockTimeRequest)
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to set clock time: %v", err))
@@ -96,6 +99,7 @@ func setClockTime(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Clock time set to %02d:%02d", hour, minute))
+
 	return nil
 }
 
@@ -118,6 +122,7 @@ func setClockTimeNow(c *cli.Context) error {
 
 	now := time.Now()
 	PrintSuccess(fmt.Sprintf("Clock time set to current time (%02d:%02d)", now.Hour(), now.Minute()))
+
 	return nil
 }
 
@@ -172,6 +177,7 @@ func enableClockDisplay(c *cli.Context) error {
 	}
 
 	PrintSuccess("Clock display enabled")
+
 	return nil
 }
 
@@ -193,6 +199,7 @@ func disableClockDisplay(c *cli.Context) error {
 	}
 
 	PrintSuccess("Clock display disabled")
+
 	return nil
 }
 
@@ -210,6 +217,7 @@ func setClockDisplayBrightness(c *cli.Context) error {
 
 	// Convert brightness string to numeric value
 	var brightnessLevel int
+
 	switch brightness {
 	case "low", "LOW":
 		brightnessLevel = 25
@@ -231,6 +239,7 @@ func setClockDisplayBrightness(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Clock display brightness set to %s", brightness))
+
 	return nil
 }
 
@@ -248,6 +257,7 @@ func setClockDisplayFormat(c *cli.Context) error {
 
 	// Validate and normalize format value
 	var formatSetting models.ClockFormat
+
 	switch format {
 	case "12", "12h", "12hour":
 		formatSetting = models.ClockFormat12Hour
@@ -267,6 +277,7 @@ func setClockDisplayFormat(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Clock display format set to %s", format))
+
 	return nil
 }
 

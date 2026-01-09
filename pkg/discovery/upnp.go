@@ -16,8 +16,8 @@ import (
 	"github.com/user_account/bose-soundtouch/pkg/models"
 )
 
-// DiscoveryService handles UPnP SSDP discovery of SoundTouch devices
-type DiscoveryService struct {
+// Service handles UPnP SSDP discovery of SoundTouch devices
+type Service struct {
 	timeout  time.Duration
 	cache    map[string]*models.DiscoveredDevice
 	cacheTTL time.Duration
@@ -25,13 +25,13 @@ type DiscoveryService struct {
 	config   *config.Config
 }
 
-// NewDiscoveryService creates a new UPnP discovery service
-func NewDiscoveryService(timeout time.Duration) *DiscoveryService {
+// NewService creates a new UPnP discovery service
+func NewService(timeout time.Duration) *Service {
 	if timeout == 0 {
 		timeout = defaultTimeout
 	}
 
-	return &DiscoveryService{
+	return &Service{
 		timeout:  timeout,
 		cache:    make(map[string]*models.DiscoveredDevice),
 		cacheTTL: defaultCacheTTL,
@@ -40,8 +40,8 @@ func NewDiscoveryService(timeout time.Duration) *DiscoveryService {
 	}
 }
 
-// NewDiscoveryServiceWithConfig creates a new discovery service with configuration
-func NewDiscoveryServiceWithConfig(cfg *config.Config) *DiscoveryService {
+// NewServiceWithConfig creates a new discovery service with configuration
+func NewServiceWithConfig(cfg *config.Config) *Service {
 	timeout := cfg.DiscoveryTimeout
 	if timeout == 0 {
 		timeout = defaultTimeout
@@ -52,7 +52,7 @@ func NewDiscoveryServiceWithConfig(cfg *config.Config) *DiscoveryService {
 		cacheTTL = defaultCacheTTL
 	}
 
-	return &DiscoveryService{
+	return &Service{
 		timeout:  timeout,
 		cache:    make(map[string]*models.DiscoveredDevice),
 		cacheTTL: cacheTTL,
@@ -62,7 +62,7 @@ func NewDiscoveryServiceWithConfig(cfg *config.Config) *DiscoveryService {
 }
 
 // DiscoverDevices discovers all SoundTouch devices on the network
-func (d *DiscoveryService) DiscoverDevices(ctx context.Context) ([]*models.DiscoveredDevice, error) {
+func (d *Service) DiscoverDevices(ctx context.Context) ([]*models.DiscoveredDevice, error) {
 	// Check cache first
 	d.cleanupCache()
 
@@ -97,7 +97,7 @@ func (d *DiscoveryService) DiscoverDevices(ctx context.Context) ([]*models.Disco
 }
 
 // DiscoverDevice discovers a specific SoundTouch device by host
-func (d *DiscoveryService) DiscoverDevice(ctx context.Context, host string) (*models.DiscoveredDevice, error) {
+func (d *Service) DiscoverDevice(ctx context.Context, host string) (*models.DiscoveredDevice, error) {
 	// Check cache first
 	d.mutex.RLock()
 
@@ -124,13 +124,13 @@ func (d *DiscoveryService) DiscoverDevice(ctx context.Context, host string) (*mo
 }
 
 // GetCachedDevices returns all cached devices that haven't expired
-func (d *DiscoveryService) GetCachedDevices() []*models.DiscoveredDevice {
+func (d *Service) GetCachedDevices() []*models.DiscoveredDevice {
 	d.cleanupCache()
 	return d.getCachedDevices()
 }
 
 // ClearCache clears the device cache
-func (d *DiscoveryService) ClearCache() {
+func (d *Service) ClearCache() {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -138,7 +138,7 @@ func (d *DiscoveryService) ClearCache() {
 }
 
 // performDiscovery performs the actual UPnP SSDP discovery
-func (d *DiscoveryService) performDiscovery(ctx context.Context) ([]*models.DiscoveredDevice, error) {
+func (d *Service) performDiscovery(ctx context.Context) ([]*models.DiscoveredDevice, error) {
 	log.Printf("UPnP: Starting SSDP discovery for '%s' with timeout %v", soundTouchURN, d.timeout)
 
 	// Create UDP connection for multicast
@@ -235,7 +235,7 @@ func (d *DiscoveryService) performDiscovery(ctx context.Context) ([]*models.Disc
 }
 
 // buildMSearchRequest builds the M-SEARCH request for SoundTouch devices
-func (d *DiscoveryService) buildMSearchRequest() string {
+func (d *Service) buildMSearchRequest() string {
 	return fmt.Sprintf(
 		"M-SEARCH * HTTP/1.1\r\n"+
 			"HOST: %s\r\n"+
@@ -250,7 +250,7 @@ func (d *DiscoveryService) buildMSearchRequest() string {
 }
 
 // parseResponse parses UPnP SSDP response and extracts device information
-func (d *DiscoveryService) parseResponse(response string) (*models.DiscoveredDevice, error) {
+func (d *Service) parseResponse(response string) (*models.DiscoveredDevice, error) {
 	log.Printf("UPnP: Parsing response (%d chars): %.100s...", len(response), strings.ReplaceAll(response, "\r\n", "\\r\\n"))
 
 	// Try both \r\n and \n line endings
@@ -338,7 +338,7 @@ func (d *DiscoveryService) parseResponse(response string) (*models.DiscoveredDev
 }
 
 // parseLocationURL extracts basic device info from the location URL
-func (d *DiscoveryService) parseLocationURL(location string) (*models.DiscoveredDevice, error) {
+func (d *Service) parseLocationURL(location string) (*models.DiscoveredDevice, error) {
 	log.Printf("UPnP: Parsing location URL: %s", location)
 
 	// Parse the URL to extract host and port
@@ -366,7 +366,7 @@ func (d *DiscoveryService) parseLocationURL(location string) (*models.Discovered
 }
 
 // enrichDeviceInfo tries to get additional device information from the device description
-func (d *DiscoveryService) enrichDeviceInfo(_ *models.DiscoveredDevice, location string) error {
+func (d *Service) enrichDeviceInfo(_ *models.DiscoveredDevice, location string) error {
 	log.Printf("UPnP: Attempting to enrich device info by fetching %s", location)
 
 	client := &http.Client{
@@ -391,7 +391,7 @@ func (d *DiscoveryService) enrichDeviceInfo(_ *models.DiscoveredDevice, location
 }
 
 // updateCache updates the device cache with discovered devices
-func (d *DiscoveryService) updateCache(devices []*models.DiscoveredDevice) {
+func (d *Service) updateCache(devices []*models.DiscoveredDevice) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -401,7 +401,7 @@ func (d *DiscoveryService) updateCache(devices []*models.DiscoveredDevice) {
 }
 
 // getCachedDevices returns all valid cached devices (internal method)
-func (d *DiscoveryService) getCachedDevices() []*models.DiscoveredDevice {
+func (d *Service) getCachedDevices() []*models.DiscoveredDevice {
 	d.mutex.RLock()
 	defer d.mutex.RUnlock()
 
@@ -416,7 +416,7 @@ func (d *DiscoveryService) getCachedDevices() []*models.DiscoveredDevice {
 }
 
 // cleanupCache removes expired devices from cache
-func (d *DiscoveryService) cleanupCache() {
+func (d *Service) cleanupCache() {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -428,12 +428,12 @@ func (d *DiscoveryService) cleanupCache() {
 }
 
 // getConfiguredDevices returns devices from configuration
-func (d *DiscoveryService) getConfiguredDevices() []*models.DiscoveredDevice {
+func (d *Service) getConfiguredDevices() []*models.DiscoveredDevice {
 	return d.config.GetPreferredDevicesAsDiscovered()
 }
 
 // mergeDevices merges two device lists, avoiding duplicates based on host
-func (d *DiscoveryService) mergeDevices(existing, newDevices []*models.DiscoveredDevice) []*models.DiscoveredDevice {
+func (d *Service) mergeDevices(existing, newDevices []*models.DiscoveredDevice) []*models.DiscoveredDevice {
 	hostSet := make(map[string]bool)
 	result := make([]*models.DiscoveredDevice, 0, len(existing)+len(newDevices))
 

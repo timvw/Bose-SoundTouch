@@ -58,7 +58,7 @@ func main() {
 	}
 
 	// Use the configured discovery service to isolate UPnP
-	configuredService := discovery.NewDiscoveryServiceWithConfig(cfg)
+	configuredService := discovery.NewServiceWithConfig(cfg)
 	devices, err := configuredService.DiscoverDevices(ctx)
 	duration := time.Since(start)
 

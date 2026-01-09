@@ -36,7 +36,9 @@ func getNetworkInfo(c *cli.Context) error {
 	}
 
 	fmt.Printf("  Interfaces (%d):\n", len(interfaces))
-	for i, iface := range interfaces {
+
+	for i := range interfaces {
+		iface := &interfaces[i]
 		fmt.Printf("\n  Interface %d:\n", i+1)
 		fmt.Printf("    Type: %s\n", iface.GetType())
 
@@ -77,7 +79,9 @@ func getNetworkInfo(c *cli.Context) error {
 	activeInterfaces := networkInfo.GetActiveInterfaces()
 	if len(activeInterfaces) > 0 {
 		fmt.Println("\n  Active Connections:")
-		for _, iface := range activeInterfaces {
+
+		for i := range activeInterfaces {
+			iface := &activeInterfaces[i]
 			fmt.Printf("    - %s: %s\n", iface.GetType(), iface.GetNetworkSummary())
 		}
 	}
@@ -103,6 +107,7 @@ func pingDevice(c *cli.Context) error {
 	}
 
 	PrintSuccess("Device is reachable")
+
 	return nil
 }
 
@@ -118,5 +123,6 @@ func getDeviceURL(c *cli.Context) error {
 
 	baseURL := client.BaseURL()
 	fmt.Printf("Device URL: %s\n", baseURL)
+
 	return nil
 }

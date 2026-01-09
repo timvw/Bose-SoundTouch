@@ -16,10 +16,12 @@ func discoverDevices(c *cli.Context) error {
 	showAll := c.Bool("all")
 
 	fmt.Printf("Discovering SoundTouch devices...\n")
+
 	if showAll {
 		fmt.Printf("Timeout: %v\n", timeout)
 		fmt.Printf("Mode: Detailed information\n")
 	}
+
 	fmt.Println()
 
 	// Load configuration
@@ -35,6 +37,7 @@ func discoverDevices(c *cli.Context) error {
 
 	// Create discovery service
 	discoveryService := discovery.NewUnifiedDiscoveryService(cfg)
+
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.DiscoveryTimeout+5*time.Second)
 	defer cancel()
 
@@ -52,6 +55,7 @@ func discoverDevices(c *cli.Context) error {
 		fmt.Println("- Devices are on a different network segment")
 		fmt.Println("- Network blocks multicast traffic")
 		fmt.Println("- Firewall is blocking discovery ports")
+
 		return nil
 	}
 

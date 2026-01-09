@@ -51,6 +51,7 @@ func setBass(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Bass level set to %d", level))
+
 	return nil
 }
 
@@ -74,6 +75,7 @@ func bassUp(c *cli.Context) error {
 	}
 
 	newLevel := currentBass.ActualBass + amount
+
 	err = client.SetBassSafe(newLevel)
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to increase bass: %v", err))
@@ -81,6 +83,7 @@ func bassUp(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Bass increased from %d to %d", currentBass.ActualBass, newLevel))
+
 	return nil
 }
 
@@ -104,6 +107,7 @@ func bassDown(c *cli.Context) error {
 	}
 
 	newLevel := currentBass.ActualBass - amount
+
 	err = client.SetBassSafe(newLevel)
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to decrease bass: %v", err))
@@ -111,6 +115,7 @@ func bassDown(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Bass decreased from %d to %d", currentBass.ActualBass, newLevel))
+
 	return nil
 }
 

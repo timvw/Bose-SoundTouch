@@ -10,6 +10,7 @@ import (
 // getDeviceInfo handles the device info command
 func getDeviceInfo(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -27,6 +28,7 @@ func getDeviceInfo(c *cli.Context) error {
 	fmt.Printf("  Name: %s\n", deviceInfo.Name)
 	fmt.Printf("  Type: %s\n", deviceInfo.Type)
 	fmt.Printf("  Device ID: %s\n", deviceInfo.DeviceID)
+
 	if deviceInfo.MargeAccountUUID != "" {
 		fmt.Printf("  Account UUID: %s\n", deviceInfo.MargeAccountUUID)
 	}
@@ -46,9 +48,11 @@ func getDeviceInfo(c *cli.Context) error {
 
 		for _, component := range deviceInfo.Components {
 			fmt.Printf("    - Category: %s\n", component.ComponentCategory)
+
 			if component.SoftwareVersion != "" {
 				fmt.Printf("      Software Version: %s\n", component.SoftwareVersion)
 			}
+
 			if component.SerialNumber != "" {
 				fmt.Printf("      Serial Number: %s\n", component.SerialNumber)
 			}
@@ -61,6 +65,7 @@ func getDeviceInfo(c *cli.Context) error {
 // getDeviceName handles getting the device name
 func getDeviceName(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -74,12 +79,14 @@ func getDeviceName(c *cli.Context) error {
 	}
 
 	fmt.Printf("Device Name: %s\n", name)
+
 	return nil
 }
 
 // setDeviceName handles setting the device name
 func setDeviceName(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -98,12 +105,14 @@ func setDeviceName(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Device name set to '%s'", newName))
+
 	return nil
 }
 
 // getCapabilities handles getting device capabilities
 func getCapabilities(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -137,9 +146,11 @@ func getCapabilities(c *cli.Context) error {
 		for _, capName := range capNames {
 			capability := capabilities.GetCapabilityByName(capName)
 			fmt.Printf("    - %s", capName)
+
 			if capability.URL != "" {
 				fmt.Printf(" (%s)", capability.URL)
 			}
+
 			fmt.Println()
 		}
 	}
@@ -150,6 +161,7 @@ func getCapabilities(c *cli.Context) error {
 // getPresets handles getting device presets
 func getPresets(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
@@ -170,6 +182,7 @@ func getPresets(c *cli.Context) error {
 	}
 
 	fmt.Printf("  Configured Presets:\n")
+
 	for _, preset := range presets.Preset {
 		fmt.Printf("    %d. %s\n", preset.ID, preset.GetDisplayName())
 		fmt.Printf("       Source: %s\n", preset.ContentItem.Source)
@@ -213,6 +226,7 @@ func selectPreset(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Preset %d selected", presetNum))
+
 	return nil
 }
 
