@@ -138,6 +138,14 @@ jobs:
           echo "Files before build:"
           ls -la
 
+          # Debug: Show Go cache and module cache
+          echo "Go build cache location: $(go env GOCACHE)"
+          echo "Go module cache location: $(go env GOMODCACHE)"
+          echo "Go build cache contents:"
+          ls -la "$(go env GOCACHE)" 2>/dev/null || echo "Cache directory not accessible"
+          echo "Go module cache contents (top level):"
+          ls -la "$(go env GOMODCACHE)" 2>/dev/null || echo "Module cache directory not accessible"
+
           # Ensure clean build environment
           rm -f "$OUTPUT_NAME" "$OUTPUT_NAME.sha256" "$OUTPUT_NAME.sha512"
           go clean -cache
@@ -152,6 +160,10 @@ jobs:
             ls -la
             exit 1
           fi
+
+          # Debug: Show post-build state
+          echo "Files after successful build:"
+          ls -la
 
           # Verify binary was created and is executable
           ls -la "$OUTPUT_NAME"
