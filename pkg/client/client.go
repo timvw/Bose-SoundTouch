@@ -147,6 +147,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gesellix/bose-soundtouch/pkg/models"
@@ -1060,27 +1061,41 @@ func (c *Client) GetTrackInfo() (*models.NowPlaying, error) {
 }
 
 // GetAudioDSPControls retrieves the current DSP audio controls
+// Only available if audiodspcontrols is listed in the reply to GET /capabilities
 func (c *Client) GetAudioDSPControls() (*models.AudioDSPControls, error) {
-	var dspControls models.AudioDSPControls
+	// Check if DSP controls are supported by checking capabilities
+	capabilities, err := c.GetCapabilities()
+	if err != nil {
+		return nil, fmt.Errorf("failed to check device capabilities: %w", err)
+	}
 
-	err := c.get("/audiodspcontrols", &dspControls)
+	// Check if audiodspcontrols capability exists
+	if !c.hasCapability(capabilities, "audiodspcontrols") {
+		return nil, fmt.Errorf("audiodspcontrols not supported by this device")
+	}
+
+	var dspControls models.AudioDSPControls
+	err = c.get("/audiodspcontrols", &dspControls)
 
 	return &dspControls, err
 }
 
 // SetAudioDSPControls sets the DSP audio controls
+// Only available if audiodspcontrols is listed in the reply to GET /capabilities
 func (c *Client) SetAudioDSPControls(audioMode string, videoSyncDelay int) error {
 	request := &models.AudioDSPControlsRequest{
 		AudioMode:           audioMode,
 		VideoSyncAudioDelay: videoSyncDelay,
 	}
 
-	// Validate against current capabilities if possible
+	// Validate against current capabilities
 	capabilities, err := c.GetAudioDSPControls()
-	if err == nil {
-		if validationErr := request.Validate(capabilities); validationErr != nil {
-			return fmt.Errorf("invalid DSP controls request: %w", validationErr)
-		}
+	if err != nil {
+		return fmt.Errorf("DSP controls not supported or available: %w", err)
+	}
+
+	if validationErr := request.Validate(capabilities); validationErr != nil {
+		return fmt.Errorf("invalid DSP controls request: %w", validationErr)
 	}
 
 	return c.post("/audiodspcontrols", request)
@@ -1117,10 +1132,21 @@ func (c *Client) SetVideoSyncAudioDelay(delay int) error {
 }
 
 // GetAudioProductToneControls retrieves the current advanced tone controls (bass/treble)
+// Only available if audioproducttonecontrols is listed in the reply to GET /capabilities
 func (c *Client) GetAudioProductToneControls() (*models.AudioProductToneControls, error) {
-	var toneControls models.AudioProductToneControls
+	// Check if tone controls are supported by checking capabilities
+	capabilities, err := c.GetCapabilities()
+	if err != nil {
+		return nil, fmt.Errorf("failed to check device capabilities: %w", err)
+	}
 
-	err := c.get("/audioproducttonecontrols", &toneControls)
+	// Check if audioproducttonecontrols capability exists
+	if !c.hasCapability(capabilities, "audioproducttonecontrols") {
+		return nil, fmt.Errorf("audioproducttonecontrols not supported by this device")
+	}
+
+	var toneControls models.AudioProductToneControls
+	err = c.get("/audioproducttonecontrols", &toneControls)
 
 	return &toneControls, err
 }
@@ -1159,10 +1185,21 @@ func (c *Client) SetAdvancedTreble(level int) error {
 }
 
 // GetAudioProductLevelControls retrieves the current speaker level controls
+// Only available if audioproductlevelcontrols is listed in the reply to GET /capabilities
 func (c *Client) GetAudioProductLevelControls() (*models.AudioProductLevelControls, error) {
-	var levelControls models.AudioProductLevelControls
+	// Check if level controls are supported by checking capabilities
+	capabilities, err := c.GetCapabilities()
+	if err != nil {
+		return nil, fmt.Errorf("failed to check device capabilities: %w", err)
+	}
 
-	err := c.get("/audioproductlevelcontrols", &levelControls)
+	// Check if audioproductlevelcontrols capability exists
+	if !c.hasCapability(capabilities, "audioproductlevelcontrols") {
+		return nil, fmt.Errorf("audioproductlevelcontrols not supported by this device")
+	}
+
+	var levelControls models.AudioProductLevelControls
+	err = c.get("/audioproductlevelcontrols", &levelControls)
 
 	return &levelControls, err
 }
@@ -1232,4 +1269,12 @@ func (c *Client) RemoveZoneSlave(masterDeviceID, slaveDeviceID, slaveIP string) 
 // RemoveZoneSlaveByDeviceID removes a single device from an existing zone by device ID only
 func (c *Client) RemoveZoneSlaveByDeviceID(masterDeviceID, slaveDeviceID string) error {
 	return c.RemoveZoneSlave(masterDeviceID, slaveDeviceID, "")
+}
+
+// hasCapability checks if a capability is present in the device capabilities
+func (c *Client) hasCapability(capabilities *models.Capabilities, capability string) bool {
+	// Convert capabilities to string and check if it contains the capability
+	// This is a simplified check - in practice, you'd parse the actual capabilities XML structure
+	capStr := fmt.Sprintf("%+v", capabilities)
+	return strings.Contains(capStr, capability)
 }

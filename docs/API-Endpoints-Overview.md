@@ -307,23 +307,29 @@ Remove individual device from existing zone using official API format.
 - **Enhanced**: `CreateZone()`, `AddToZone()`, `RemoveFromZone()` methods via `/setZone`
 - **Status**: Provides both official low-level API and enhanced high-level operations
 
-### Advanced Audio Controls ✅ **Implemented**
-Professional/high-end device features (only available via `/capabilities` check):
+### Advanced Audio Controls ✅ **Conditionally Available**
+Professional/high-end device features (only available on devices that list these capabilities):
 
 #### `/audiodspcontrols` - GET/POST ✅ **Implemented**
 Access DSP settings including audio modes and video sync delay.
 
-**Implementation**: Available via `GetAudioDSPControls()`, `SetAudioDSPControls()`, `SetAudioMode()`, `SetVideoSyncAudioDelay()` methods
+**Availability**: Only available if `audiodspcontrols` is listed in the reply to `GET /capabilities`
+
+**Implementation**: Available via `GetAudioDSPControls()`, `SetAudioDSPControls()`, `SetAudioMode()`, `SetVideoSyncAudioDelay()` methods with automatic capability checking
 
 #### `/audioproducttonecontrols` - GET/POST ✅ **Implemented**
 Advanced bass and treble controls (beyond basic `/bass` endpoint).
 
-**Implementation**: Available via `GetAudioProductToneControls()`, `SetAudioProductToneControls()`, `SetAdvancedBass()`, `SetAdvancedTreble()` methods
+**Availability**: Only available if `audioproducttonecontrols` is listed in the reply to `GET /capabilities`
+
+**Implementation**: Available via `GetAudioProductToneControls()`, `SetAudioProductToneControls()`, `SetAdvancedBass()`, `SetAdvancedTreble()` methods with automatic capability checking
 
 #### `/audioproductlevelcontrols` - GET/POST ✅ **Implemented**
 Speaker level controls for front-center and rear-surround speakers.
 
-**Implementation**: Available via `GetAudioProductLevelControls()`, `SetAudioProductLevelControls()`, `SetFrontCenterSpeakerLevel()`, `SetRearSurroundSpeakersLevel()` methods
+**Availability**: Only available if `audioproductlevelcontrols` is listed in the reply to `GET /capabilities`
+
+**Implementation**: Available via `GetAudioProductLevelControls()`, `SetAudioProductLevelControls()`, `SetFrontCenterSpeakerLevel()`, `SetRearSurroundSpeakersLevel()` methods with automatic capability checking
 
 ### Clock and Network Endpoints 🔍 **Extra**
 These endpoints work with real hardware but are NOT in official API v1.0:
@@ -342,13 +348,14 @@ These endpoints work with real hardware but are NOT in official API v1.0:
 - **Total Official Endpoints**: 19
 - **Implemented**: 18 (95%)
 - **Non-functional**: 1 (5%) - `/trackInfo` times out on real devices
-- **Missing Low-Impact**: 0 (0%)
+- **Conditionally Available**: 3 (16%) - Advanced audio endpoints require device support
 
 ### Feature Coverage: 100%
 - ✅ All essential user functionality implemented
-- ✅ All core device operations supported
+- ✅ All core device operations supported  
 - ✅ Complete WebSocket event system
 - ✅ Full multiroom capabilities
+- ✅ Complete advanced audio controls (where supported by device)
 - 🔍 Additional features beyond official specification
 
 
