@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/xml"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -298,13 +299,47 @@ type Language struct {
 	Value   string   `xml:",chardata"`
 }
 
+// SpecialMessageType represents message types that are not part of <updates>
+type SpecialMessageType string
+
+// Constants for special message types
+const (
+	MessageTypeSdkInfo      SpecialMessageType = "sdkInfo"
+	MessageTypeUserActivity SpecialMessageType = "userActivity"
+)
+
+// SoundTouchSdkInfo represents the SDK info message sent on connection
+type SoundTouchSdkInfo struct {
+	XMLName       xml.Name `xml:"SoundTouchSdkInfo"`
+	ServerVersion string   `xml:"serverVersion,attr"`
+	ServerBuild   string   `xml:"serverBuild,attr"`
+}
+
+// UserActivityUpdate represents user activity notifications
+type UserActivityUpdate struct {
+	XMLName  xml.Name `xml:"userActivityUpdate"`
+	DeviceID string   `xml:"deviceID,attr"`
+}
+
+// SpecialMessage represents non-updates WebSocket messages
+type SpecialMessage struct {
+	Type      SpecialMessageType
+	DeviceID  string
+	Data      interface{}
+	RawData   []byte
+	Timestamp time.Time
+}
+
+// SpecialMessageHandler defines the signature for special message handlers
+type SpecialMessageHandler func(message *SpecialMessage)
+
 // EventHandler represents a function that handles WebSocket events
 type EventHandler func(event *WebSocketEvent)
 
 // TypedEventHandler represents a function that handles specific event types
 type TypedEventHandler[T any] func(event T)
 
-// WebSocketEventHandlers holds typed event handlers for different event types
+// WebSocketEventHandlers contains handlers for different types of WebSocket events
 type WebSocketEventHandlers struct {
 	OnNowPlaying          TypedEventHandler[*NowPlayingUpdatedEvent]
 	OnVolumeUpdated       TypedEventHandler[*VolumeUpdatedEvent]
@@ -319,6 +354,7 @@ type WebSocketEventHandlers struct {
 	OnRecentsUpdated      TypedEventHandler[*RecentsUpdatedEvent]
 	OnLanguageUpdated     TypedEventHandler[*LanguageUpdatedEvent]
 	OnUnknownEvent        EventHandler
+	OnSpecialMessage      SpecialMessageHandler
 }
 
 // ParseWebSocketEvent attempts to parse a WebSocket message into a specific event type
@@ -521,16 +557,88 @@ func (e *WebSocketEvent) GetEventTypes() []WebSocketEventType {
 
 // String returns a human-readable string representation of the WebSocket event
 func (e *WebSocketEvent) String() string {
-	events := e.GetEvents()
 	eventTypes := e.GetEventTypes()
-
-	if len(events) == 0 {
+	if len(eventTypes) == 0 {
 		return fmt.Sprintf("WebSocket Event [Device: %s] - No events", e.DeviceID)
 	}
 
-	if len(events) == 1 {
+	if len(eventTypes) == 1 {
 		return fmt.Sprintf("WebSocket Event [Device: %s] - %s", e.DeviceID, eventTypes[0].String())
 	}
 
-	return fmt.Sprintf("WebSocket Event [Device: %s] - %d events", e.DeviceID, len(events))
+	return fmt.Sprintf("WebSocket Event [Device: %s] - %d events", e.DeviceID, len(eventTypes))
+}
+
+// ParseSpecialMessage parses non-updates WebSocket messages
+func ParseSpecialMessage(data []byte) (*SpecialMessage, error) {
+	dataStr := string(data)
+
+	// Check for SoundTouchSdkInfo
+	if strings.Contains(dataStr, "<SoundTouchSdkInfo") {
+		var sdkInfo SoundTouchSdkInfo
+		if err := xml.Unmarshal(data, &sdkInfo); err != nil {
+			return nil, fmt.Errorf("failed to parse SoundTouchSdkInfo: %w", err)
+		}
+
+		return &SpecialMessage{
+			Type:      MessageTypeSdkInfo,
+			Data:      &sdkInfo,
+			RawData:   data,
+			Timestamp: time.Now(),
+		}, nil
+	}
+
+	// Check for userActivityUpdate
+	if strings.Contains(dataStr, "<userActivityUpdate") {
+		var userActivity UserActivityUpdate
+		if err := xml.Unmarshal(data, &userActivity); err != nil {
+			return nil, fmt.Errorf("failed to parse userActivityUpdate: %w", err)
+		}
+
+		return &SpecialMessage{
+			Type:      MessageTypeUserActivity,
+			DeviceID:  userActivity.DeviceID,
+			Data:      &userActivity,
+			RawData:   data,
+			Timestamp: time.Now(),
+		}, nil
+	}
+
+	return nil, fmt.Errorf("unknown special message type: %s", dataStr)
+}
+
+// GetSdkInfo returns the parsed SdkInfo data if the message is of that type
+func (sm *SpecialMessage) GetSdkInfo() *SoundTouchSdkInfo {
+	if sm.Type == MessageTypeSdkInfo {
+		if sdkInfo, ok := sm.Data.(*SoundTouchSdkInfo); ok {
+			return sdkInfo
+		}
+	}
+
+	return nil
+}
+
+// GetUserActivity returns the parsed UserActivity data if the message is of that type
+func (sm *SpecialMessage) GetUserActivity() *UserActivityUpdate {
+	if sm.Type == MessageTypeUserActivity {
+		if userActivity, ok := sm.Data.(*UserActivityUpdate); ok {
+			return userActivity
+		}
+	}
+
+	return nil
+}
+
+// String returns a string representation of the special message
+func (sm *SpecialMessage) String() string {
+	switch sm.Type {
+	case MessageTypeSdkInfo:
+		if sdkInfo := sm.GetSdkInfo(); sdkInfo != nil {
+			return fmt.Sprintf("SoundTouch SDK Info - Version: %s, Build: %s", sdkInfo.ServerVersion, sdkInfo.ServerBuild)
+		}
+	case MessageTypeUserActivity:
+		return fmt.Sprintf("User Activity [Device: %s]", sm.DeviceID)
+	}
+
+	return fmt.Sprintf("Unknown Special Message - Type: %s", sm.Type)
 }

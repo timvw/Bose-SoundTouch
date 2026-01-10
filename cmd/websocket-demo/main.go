@@ -47,6 +47,7 @@ func parseFilters(eventFilter string) map[string]bool {
 	validFilters := map[string]bool{
 		"nowPlaying": true, "volume": true, "connection": true,
 		"preset": true, "zone": true, "bass": true,
+		"sdkInfo": true, "userActivity": true,
 	}
 
 	if eventFilter == "" {
@@ -59,7 +60,7 @@ func parseFilters(eventFilter string) map[string]bool {
 	for _, f := range filterList {
 		f = strings.TrimSpace(f)
 		if !validFilters[f] {
-			fmt.Printf("Invalid filter '%s'. Valid filters: nowPlaying, volume, connection, preset, zone, bass\n", f)
+			fmt.Printf("Invalid filter '%s'. Valid filters: nowPlaying, volume, connection, preset, zone, bass, sdkInfo, userActivity\n", f)
 			os.Exit(1)
 		}
 
@@ -116,6 +117,9 @@ func setupWebSocket(soundTouchClient *client.Client, reconnect, verbose bool) *c
 
 	if verbose {
 		wsConfig.Logger = &VerboseLogger{}
+	} else {
+		// Use a silent logger when not verbose
+		wsConfig.Logger = &SilentLogger{}
 	}
 
 	if !reconnect {
@@ -186,6 +190,11 @@ func main() {
 
 	// Set up event handlers
 	setupEventHandlers(wsClient, filters, *verbose)
+
+	// Set up special message handler
+	wsClient.OnSpecialMessage(func(message *models.SpecialMessage) {
+		handleSpecialMessage(message, filters, *verbose)
+	})
 
 	// Connect to WebSocket
 	fmt.Println("Connecting to WebSocket...")
@@ -382,6 +391,43 @@ func handleBass(event *models.BassUpdatedEvent) {
 	fmt.Printf("  📊 %s\n", levelDesc)
 }
 
+func handleSpecialMessage(message *models.SpecialMessage, filters map[string]bool, verbose bool) {
+	// Check if we should filter this message type
+	if filters != nil {
+		switch message.Type {
+		case models.MessageTypeSdkInfo:
+			if !filters["sdkInfo"] {
+				return
+			}
+		case models.MessageTypeUserActivity:
+			if !filters["userActivity"] {
+				return
+			}
+		}
+	}
+
+	switch message.Type {
+	case models.MessageTypeSdkInfo:
+		if sdkInfo := message.GetSdkInfo(); sdkInfo != nil {
+			fmt.Printf("\n📡 SDK Info:\n")
+			fmt.Printf("  📋 Server Version: %s\n", sdkInfo.ServerVersion)
+			fmt.Printf("  🔧 Server Build: %s\n", sdkInfo.ServerBuild)
+		}
+	case models.MessageTypeUserActivity:
+		fmt.Printf("\n👤 User Activity [%s]\n", message.DeviceID)
+
+		if verbose {
+			fmt.Printf("  ⏰ Timestamp: %s\n", message.Timestamp.Format("15:04:05"))
+		}
+	default:
+		fmt.Printf("\n❓ Unknown Special Message: %s\n", message.String())
+
+		if verbose {
+			fmt.Printf("  📱 Raw data: %s\n", string(message.RawData))
+		}
+	}
+}
+
 func setupEventHandlers(wsClient *client.WebSocketClient, filters map[string]bool, verbose bool) {
 	// Now Playing events
 	if filters == nil || filters["nowPlaying"] {
@@ -477,7 +523,7 @@ func printHelp() {
 	fmt.Println("        Enable verbose logging")
 	fmt.Println("  -filter string")
 	fmt.Println("        Filter events by type (comma-separated):")
-	fmt.Println("        nowPlaying, volume, connection, preset, zone, bass")
+	fmt.Println("        nowPlaying, volume, connection, preset, zone, bass, sdkInfo, userActivity")
 	fmt.Println("  -help")
 	fmt.Println("        Show this help message")
 	fmt.Println()
@@ -501,6 +547,8 @@ func printHelp() {
 	fmt.Println("  📻 preset      - Preset configuration changes")
 	fmt.Println("  🏠 zone        - Multiroom zone changes")
 	fmt.Println("  🎚️  bass        - Bass level changes")
+	fmt.Println("  📡 sdkInfo     - SDK version information")
+	fmt.Println("  👤 userActivity - User interaction notifications")
 	fmt.Println()
 	fmt.Println("The tool will automatically reconnect if the connection is lost.")
 	fmt.Println("Press Ctrl+C to stop monitoring.")
@@ -512,4 +560,11 @@ type VerboseLogger struct{}
 func (v *VerboseLogger) Printf(format string, args ...interface{}) {
 	timestamp := time.Now().Format("15:04:05")
 	fmt.Printf("[%s] [WebSocket] %s\n", timestamp, fmt.Sprintf(format, args...))
+}
+
+// SilentLogger provides no-op WebSocket logging
+type SilentLogger struct{}
+
+func (s *SilentLogger) Printf(_ string, _ ...interface{}) {
+	// Do nothing - silent logging
 }

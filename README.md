@@ -145,7 +145,7 @@ go run ./cmd/websocket-demo -host 192.168.1.10 -filter volume,nowPlaying
 go run ./cmd/websocket-demo -host 192.168.1.10 -duration 5m -verbose
 
 # Available event types for filtering:
-# nowPlaying, volume, connection, preset, zone, bass
+# nowPlaying, volume, connection, preset, zone, bass, sdkInfo, userActivity
 ```
 
 **Supported WebSocket Events:**
@@ -155,6 +155,8 @@ go run ./cmd/websocket-demo -host 192.168.1.10 -duration 5m -verbose
 - 📻 **Preset**: Preset configuration updates
 - 🏠 **Zone**: Multiroom zone membership changes
 - 🎚️ **Bass**: Bass equalizer level adjustments
+- 📡 **SDK Info**: Server version and build information (sent on connection)
+- 👤 **User Activity**: User interaction notifications
 
 See [docs/websocket-events.md](docs/websocket-events.md) for complete WebSocket documentation.
 

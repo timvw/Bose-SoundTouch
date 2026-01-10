@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"strings"
 	"sync"
 	"time"
 
@@ -153,6 +154,14 @@ func (ws *WebSocketClient) OnUnknownEvent(handler models.EventHandler) {
 	ws.handlers.OnUnknownEvent = handler
 }
 
+// OnSpecialMessage sets a handler for special (non-updates) messages
+func (ws *WebSocketClient) OnSpecialMessage(handler models.SpecialMessageHandler) {
+	ws.mu.Lock()
+	defer ws.mu.Unlock()
+
+	ws.handlers.OnSpecialMessage = handler
+}
+
 // Connect establishes a WebSocket connection to the SoundTouch device
 func (ws *WebSocketClient) Connect() error {
 	return ws.connectWithConfig(DefaultWebSocketConfig())
@@ -172,19 +181,26 @@ func (ws *WebSocketClient) connectWithConfig(config *WebSocketConfig) error {
 	}
 
 	// Build WebSocket URL
+	// Parse the base URL to extract just the hostname
+	baseURL, err := url.Parse(ws.client.BaseURL())
+	if err != nil {
+		return fmt.Errorf("failed to parse base URL: %w", err)
+	}
+
 	wsURL := url.URL{
 		Scheme: "ws",
-		Host:   fmt.Sprintf("%s:%d", ws.client.Host(), 8080), // SoundTouch WebSocket port is typically 8080
+		Host:   fmt.Sprintf("%s:8080", baseURL.Hostname()), // SoundTouch WebSocket port is typically 8080
 		Path:   "/",
 	}
 
 	ws.logger.Printf("Connecting to %s", wsURL.String())
 
-	// Create dialer with custom buffer sizes
+	// Create dialer with custom buffer sizes and "gabbo" protocol
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 10 * time.Second,
 		ReadBufferSize:   config.ReadBufferSize,
 		WriteBufferSize:  config.WriteBufferSize,
+		Subprotocols:     []string{"gabbo"}, // Required by SoundTouch API
 	}
 
 	// Establish connection
@@ -357,6 +373,12 @@ func (ws *WebSocketClient) attemptReconnect(config *WebSocketConfig) {
 
 // handleMessage processes incoming WebSocket messages
 func (ws *WebSocketClient) handleMessage(data []byte) {
+	// Check if this is a SoundTouchSdkInfo or other non-updates message
+	if !ws.isUpdatesMessage(data) {
+		ws.handleSpecialMessage(data)
+		return
+	}
+
 	// Parse the WebSocket event
 	event, err := models.ParseWebSocketEvent(data)
 	if err != nil {
@@ -366,6 +388,34 @@ func (ws *WebSocketClient) handleMessage(data []byte) {
 
 	// Process each event type in the message
 	ws.handleEvent(event)
+}
+
+// handleSpecialMessage processes special (non-updates) WebSocket messages
+func (ws *WebSocketClient) handleSpecialMessage(data []byte) {
+	specialMessage, err := models.ParseSpecialMessage(data)
+	if err != nil {
+		ws.logger.Printf("Unknown special message type: %v", err)
+		ws.logger.Printf("Raw message: %s", string(data))
+
+		return
+	}
+
+	// Call handler if set
+	ws.mu.RLock()
+	handler := ws.handlers.OnSpecialMessage
+	ws.mu.RUnlock()
+
+	if handler != nil {
+		handler(specialMessage)
+	}
+}
+
+// isUpdatesMessage checks if the message contains an <updates> element
+func (ws *WebSocketClient) isUpdatesMessage(data []byte) bool {
+	// Simple check for <updates> element - this avoids full XML parsing
+	// for messages we want to ignore like <SoundTouchSdkInfo>
+	dataStr := string(data)
+	return strings.Contains(dataStr, "<updates") && strings.Contains(dataStr, "deviceID=")
 }
 
 func (ws *WebSocketClient) dispatchTypedEvent(handlers *models.WebSocketEventHandlers, eventType models.WebSocketEventType, event *models.WebSocketEvent) bool {
