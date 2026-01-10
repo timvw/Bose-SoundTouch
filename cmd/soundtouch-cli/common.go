@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -145,4 +146,15 @@ func PrintError(message string) {
 // PrintWarning prints a standard warning message
 func PrintWarning(message string) {
 	fmt.Printf("⚠️  %s\n", message)
+}
+
+// showVersionInfo displays detailed version information including build details
+func showVersionInfo(_ *cli.Context) error {
+	fmt.Printf("soundtouch-cli version %s\n", version)
+	fmt.Printf("Build commit: %s\n", commit)
+	fmt.Printf("Build date: %s\n", date)
+	fmt.Printf("Go version: %s\n", runtime.Version())
+	fmt.Printf("Platform: %s/%s\n", runtime.GOOS, runtime.GOARCH)
+
+	return nil
 }

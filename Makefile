@@ -26,7 +26,7 @@ BUILD_TIME=$(shell date -u '+%Y-%m-%d_%H:%M:%S')
 COMMIT=$(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
 # Linker flags
-LDFLAGS=-X main.Version=$(VERSION) -X main.BuildTime=$(BUILD_TIME) -X main.Commit=$(COMMIT)
+LDFLAGS=-X main.version=$(VERSION) -X main.date=$(BUILD_TIME) -X main.commit=$(COMMIT)
 
 all: check build
 

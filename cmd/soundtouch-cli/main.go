@@ -7,6 +7,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// Build-time variables injected via ldflags
+var (
+	version = "dev"
+	commit  = "unknown"
+	date    = "unknown"
+)
+
 func main() {
 	app := &cli.App{
 		Name:  "soundtouch-cli",
@@ -14,7 +21,7 @@ func main() {
 		Description: `A comprehensive CLI tool for interacting with Bose SoundTouch devices.
    Supports device discovery, playback control, volume/bass/balance adjustment,
    source selection, zone management, and more.`,
-		Version: "1.0.0",
+		Version: version,
 		Authors: []*cli.Author{
 			{
 				Name:  "SoundTouch CLI Contributors",
@@ -23,6 +30,13 @@ func main() {
 		},
 		Flags: CommonFlags,
 		Commands: []*cli.Command{
+			// Version commands
+			{
+				Name:    "version",
+				Aliases: []string{"v"},
+				Usage:   "Show detailed version information",
+				Action:  showVersionInfo,
+			},
 			// Discovery commands
 			{
 				Name:    "discover",
