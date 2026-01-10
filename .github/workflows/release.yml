@@ -224,12 +224,17 @@ jobs:
           echo "📁 Downloaded artifact structure:"
           find . -type f -name "soundtouch-cli-*"
 
-          # Flatten directory structure (artifacts are in subdirs)
-          # Move all binary and checksum files to current directory
-          find . -mindepth 2 -type f -name "soundtouch-cli-*" -exec mv {} . \;
+          # Create a collection directory to avoid naming conflicts
+          mkdir -p release-files
+
+          # Move all files from subdirectories to the collection directory
+          find . -mindepth 2 -type f -name "soundtouch-cli-*" -exec mv {} release-files/ \;
 
           # Remove empty directories
           find . -type d -empty -delete
+
+          # Move to the collection directory for the rest of the processing
+          cd release-files
 
           # Debug: Show flattened structure
           echo "📁 Flattened structure:"
@@ -267,17 +272,17 @@ jobs:
         with:
           name: checksums
           path: |
-            binaries/checksums.sha256
-            binaries/checksums.sha512
-            binaries/*.sha256
-            binaries/*.sha512
+            binaries/release-files/checksums.sha256
+            binaries/release-files/checksums.sha512
+            binaries/release-files/*.sha256
+            binaries/release-files/*.sha512
           retention-days: 1
 
       - name: Upload all release assets
         uses: actions/upload-artifact@v6
         with:
           name: release-assets
-          path: binaries/
+          path: binaries/release-files/
           retention-days: 1
 
   create_release:
