@@ -660,6 +660,50 @@ func main() {
 						},
 						Before: RequireHost,
 					},
+					{
+						Name:   "add-slave",
+						Usage:  "Add slave to zone (official API)",
+						Action: addZoneSlave,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "master",
+								Usage:    "Master device ID",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "slave",
+								Usage:    "Slave device ID",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "slave-ip",
+								Usage: "Slave device IP address (optional)",
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "remove-slave",
+						Usage:  "Remove slave from zone (official API)",
+						Action: removeZoneSlave,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "master",
+								Usage:    "Master device ID",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "slave",
+								Usage:    "Slave device ID",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "slave-ip",
+								Usage: "Slave device IP address (optional)",
+							},
+						},
+						Before: RequireHost,
+					},
 				},
 			},
 		},

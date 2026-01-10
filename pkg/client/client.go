@@ -1056,3 +1056,37 @@ func (c *Client) GetTrackInfo() (*models.NowPlaying, error) {
 
 	return &nowPlaying, err
 }
+
+// AddZoneSlave adds a single device to an existing zone using the official /addZoneSlave endpoint
+func (c *Client) AddZoneSlave(masterDeviceID, slaveDeviceID, slaveIP string) error {
+	request := models.NewZoneSlaveRequest(masterDeviceID)
+	request.AddSlave(slaveDeviceID, slaveIP)
+
+	if err := request.Validate(); err != nil {
+		return fmt.Errorf("invalid zone slave request: %w", err)
+	}
+
+	return c.post("/addZoneSlave", request)
+}
+
+// AddZoneSlaveByDeviceID adds a single device to an existing zone by device ID only
+func (c *Client) AddZoneSlaveByDeviceID(masterDeviceID, slaveDeviceID string) error {
+	return c.AddZoneSlave(masterDeviceID, slaveDeviceID, "")
+}
+
+// RemoveZoneSlave removes a single device from an existing zone using the official /removeZoneSlave endpoint
+func (c *Client) RemoveZoneSlave(masterDeviceID, slaveDeviceID, slaveIP string) error {
+	request := models.NewZoneSlaveRequest(masterDeviceID)
+	request.AddSlave(slaveDeviceID, slaveIP)
+
+	if err := request.Validate(); err != nil {
+		return fmt.Errorf("invalid zone slave request: %w", err)
+	}
+
+	return c.post("/removeZoneSlave", request)
+}
+
+// RemoveZoneSlaveByDeviceID removes a single device from an existing zone by device ID only
+func (c *Client) RemoveZoneSlaveByDeviceID(masterDeviceID, slaveDeviceID string) error {
+	return c.RemoveZoneSlave(masterDeviceID, slaveDeviceID, "")
+}

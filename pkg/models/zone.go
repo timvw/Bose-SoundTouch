@@ -387,3 +387,94 @@ func (zc *ZoneCapabilities) CanCreateZone() bool {
 func (zc *ZoneCapabilities) CanJoinZone() bool {
 	return zc.SupportsMultiroom && zc.CanBeMember
 }
+
+// ZoneSlaveRequest represents the request for /addZoneSlave and /removeZoneSlave endpoints
+type ZoneSlaveRequest struct {
+	XMLName xml.Name         `xml:"zone"`
+	Master  string           `xml:"master,attr"`
+	Members []ZoneSlaveEntry `xml:"member"`
+}
+
+// ZoneSlaveEntry represents a single member entry in zone slave operations
+type ZoneSlaveEntry struct {
+	XMLName  xml.Name `xml:"member"`
+	DeviceID string   `xml:",chardata"`
+	IP       string   `xml:"ipaddress,attr,omitempty"`
+}
+
+// NewZoneSlaveRequest creates a new zone slave operation request
+func NewZoneSlaveRequest(masterDeviceID string) *ZoneSlaveRequest {
+	return &ZoneSlaveRequest{
+		Master:  masterDeviceID,
+		Members: []ZoneSlaveEntry{},
+	}
+}
+
+// AddSlave adds a single slave to the request
+func (zsr *ZoneSlaveRequest) AddSlave(deviceID, ipAddress string) {
+	slave := ZoneSlaveEntry{
+		DeviceID: deviceID,
+		IP:       ipAddress,
+	}
+	zsr.Members = append(zsr.Members, slave)
+}
+
+// Validate validates the zone slave request
+func (zsr *ZoneSlaveRequest) Validate() error {
+	if zsr.Master == "" {
+		return fmt.Errorf("master device ID is required")
+	}
+
+	if len(zsr.Members) != 1 {
+		return fmt.Errorf("zone slave operations require exactly one member, got %d", len(zsr.Members))
+	}
+
+	member := zsr.Members[0]
+	if member.DeviceID == "" {
+		return fmt.Errorf("slave device ID cannot be empty")
+	}
+
+	if member.DeviceID == zsr.Master {
+		return fmt.Errorf("slave device ID cannot be the same as master: %s", member.DeviceID)
+	}
+
+	if member.IP != "" {
+		if net.ParseIP(member.IP) == nil {
+			return fmt.Errorf("invalid IP address for device %s: %s", member.DeviceID, member.IP)
+		}
+	}
+
+	return nil
+}
+
+// GetSlaveDeviceID returns the device ID of the slave being added/removed
+func (zsr *ZoneSlaveRequest) GetSlaveDeviceID() string {
+	if len(zsr.Members) > 0 {
+		return zsr.Members[0].DeviceID
+	}
+	return ""
+}
+
+// GetSlaveIP returns the IP address of the slave being added/removed
+func (zsr *ZoneSlaveRequest) GetSlaveIP() string {
+	if len(zsr.Members) > 0 {
+		return zsr.Members[0].IP
+	}
+	return ""
+}
+
+// String returns a human-readable string representation
+func (zsr *ZoneSlaveRequest) String() string {
+	if len(zsr.Members) == 0 {
+		return fmt.Sprintf("Zone slave operation on master %s (no slave specified)", zsr.Master)
+	}
+
+	slave := zsr.Members[0]
+	if slave.IP != "" {
+		return fmt.Sprintf("Zone slave operation: master=%s, slave=%s (%s)",
+			zsr.Master, slave.DeviceID, slave.IP)
+	}
+
+	return fmt.Sprintf("Zone slave operation: master=%s, slave=%s",
+		zsr.Master, slave.DeviceID)
+}

@@ -2,24 +2,24 @@
 
 **Last Updated:** January 2025  
 **API Version:** Official Bose SoundTouch Web API v1.0  
-**Implementation Status:** 84% Official Coverage + Extended Features
+**Implementation Status:** 89% Official Coverage + Extended Features
 
 ## Executive Summary
 
-This Go implementation provides **comprehensive coverage** of the Bose SoundTouch Web API with **84% of official endpoints implemented** (16/19) plus **5 additional extended features** not documented in the official API v1.0 but working with real hardware.
+This Go implementation provides **comprehensive coverage** of the Bose SoundTouch Web API with **89% of official endpoints implemented** (17/19) plus **5 additional extended features** not documented in the official API v1.0 but working with real hardware.
 
 ### Key Findings
 - ✅ **All essential user functionality implemented**
-- ✅ **Superior zone management implementation** 
+- ✅ **Complete zone management implementation** 
 - ✅ **Real-time WebSocket event system**
 - ✅ **Extended features beyond official specification**
-- ❌ **3 missing advanced audio endpoints** (professional/audiophile features)
+- ❌ **2 missing advanced audio endpoints** (professional/audiophile features)
 
 ---
 
 ## Official API v1.0 Endpoint Coverage
 
-### Implemented Endpoints: 16/19 (84%)
+### Implemented Endpoints: 17/19 (89%)
 
 | Endpoint | Method | Status | Implementation | Notes |
 |----------|--------|--------|----------------|--------|
@@ -37,13 +37,13 @@ This Go implementation provides **comprehensive coverage** of the Bose SoundTouc
 | `/info` | GET | ✅ **Complete** | `GetDeviceInfo()` | Device information and capabilities |
 | `/name` | POST | ✅ **Complete** | `SetName()` | Device name modification |
 | `/capabilities` | GET | ✅ **Complete** | `GetCapabilities()` | Device feature capabilities |
+| `/addZoneSlave` | POST | ✅ **Complete** | `AddZoneSlave()`, `AddZoneSlaveByDeviceID()` | Individual device addition to zone |
+| `/removeZoneSlave` | POST | ✅ **Complete** | `RemoveZoneSlave()`, `RemoveZoneSlaveByDeviceID()` | Individual device removal from zone |
 
-### Missing Official Endpoints: 3/19 (16%)
+### Missing Official Endpoints: 2/19 (11%)
 
 | Endpoint | Method | Status | Reason | Impact |
 |----------|--------|--------|--------|---------|
-| `/addZoneSlave` | POST | ❌ **Missing** | Replaced by superior high-level zone API | **Low** - Better implementation exists |
-| `/removeZoneSlave` | POST | ❌ **Missing** | Replaced by superior high-level zone API | **Low** - Better implementation exists |
 | `/audiodspcontrols` | GET/POST | ❌ **Missing** | Advanced professional feature | **Low** - Niche audiophile feature |
 | `/audioproducttonecontrols` | GET/POST | ❌ **Missing** | Advanced bass/treble beyond `/bass` | **Low** - Basic bass control available |
 | `/audioproductlevelcontrols` | GET/POST | ❌ **Missing** | Front-center/rear-surround speaker levels | **Low** - Professional audio feature |
@@ -81,18 +81,18 @@ This Go implementation provides **comprehensive coverage** of the Bose SoundTouc
 
 ## Implementation Analysis
 
-### Zone Management: Superior Implementation ⚠️
+### Zone Management: Complete Implementation ✅
 
-**Official API Approach:**
-```xml
-<!-- Low-level individual operations -->
-POST /addZoneSlave
-POST /removeZoneSlave
+**Official Low-Level API:**
+```go
+// Individual slave operations (exact official API implementation)
+client.AddZoneSlave("MASTER123", "SLAVE456", "192.168.1.101")
+client.RemoveZoneSlave("MASTER123", "SLAVE456", "192.168.1.101")
 ```
 
-**Our Implementation:**
+**Enhanced High-Level API:**
 ```go
-// High-level fluent API
+// High-level fluent API (enhanced implementation)
 zone := client.CreateZoneWithIPs("192.168.1.100", []string{"192.168.1.101", "192.168.1.102"})
 client.AddToZone("192.168.1.100", "192.168.1.103")
 client.RemoveFromZone("192.168.1.100", "192.168.1.101")
@@ -100,9 +100,10 @@ client.DissolveZone("192.168.1.100")
 ```
 
 **Advantages:**
-- ✅ **Atomic operations** - entire zone created/modified in single request
+- ✅ **Complete official API compliance** - exact implementation of official endpoints
+- ✅ **Enhanced high-level operations** - atomic zone creation/modification
 - ✅ **Validation and error handling** - comprehensive zone state validation
-- ✅ **Simpler API** - no need to manage individual slave additions/removals
+- ✅ **Flexible usage patterns** - choose low-level or high-level as needed
 - ✅ **Better user experience** - intuitive zone construction and modification
 
 ### Safety and Validation Enhancements
@@ -130,19 +131,14 @@ All essential user functionality is fully implemented.
 ### Medium Impact: None ✅
 All common use cases are covered.
 
-### Low Impact: 3 Missing Features ❌
+### Low Impact: 2 Missing Features ❌
 
-#### 1. Individual Zone Slave Management
-- **Official**: `/addZoneSlave`, `/removeZoneSlave`
-- **Impact**: Low - Our high-level zone API is superior
-- **Workaround**: Use `AddToZone()`, `RemoveFromZone()` methods
-
-#### 2. Advanced Audio DSP Controls
+#### 1. Advanced Audio DSP Controls
 - **Official**: `/audiodspcontrols`
 - **Impact**: Low - Professional feature for high-end devices only
 - **Alternative**: Basic controls available via other endpoints
 
-#### 3. Advanced Tone and Level Controls
+#### 2. Advanced Tone and Level Controls
 - **Official**: `/audioproducttonecontrols`, `/audioproductlevelcontrols`
 - **Impact**: Low - Audiophile features for professional installations
 - **Alternative**: Basic bass control via `/bass` endpoint
@@ -195,8 +191,7 @@ Missing only niche professional features:
 
 ### Potential Additions (Low Priority):
 1. **Advanced Audio Controls** - For professional installations requiring fine audio control
-2. **Individual Zone Slave Operations** - For applications requiring micro-management of zone membership
-3. **Extended WebSocket Events** - Additional real-time notifications if discovered
+2. **Extended WebSocket Events** - Additional real-time notifications if discovered
 
 ### API Evolution:
 - Monitor for new official API versions beyond v1.0
@@ -208,12 +203,12 @@ Missing only niche professional features:
 ## Conclusion
 
 This implementation achieves **excellent API coverage** with:
-- ✅ **84% official endpoint implementation** (16/19)
+- ✅ **89% official endpoint implementation** (17/19)
 - ✅ **100% essential functionality coverage**
 - ✅ **Superior implementations** for complex operations
 - ✅ **Extended features** beyond official specification
 - ✅ **Comprehensive testing and validation**
 
-The missing 3 endpoints represent **professional/niche features** that don't impact the vast majority of users. The implementation actually **exceeds the official API** in many areas through enhanced safety features, better zone management, and real-time event capabilities.
+The missing 2 endpoints represent **professional/niche features** that don't impact the vast majority of users. The implementation actually **exceeds the official API** in many areas through enhanced safety features, complete zone management, and real-time event capabilities.
 
 **Overall Assessment: Excellent** ⭐⭐⭐⭐⭐
