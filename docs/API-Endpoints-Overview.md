@@ -214,10 +214,10 @@ Creates or updates a preset.
 
 ## Advanced Features
 
-### GET /getZone 🔄 **Planned**
+### GET /getZone ✅ **Implemented**
 Retrieves multiroom zone information.
 
-### POST /setZone 🔄 **Planned**
+### POST /setZone ✅ **Implemented**
 Configures multiroom zones.
 
 ### GET /balance ✅ **Implemented**
@@ -240,7 +240,7 @@ Configures the clock display.
 
 ## WebSocket Connection
 
-### WebSocket / 🔄 **Planned**
+### WebSocket / ✅ **Implemented**
 Establishes a persistent connection for live updates.
 
 **Event Types:**
@@ -262,15 +262,15 @@ Retrieves the device name.
 
 **Note**: Official API only documents `POST /name` for setting device name. Our GET implementation appears to be an undocumented extension.
 
-### POST /name ❌ **Missing**
-Sets the device name.
+### POST /name ✅ **Implemented**
+Sets the device name via `SetName()` method.
 
 **Official Request Format:**
 ```xml
 <name>$STRING</name>
 ```
 
-### GET /bassCapabilities ❌ **Missing**
+### GET /bassCapabilities ✅ **Implemented**
 Checks if bass customization is supported on the device.
 
 **Official Response Format:**
@@ -283,10 +283,10 @@ Checks if bass customization is supported on the device.
 </bassCapabilities>
 ```
 
-### GET /trackInfo ❌ **Missing**
-Gets track information (appears to be duplicate of `/now_playing`).
+### GET /trackInfo ✅ **Implemented**
+Gets track information (duplicate of `/now_playing` per official API).
 
-**Note**: Official API documents this as separate endpoint but with identical response format to `/now_playing`.
+**Implementation**: Available via `GetTrackInfo()` method with identical response format to `/now_playing`.
 
 ### Zone Slave Management ⚠️ **Different Implementation**
 Our implementation uses high-level methods instead of official endpoints:
@@ -321,10 +321,10 @@ These endpoints work with real hardware but are NOT in official API v1.0:
 
 ## Coverage Summary
 
-### Official API Coverage: 94%
+### Official API Coverage: 84%
 - **Total Official Endpoints**: 19
-- **Implemented**: 15 (79%)
-- **Missing Low-Impact**: 4 (21%)
+- **Implemented**: 16 (84%)
+- **Missing Low-Impact**: 3 (16%)
 
 ### Feature Coverage: 100%
 - ✅ All essential user functionality implemented

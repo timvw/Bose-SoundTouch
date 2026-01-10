@@ -6,7 +6,7 @@ A modern Go library and CLI tool for interacting with Bose SoundTouch devices vi
 
 ## Features
 
-### ✅ Implemented (90% Complete - 18/20 endpoints)
+### ✅ Implemented (84% Complete - 16/19 official endpoints)
 - **HTTP Client with XML Support**: Complete client for SoundTouch Web API
 - **Device Information**: Get detailed device info via `/info` endpoint
 - **Device Name**: Get device name via `/name` endpoint  
@@ -682,6 +682,14 @@ Bose-SoundTouch/
 | **Discovery** | UPnP/mDNS | ✅ Complete | Device discovery services |
 | `/getZone` | GET | ✅ **NEW** | **Multiroom zone information** |
 | `/setZone` | POST | ✅ **NEW** | **Zone creation and management** |
+| `/name` | POST | ✅ Complete | Set device name |
+| `/bassCapabilities` | GET | ✅ Complete | Bass capability detection |
+| `/trackInfo` | GET | ✅ Complete | Track information (duplicate of /now_playing) |
+| `/addZoneSlave` | POST | ❌ Missing | **Individual slave addition (use AddToZone instead)** |
+| `/removeZoneSlave` | POST | ❌ Missing | **Individual slave removal (use RemoveFromZone instead)** |
+| `/audiodspcontrols` | GET/POST | ❌ Missing | **DSP audio modes and video sync delay** |
+| `/audioproducttonecontrols` | GET/POST | ❌ Missing | **Advanced bass/treble controls** |
+| `/audioproductlevelcontrols` | GET/POST | ❌ Missing | **Speaker level controls (front-center/rear-surround)** |
 
 ### Zone Management Features ✅ **NEW**
 
