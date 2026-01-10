@@ -145,11 +145,24 @@ jobs:
           echo "binary_name=$OUTPUT_NAME" >> $GITHUB_OUTPUT
         id: build
 
+      - name: Generate individual checksum
+        run: |
+          OUTPUT_NAME="${{ steps.build.outputs.binary_name }}"
+          sha256sum "$OUTPUT_NAME" > "$OUTPUT_NAME.sha256"
+          sha512sum "$OUTPUT_NAME" > "$OUTPUT_NAME.sha512"
+
+          echo "📋 Generated individual checksums:"
+          cat "$OUTPUT_NAME.sha256"
+          cat "$OUTPUT_NAME.sha512"
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v6
         with:
           name: ${{ steps.build.outputs.binary_name }}
-          path: ${{ steps.build.outputs.binary_name }}
+          path: |
+            ${{ steps.build.outputs.binary_name }}
+            ${{ steps.build.outputs.binary_name }}.sha256
+            ${{ steps.build.outputs.binary_name }}.sha512
           retention-days: 1
 
   checksums:
@@ -182,17 +195,18 @@ jobs:
           echo "📁 Flattened structure:"
           ls -la soundtouch-cli-* || echo "No files found matching pattern"
 
-          # Generate SHA256 checksums
-          if ls soundtouch-cli-* 1> /dev/null 2>&1; then
-            sha256sum soundtouch-cli-* > checksums.sha256
-            sha512sum soundtouch-cli-* > checksums.sha512
+          # Generate combined checksums (exclude individual .sha256/.sha512 files)
+          if ls soundtouch-cli-v* 1> /dev/null 2>&1; then
+            # Only checksum the actual binaries, not the .sha256/.sha512 files
+            ls soundtouch-cli-v* | grep -v '\.sha256$' | grep -v '\.sha512$' | xargs sha256sum > checksums.sha256
+            ls soundtouch-cli-v* | grep -v '\.sha256$' | grep -v '\.sha512$' | xargs sha512sum > checksums.sha512
 
-            echo "📋 Generated checksums:"
+            echo "📋 Generated combined checksums:"
             cat checksums.sha256
 
-            # Verify all expected files are present
+            # Verify all expected files are present (binaries only, not checksum files)
             EXPECTED_COUNT=7  # Based on build matrix
-            ACTUAL_COUNT=$(ls soundtouch-cli-* | wc -l)
+            ACTUAL_COUNT=$(ls soundtouch-cli-v* | grep -v '\.sha256$' | grep -v '\.sha512$' | wc -l)
 
             if [[ $ACTUAL_COUNT -ne $EXPECTED_COUNT ]]; then
               echo "❌ Expected $EXPECTED_COUNT binaries, found $ACTUAL_COUNT"
@@ -215,6 +229,8 @@ jobs:
           path: |
             binaries/checksums.sha256
             binaries/checksums.sha512
+            binaries/*.sha256
+            binaries/*.sha512
           retention-days: 1
 
       - name: Upload all release assets
@@ -339,7 +355,34 @@ jobs:
 
           ## 🔐 Checksums
 
-          SHA256 checksums are provided in \`checksums.sha256\` to verify download integrity.
+          Multiple checksum options are provided for download verification:
+
+          ### Combined Checksums (Recommended)
+          - \`checksums.sha256\` - SHA256 checksums for all binaries
+          - \`checksums.sha512\` - SHA512 checksums for all binaries
+
+          \`\`\`bash
+          # Download any binary + combined checksums
+          curl -L -O https://github.com/.../soundtouch-cli-v$TAG_NAME-linux-amd64
+          curl -L -O https://github.com/.../checksums.sha256
+
+          # Verify your specific download
+          sha256sum -c checksums.sha256 --ignore-missing
+          \`\`\`
+
+          ### Individual Checksums (Per Binary)
+          Each binary also has its own dedicated checksum files:
+          - \`soundtouch-cli-v$TAG_NAME-platform.sha256\`
+          - \`soundtouch-cli-v$TAG_NAME-platform.sha512\`
+
+          \`\`\`bash
+          # Download binary + its individual checksum
+          curl -L -O https://github.com/.../soundtouch-cli-v$TAG_NAME-linux-amd64
+          curl -L -O https://github.com/.../soundtouch-cli-v$TAG_NAME-linux-amd64.sha256
+
+          # Verify with individual checksum
+          sha256sum -c soundtouch-cli-v$TAG_NAME-linux-amd64.sha256
+          \`\`\`
 
           ## 🤝 Contributing
 
@@ -361,7 +404,7 @@ jobs:
           draft: false
           prerelease: ${{ needs.validate.outputs.is_prerelease == 'true' }}
           files: |
-            release-assets/soundtouch-cli-*
+            release-assets/soundtouch-cli-v*
             release-assets/checksums.sha256
             release-assets/checksums.sha512
           fail_on_unmatched_files: true
@@ -386,7 +429,7 @@ jobs:
         with:
           tag_name: ${{ github.event.release.tag_name }}
           files: |
-            release-assets/soundtouch-cli-*
+            release-assets/soundtouch-cli-v*
             release-assets/checksums.sha256
             release-assets/checksums.sha512
           fail_on_unmatched_files: true
