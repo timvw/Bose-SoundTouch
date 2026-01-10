@@ -2,24 +2,24 @@
 
 **Last Updated:** January 2025  
 **API Version:** Official Bose SoundTouch Web API v1.0  
-**Implementation Status:** 89% Official Coverage + Extended Features
+**Implementation Status:** 84% Official Coverage + Extended Features
 
 ## Executive Summary
 
-This Go implementation provides **comprehensive coverage** of the Bose SoundTouch Web API with **89% of official endpoints implemented** (17/19) plus **5 additional extended features** not documented in the official API v1.0 but working with real hardware.
+This Go implementation provides **comprehensive coverage** of the Bose SoundTouch Web API with **84% of official endpoints implemented** (16/19) plus **5 additional extended features** not documented in the official API v1.0 but working with real hardware.
 
 ### Key Findings
 - ✅ **All essential user functionality implemented**
 - ✅ **Complete zone management implementation** 
 - ✅ **Real-time WebSocket event system**
 - ✅ **Extended features beyond official specification**
-- ❌ **2 missing advanced audio endpoints** (professional/audiophile features)
+- ❌ **3 missing/non-functional endpoints** (1 broken + 2 professional/audiophile features)
 
 ---
 
 ## Official API v1.0 Endpoint Coverage
 
-### Implemented Endpoints: 17/19 (89%)
+### Implemented Endpoints: 16/19 (84%)
 
 | Endpoint | Method | Status | Implementation | Notes |
 |----------|--------|--------|----------------|--------|
@@ -31,7 +31,7 @@ This Go implementation provides **comprehensive coverage** of the Bose SoundTouc
 | `/getZone` | GET | ✅ **Complete** | `GetZone()`, `GetZoneStatus()`, `GetZoneMembers()` | Multiroom zone information |
 | `/setZone` | POST | ✅ **Complete** | `SetZone()`, `CreateZone()`, `AddToZone()`, `RemoveFromZone()` | Zone configuration and management |
 | `/now_playing` | GET | ✅ **Complete** | `GetNowPlaying()` | Current playback status with full metadata |
-| `/trackInfo` | GET | ✅ **Complete** | `GetTrackInfo()` | Track information (identical to /now_playing) |
+| `/trackInfo` | GET | ❌ **Non-functional** | `GetTrackInfo()` | Documented but times out on real devices |
 | `/volume` | GET/POST | ✅ **Complete** | `GetVolume()`, `SetVolume()`, `SetVolumeSafe()` | Volume and mute control with safety features |
 | `/presets` | GET | ✅ **Complete** | `GetPresets()`, `GetNextAvailablePresetSlot()` | Preset configurations (read-only per API spec) |
 | `/info` | GET | ✅ **Complete** | `GetDeviceInfo()` | Device information and capabilities |
@@ -40,10 +40,11 @@ This Go implementation provides **comprehensive coverage** of the Bose SoundTouc
 | `/addZoneSlave` | POST | ✅ **Complete** | `AddZoneSlave()`, `AddZoneSlaveByDeviceID()` | Individual device addition to zone |
 | `/removeZoneSlave` | POST | ✅ **Complete** | `RemoveZoneSlave()`, `RemoveZoneSlaveByDeviceID()` | Individual device removal from zone |
 
-### Missing Official Endpoints: 2/19 (11%)
+### Missing/Non-functional Endpoints: 3/19 (16%)
 
 | Endpoint | Method | Status | Reason | Impact |
 |----------|--------|--------|--------|---------|
+| `/trackInfo` | GET | ❌ **Non-functional** | Times out on real devices (AllegroWebserver timeout) | **None** - Use `/now_playing` instead |
 | `/audiodspcontrols` | GET/POST | ❌ **Missing** | Advanced professional feature | **Low** - Niche audiophile feature |
 | `/audioproducttonecontrols` | GET/POST | ❌ **Missing** | Advanced bass/treble beyond `/bass` | **Low** - Basic bass control available |
 | `/audioproductlevelcontrols` | GET/POST | ❌ **Missing** | Front-center/rear-surround speaker levels | **Low** - Professional audio feature |
@@ -131,14 +132,20 @@ All essential user functionality is fully implemented.
 ### Medium Impact: None ✅
 All common use cases are covered.
 
-### Low Impact: 2 Missing Features ❌
+### Low Impact: 3 Missing/Non-functional Features ❌
 
-#### 1. Advanced Audio DSP Controls
+#### 1. Non-functional Endpoint
+- **Official**: `/trackInfo`
+- **Impact**: None - identical functionality available via `/now_playing`
+- **Issue**: Times out on real devices despite being documented in API
+- **Workaround**: Use `GetNowPlaying()` method instead
+
+#### 2. Advanced Audio DSP Controls
 - **Official**: `/audiodspcontrols`
 - **Impact**: Low - Professional feature for high-end devices only
 - **Alternative**: Basic controls available via other endpoints
 
-#### 2. Advanced Tone and Level Controls
+#### 3. Advanced Tone and Level Controls
 - **Official**: `/audioproducttonecontrols`, `/audioproductlevelcontrols`
 - **Impact**: Low - Audiophile features for professional installations
 - **Alternative**: Basic bass control via `/bass` endpoint
@@ -203,12 +210,14 @@ Missing only niche professional features:
 ## Conclusion
 
 This implementation achieves **excellent API coverage** with:
-- ✅ **89% official endpoint implementation** (17/19)
+- ✅ **84% functional endpoint implementation** (16/19)
 - ✅ **100% essential functionality coverage**
 - ✅ **Superior implementations** for complex operations
 - ✅ **Extended features** beyond official specification
 - ✅ **Comprehensive testing and validation**
 
-The missing 2 endpoints represent **professional/niche features** that don't impact the vast majority of users. The implementation actually **exceeds the official API** in many areas through enhanced safety features, complete zone management, and real-time event capabilities.
+The missing/broken 3 endpoints represent **professional/niche features** or **broken implementations** that don't impact users. The implementation actually **exceeds the official API** in many areas through enhanced safety features, complete zone management, and real-time event capabilities.
+
+**Note**: The `/trackInfo` endpoint is documented in the official API but times out on real devices, making it non-functional despite implementation.
 
 **Overall Assessment: Excellent** ⭐⭐⭐⭐⭐

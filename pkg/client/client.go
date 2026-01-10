@@ -1049,6 +1049,8 @@ func (c *Client) GetBassCapabilities() (*models.BassCapabilities, error) {
 }
 
 // GetTrackInfo retrieves track information (duplicate of GetNowPlaying per official API)
+// WARNING: This endpoint times out on real devices despite being documented in the official API.
+// Use GetNowPlaying() instead for reliable track information.
 func (c *Client) GetTrackInfo() (*models.NowPlaying, error) {
 	var nowPlaying models.NowPlaying
 

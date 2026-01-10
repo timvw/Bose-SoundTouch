@@ -283,10 +283,12 @@ Checks if bass customization is supported on the device.
 </bassCapabilities>
 ```
 
-### GET /trackInfo ✅ **Implemented**
+### GET /trackInfo ❌ **Not Working**
 Gets track information (duplicate of `/now_playing` per official API).
 
-**Implementation**: Available via `GetTrackInfo()` method with identical response format to `/now_playing`.
+**Status**: Documented in official API but times out on real devices (AllegroWebserver timeout). Use `/now_playing` instead.
+
+**Implementation**: Available via `GetTrackInfo()` method but not functional on hardware.
 
 ### Zone Slave Management ✅ **Implemented**
 Both official low-level endpoints and high-level zone management are available:
@@ -330,9 +332,10 @@ These endpoints work with real hardware but are NOT in official API v1.0:
 
 ## Coverage Summary
 
-### Official API Coverage: 89%
+### Official API Coverage: 84%
 - **Total Official Endpoints**: 19
-- **Implemented**: 17 (89%)
+- **Implemented**: 16 (84%)
+- **Non-functional**: 1 (5%) - `/trackInfo` times out on real devices
 - **Missing Low-Impact**: 2 (11%)
 
 ### Feature Coverage: 100%

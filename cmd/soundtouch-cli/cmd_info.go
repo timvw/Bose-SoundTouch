@@ -235,6 +235,8 @@ func getTrackInfo(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
 	PrintDeviceHeader("Getting track information", clientConfig.Host, clientConfig.Port)
 
+	fmt.Println("⚠️  WARNING: /trackInfo endpoint times out on real devices. Use 'now' command instead.")
+
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to create client: %v", err))

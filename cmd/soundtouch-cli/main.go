@@ -223,7 +223,7 @@ func main() {
 			// Track info
 			{
 				Name:   "track",
-				Usage:  "Get track information",
+				Usage:  "Get track information (WARNING: times out on real devices, use 'now' instead)",
 				Action: getTrackInfo,
 				Before: RequireHost,
 			},
