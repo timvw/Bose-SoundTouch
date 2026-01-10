@@ -7,12 +7,17 @@ dist/
 *.dylib
 
 # CLI binaries (should be in build/ directory)
-soundtouch-cli
-example-mdns
-example-upnp
-example-unified
-mdns-scanner
-websocket-demo
+#soundtouch-cli
+#example-mdns
+#example-upnp
+
+# Root-level binary executables (exclude built binaries in root)
+/soundtouch-cli
+/example-mdns
+/example-upnp
+/example-unified
+/mdns-scanner
+/websocket-demo
 
 # Environment configuration
 .env
