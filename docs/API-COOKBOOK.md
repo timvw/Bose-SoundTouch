@@ -8,7 +8,7 @@ This cookbook provides practical solutions to common SoundTouch integration chal
 
 - [Device Management](#device-management)
 - [Playback Control](#playback-control)
-- [Volume & Audio](#volume--audio)
+- [Volume Audio](#volume-audio)
 - [Real-time Monitoring](#real-time-monitoring)
 - [Multiroom Coordination](#multiroom-coordination)
 - [Error Handling](#error-handling)
@@ -17,7 +17,7 @@ This cookbook provides practical solutions to common SoundTouch integration chal
 
 ---
 
-## 🖥️ **Device Management**
+## Device Management
 
 ### Recipe: Robust Device Discovery
 
@@ -185,7 +185,7 @@ func (dm *DeviceMonitor) IsHealthy() bool {
 
 ---
 
-## 🎵 **Playback Control**
+## Playback Control
 
 ### Recipe: Smart Play/Pause Toggle
 
@@ -292,7 +292,7 @@ func (pn *PlaylistNavigator) GetTrackInfo() (string, error) {
 
 ---
 
-## 🔊 **Volume & Audio**
+## Volume Audio
 
 ### Recipe: Gradual Volume Transitions
 
@@ -539,7 +539,7 @@ func (pm *ProfileManager) CreateDefaultProfiles() {
 
 ---
 
-## 📡 **Real-time Monitoring**
+## Real-time Monitoring
 
 ### Recipe: Event-Driven State Manager
 
@@ -658,7 +658,7 @@ func (aps *AutoPauseSubscriber) OnStateChange(oldState, newState DeviceState) {
 
 ---
 
-## 👥 **Multiroom Coordination**
+## Multiroom Coordination
 
 ### Recipe: Party Mode Controller
 
@@ -780,7 +780,7 @@ func (pmc *PartyModeController) GetZoneStatus() (string, error) {
 
 ---
 
-## ⚠️ **Error Handling**
+## Error Handling
 
 ### Recipe: Resilient Operation Wrapper
 
@@ -884,7 +884,7 @@ func (rc *ResilientClient) SelectSource(source, account string) error {
 
 ---
 
-## 🚀 **Performance Optimization**
+## Performance Optimization
 
 ### Recipe: Connection Pool Manager
 
@@ -1014,7 +1014,7 @@ func (cp *ConnectionPool) Stats() (active int, idle int) {
 
 ---
 
-## 🏭 **Production Patterns**
+## Production Patterns
 
 ### Recipe: Configuration Management
 
