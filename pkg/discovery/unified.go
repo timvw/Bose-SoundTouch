@@ -1,3 +1,110 @@
+// Package discovery provides automatic network discovery of Bose SoundTouch devices.
+//
+// This package implements both UPnP/SSDP (Universal Plug and Play) and mDNS/Bonjour
+// discovery protocols to automatically find SoundTouch devices on your local network.
+// It provides a unified interface that combines both discovery methods for maximum
+// device detection reliability.
+//
+// # Basic Usage
+//
+// Discover all SoundTouch devices on your network:
+//
+//	import (
+//		"context"
+//		"time"
+//		"github.com/gesellix/bose-soundtouch/pkg/discovery"
+//	)
+//
+//	ctx := context.Background()
+//	timeout := 5 * time.Second
+//
+//	devices, err := discovery.DiscoverDevices(ctx, timeout)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	for _, device := range devices {
+//		fmt.Printf("Found: %s at %s:%d\n", device.Name, device.Host, device.Port)
+//	}
+//
+// # Advanced Discovery
+//
+// Use specific discovery methods or configure advanced options:
+//
+//	// Create a unified discovery service
+//	service, err := discovery.NewUnifiedDiscoveryService()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	// Discover with caching (devices cached for 5 minutes)
+//	devices, err := service.DiscoverWithCache(ctx, timeout)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	// Use only UPnP/SSDP discovery
+//	ssdpDevices, err := service.DiscoverUPnP(ctx, timeout)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	// Use only mDNS discovery
+//	mdnsDevices, err := service.DiscoverMDNS(ctx, timeout)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+// # Discovery Methods
+//
+// The package supports two discovery protocols:
+//
+//   - UPnP/SSDP: Discovers devices advertising UPnP services
+//   - mDNS/Bonjour: Discovers devices using multicast DNS
+//
+// The unified service automatically combines results from both methods and
+// deduplicates devices found through multiple protocols.
+//
+// # Device Information
+//
+// Discovered devices contain comprehensive information:
+//
+//	for _, device := range devices {
+//		fmt.Printf("Device: %s\n", device.Name)
+//		fmt.Printf("Host: %s:%d\n", device.Host, device.Port)
+//		fmt.Printf("MAC: %s\n", device.MACAddress)
+//		fmt.Printf("Method: %s\n", device.DiscoveryMethod)
+//		fmt.Printf("URL: %s\n", device.BaseURL)
+//	}
+//
+// # Caching
+//
+// The discovery service includes intelligent caching to avoid repeated network
+// scans. Devices are cached for a configurable TTL (default: 5 minutes).
+//
+// # Error Handling
+//
+// Discovery operations may encounter various network conditions:
+//
+//	devices, err := discovery.DiscoverDevices(ctx, timeout)
+//	if err != nil {
+//		// Handle discovery errors
+//		fmt.Printf("Discovery failed: %v\n", err)
+//		return
+//	}
+//
+//	if len(devices) == 0 {
+//		fmt.Println("No SoundTouch devices found on the network")
+//	}
+//
+// # Configuration
+//
+// Discovery behavior can be customized through configuration:
+//
+//	// Custom timeout for individual discovery methods
+//	service := &discovery.UnifiedDiscoveryService{
+//		CacheTTL: 10 * time.Minute,  // Cache devices for 10 minutes
+//	}
 package discovery
 
 import (

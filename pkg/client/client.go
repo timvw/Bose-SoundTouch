@@ -1,4 +1,144 @@
-// Package client provides HTTP client functionality for interacting with Bose SoundTouch devices.
+// Package client provides a comprehensive HTTP client for controlling Bose SoundTouch devices.
+//
+// This package implements the complete Bose SoundTouch Web API, enabling full programmatic
+// control of SoundTouch speakers including playback control, volume management, source
+// selection, multiroom zone management, and real-time event monitoring.
+//
+// # Basic Usage
+//
+// Create a client and control your SoundTouch device:
+//
+//	config := &client.Config{
+//		Host: "192.168.1.100",
+//		Port: 8090,
+//		Timeout: 10 * time.Second,
+//	}
+//	client := client.NewClient(config)
+//
+//	// Get device information
+//	info, err := client.GetInfo()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	fmt.Printf("Device: %s (Type: %s)\n", info.Name, info.Type)
+//
+//	// Control playback
+//	err = client.Play()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	// Adjust volume
+//	err = client.SetVolume(50)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+// # Advanced Features
+//
+// The client supports all SoundTouch API endpoints:
+//
+//	// Get current playback status
+//	nowPlaying, err := client.GetNowPlaying()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	fmt.Printf("Now Playing: %s by %s\n", nowPlaying.Track, nowPlaying.Artist)
+//
+//	// Select audio source
+//	err = client.SelectSource("SPOTIFY", "")
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	// Control bass and balance
+//	err = client.SetBass(3)  // Range: -9 to +9
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	err = client.SetBalance(-10)  // Range: -50 (left) to +50 (right)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+// # Multiroom Zone Management
+//
+// Create and manage multiroom zones:
+//
+//	// Get current zone configuration
+//	zone, err := client.GetZone()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	// Create a new zone with multiple speakers
+//	newZone := &models.Zone{
+//		Master: "192.168.1.100",
+//		Members: []models.ZoneMember{
+//			{IPAddress: "192.168.1.101"},
+//			{IPAddress: "192.168.1.102"},
+//		},
+//	}
+//	err = client.SetZone(newZone)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+// # Real-time Events
+//
+// Monitor device state changes using WebSocket connections:
+//
+//	ctx := context.Background()
+//	events, err := client.SubscribeToEvents(ctx)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	for event := range events {
+//		switch e := event.(type) {
+//		case *models.NowPlayingUpdated:
+//			fmt.Printf("Track changed: %s\n", e.Track)
+//		case *models.VolumeUpdated:
+//			fmt.Printf("Volume: %d\n", e.ActualVolume)
+//		case *models.ConnectionStateUpdated:
+//			fmt.Printf("Connection: %s\n", e.State)
+//		}
+//	}
+//
+// # Error Handling
+//
+// The client provides detailed error information:
+//
+//	err := client.SetVolume(150)  // Invalid volume
+//	if err != nil {
+//		fmt.Printf("Error: %v\n", err)  // Will indicate volume out of range
+//	}
+//
+// # Configuration
+//
+// The Config struct supports various options:
+//
+//	config := &client.Config{
+//		Host:      "192.168.1.100",
+//		Port:      8090,
+//		Timeout:   15 * time.Second,
+//		UserAgent: "MyApp/1.0",
+//	}
+//
+// # Supported Operations
+//
+//   - Device Information & Capabilities
+//   - Playback Control (Play/Pause/Stop/Next/Previous/Key commands)
+//   - Volume Control (Get/Set/Increment/Decrement)
+//   - Bass Control (-9 to +9 range)
+//   - Balance Control (-50 to +50 range)
+//   - Source Selection (Spotify, Bluetooth, AUX, Radio, etc.)
+//   - Preset Management (Get configured presets)
+//   - Clock/Time Management
+//   - Network Information
+//   - Multiroom Zone Management
+//   - Real-time WebSocket Event Monitoring
 package client
 
 import (
