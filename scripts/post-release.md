@@ -75,7 +75,7 @@ After successfully releasing v1.0.0, follow this checklist to maximize visibilit
   Entry: [bose-soundtouch](https://github.com/gesellix/bose-soundtouch) - Go library for controlling Bose SoundTouch speakers with 100% API coverage and WebSocket events.
   ```
 
-- [ ] Submit to **go-awesome**: https://github.com/shivammg/go-awesome
+- [ ] Submit to **awesome-go**: https://github.com/avelino/awesome-go
 - [ ] List on **awesome-home-assistant**: https://github.com/frenck/awesome-home-assistant
 - [ ] Add to **IoT awesome lists**: Search for IoT/smart home Go libraries lists
 
