@@ -223,7 +223,7 @@ func main() {
 			// Track info
 			{
 				Name:   "track",
-				Usage:  "Get track information (WARNING: times out on real devices, use 'now' instead)",
+				Usage:  "Get track information (WARNING: times out on real devices, use playback 'now' command instead)",
 				Action: getTrackInfo,
 				Before: RequireHost,
 			},

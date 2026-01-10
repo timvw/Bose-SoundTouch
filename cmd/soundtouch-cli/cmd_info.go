@@ -235,7 +235,8 @@ func getTrackInfo(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
 	PrintDeviceHeader("Getting track information", clientConfig.Host, clientConfig.Port)
 
-	fmt.Println("⚠️  WARNING: /trackInfo endpoint times out on real devices. Use 'now' command instead.")
+	fmt.Println("⚠️  WARNING: /trackInfo endpoint times out on real devices.")
+	fmt.Println("   Use 'soundtouch-cli now' (playback status) command instead for track information.")
 
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
