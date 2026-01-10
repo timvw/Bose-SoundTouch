@@ -185,8 +185,8 @@ jobs:
           find . -type f -name "soundtouch-cli-*"
 
           # Flatten directory structure (artifacts are in subdirs)
-          # Move all binary files to current directory
-          find . -type f -name "soundtouch-cli-*" -exec mv {} . \;
+          # Move all binary and checksum files to current directory
+          find . -mindepth 2 -type f -name "soundtouch-cli-*" -exec mv {} . \;
 
           # Remove empty directories
           find . -type d -empty -delete
