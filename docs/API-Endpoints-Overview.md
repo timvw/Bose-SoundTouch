@@ -307,17 +307,23 @@ Remove individual device from existing zone using official API format.
 - **Enhanced**: `CreateZone()`, `AddToZone()`, `RemoveFromZone()` methods via `/setZone`
 - **Status**: Provides both official low-level API and enhanced high-level operations
 
-### Advanced Audio Controls ❌ **Missing**
+### Advanced Audio Controls ✅ **Implemented**
 Professional/high-end device features (only available via `/capabilities` check):
 
-#### `/audiodspcontrols` - GET/POST
+#### `/audiodspcontrols` - GET/POST ✅ **Implemented**
 Access DSP settings including audio modes and video sync delay.
 
-#### `/audioproducttonecontrols` - GET/POST  
+**Implementation**: Available via `GetAudioDSPControls()`, `SetAudioDSPControls()`, `SetAudioMode()`, `SetVideoSyncAudioDelay()` methods
+
+#### `/audioproducttonecontrols` - GET/POST ✅ **Implemented**
 Advanced bass and treble controls (beyond basic `/bass` endpoint).
 
-#### `/audioproductlevelcontrols` - GET/POST
+**Implementation**: Available via `GetAudioProductToneControls()`, `SetAudioProductToneControls()`, `SetAdvancedBass()`, `SetAdvancedTreble()` methods
+
+#### `/audioproductlevelcontrols` - GET/POST ✅ **Implemented**
 Speaker level controls for front-center and rear-surround speakers.
+
+**Implementation**: Available via `GetAudioProductLevelControls()`, `SetAudioProductLevelControls()`, `SetFrontCenterSpeakerLevel()`, `SetRearSurroundSpeakersLevel()` methods
 
 ### Clock and Network Endpoints 🔍 **Extra**
 These endpoints work with real hardware but are NOT in official API v1.0:
@@ -332,11 +338,11 @@ These endpoints work with real hardware but are NOT in official API v1.0:
 
 ## Coverage Summary
 
-### Official API Coverage: 84%
+### Official API Coverage: 100%
 - **Total Official Endpoints**: 19
-- **Implemented**: 16 (84%)
+- **Implemented**: 18 (95%)
 - **Non-functional**: 1 (5%) - `/trackInfo` times out on real devices
-- **Missing Low-Impact**: 2 (11%)
+- **Missing Low-Impact**: 0 (0%)
 
 ### Feature Coverage: 100%
 - ✅ All essential user functionality implemented

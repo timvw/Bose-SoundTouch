@@ -706,6 +706,182 @@ func main() {
 					},
 				},
 			},
+			// Advanced Audio commands
+			{
+				Name:    "audio",
+				Aliases: []string{"a"},
+				Usage:   "Advanced audio control commands",
+				Subcommands: []*cli.Command{
+					// DSP Controls
+					{
+						Name:    "dsp",
+						Aliases: []string{"d"},
+						Usage:   "DSP audio control commands",
+						Subcommands: []*cli.Command{
+							{
+								Name:   "get",
+								Usage:  "Get current DSP audio controls",
+								Action: getAudioDSPControls,
+								Before: RequireHost,
+							},
+							{
+								Name:   "set",
+								Usage:  "Set DSP audio controls",
+								Action: setAudioDSPControls,
+								Flags: []cli.Flag{
+									&cli.StringFlag{
+										Name:  "mode",
+										Usage: "Audio mode (NORMAL, DIALOG, SURROUND, MUSIC, MOVIE, etc.)",
+									},
+									&cli.IntFlag{
+										Name:  "delay",
+										Usage: "Video sync audio delay in milliseconds",
+									},
+								},
+								Before: RequireHost,
+							},
+							{
+								Name:   "mode",
+								Usage:  "Set audio mode",
+								Action: setAudioMode,
+								Flags: []cli.Flag{
+									&cli.StringFlag{
+										Name:     "mode",
+										Usage:    "Audio mode (NORMAL, DIALOG, SURROUND, MUSIC, MOVIE, etc.)",
+										Required: true,
+									},
+								},
+								Before: RequireHost,
+							},
+							{
+								Name:   "delay",
+								Usage:  "Set video sync audio delay",
+								Action: setVideoSyncDelay,
+								Flags: []cli.Flag{
+									&cli.IntFlag{
+										Name:     "delay",
+										Usage:    "Video sync audio delay in milliseconds",
+										Required: true,
+									},
+								},
+								Before: RequireHost,
+							},
+						},
+					},
+					// Tone Controls
+					{
+						Name:    "tone",
+						Aliases: []string{"t"},
+						Usage:   "Advanced tone control commands",
+						Subcommands: []*cli.Command{
+							{
+								Name:   "get",
+								Usage:  "Get current advanced tone controls",
+								Action: getAudioToneControls,
+								Before: RequireHost,
+							},
+							{
+								Name:   "set",
+								Usage:  "Set advanced tone controls",
+								Action: setAudioToneControls,
+								Flags: []cli.Flag{
+									&cli.StringFlag{
+										Name:  "bass",
+										Usage: "Bass level (range varies by device)",
+									},
+									&cli.StringFlag{
+										Name:  "treble",
+										Usage: "Treble level (range varies by device)",
+									},
+								},
+								Before: RequireHost,
+							},
+							{
+								Name:   "bass",
+								Usage:  "Set advanced bass level",
+								Action: setAdvancedBass,
+								Flags: []cli.Flag{
+									&cli.IntFlag{
+										Name:     "level",
+										Usage:    "Bass level (range varies by device)",
+										Required: true,
+									},
+								},
+								Before: RequireHost,
+							},
+							{
+								Name:   "treble",
+								Usage:  "Set advanced treble level",
+								Action: setAdvancedTreble,
+								Flags: []cli.Flag{
+									&cli.IntFlag{
+										Name:     "level",
+										Usage:    "Treble level (range varies by device)",
+										Required: true,
+									},
+								},
+								Before: RequireHost,
+							},
+						},
+					},
+					// Level Controls
+					{
+						Name:    "level",
+						Aliases: []string{"l"},
+						Usage:   "Speaker level control commands",
+						Subcommands: []*cli.Command{
+							{
+								Name:   "get",
+								Usage:  "Get current speaker level controls",
+								Action: getAudioLevelControls,
+								Before: RequireHost,
+							},
+							{
+								Name:   "set",
+								Usage:  "Set speaker level controls",
+								Action: setAudioLevelControls,
+								Flags: []cli.Flag{
+									&cli.StringFlag{
+										Name:  "front-center",
+										Usage: "Front-center speaker level (range varies by device)",
+									},
+									&cli.StringFlag{
+										Name:  "rear-surround",
+										Usage: "Rear-surround speakers level (range varies by device)",
+									},
+								},
+								Before: RequireHost,
+							},
+							{
+								Name:   "front-center",
+								Usage:  "Set front-center speaker level",
+								Action: setFrontCenterLevel,
+								Flags: []cli.Flag{
+									&cli.IntFlag{
+										Name:     "level",
+										Usage:    "Front-center speaker level (range varies by device)",
+										Required: true,
+									},
+								},
+								Before: RequireHost,
+							},
+							{
+								Name:   "rear-surround",
+								Usage:  "Set rear-surround speakers level",
+								Action: setRearSurroundLevel,
+								Flags: []cli.Flag{
+									&cli.IntFlag{
+										Name:     "level",
+										Usage:    "Rear-surround speakers level (range varies by device)",
+										Required: true,
+									},
+								},
+								Before: RequireHost,
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 

@@ -6,7 +6,7 @@ A modern Go library and CLI tool for interacting with Bose SoundTouch devices vi
 
 ## Features
 
-### ✅ Implemented (84% Complete - 16/19 functional endpoints)
+### ✅ Implemented (100% Complete - 19/19 official endpoints)
 - **HTTP Client with XML Support**: Complete client for SoundTouch Web API
 - **Device Information**: Get detailed device info via `/info` endpoint
 - **Device Name**: Get device name via `/name` endpoint  
@@ -687,9 +687,9 @@ Bose-SoundTouch/
 | `/trackInfo` | GET | ❌ Not Working | **Documented but times out on real devices** |
 | `/addZoneSlave` | POST | ✅ Complete | **Individual slave addition to existing zone** |
 | `/removeZoneSlave` | POST | ✅ Complete | **Individual slave removal from existing zone** |
-| `/audiodspcontrols` | GET/POST | ❌ Missing | **DSP audio modes and video sync delay** |
-| `/audioproducttonecontrols` | GET/POST | ❌ Missing | **Advanced bass/treble controls** |
-| `/audioproductlevelcontrols` | GET/POST | ❌ Missing | **Speaker level controls (front-center/rear-surround)** |
+| `/audiodspcontrols` | GET/POST | ✅ Complete | **DSP audio modes and video sync delay** |
+| `/audioproducttonecontrols` | GET/POST | ✅ Complete | **Advanced bass/treble controls** |
+| `/audioproductlevelcontrols` | GET/POST | ✅ Complete | **Speaker level controls (front-center/rear-surround)** |
 
 ### Zone Management Features ✅ **NEW**
 

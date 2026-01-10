@@ -1059,6 +1059,147 @@ func (c *Client) GetTrackInfo() (*models.NowPlaying, error) {
 	return &nowPlaying, err
 }
 
+// GetAudioDSPControls retrieves the current DSP audio controls
+func (c *Client) GetAudioDSPControls() (*models.AudioDSPControls, error) {
+	var dspControls models.AudioDSPControls
+
+	err := c.get("/audiodspcontrols", &dspControls)
+
+	return &dspControls, err
+}
+
+// SetAudioDSPControls sets the DSP audio controls
+func (c *Client) SetAudioDSPControls(audioMode string, videoSyncDelay int) error {
+	request := &models.AudioDSPControlsRequest{
+		AudioMode:           audioMode,
+		VideoSyncAudioDelay: videoSyncDelay,
+	}
+
+	// Validate against current capabilities if possible
+	capabilities, err := c.GetAudioDSPControls()
+	if err == nil {
+		if validationErr := request.Validate(capabilities); validationErr != nil {
+			return fmt.Errorf("invalid DSP controls request: %w", validationErr)
+		}
+	}
+
+	return c.post("/audiodspcontrols", request)
+}
+
+// SetAudioMode sets only the audio mode (leaving video sync delay unchanged)
+func (c *Client) SetAudioMode(mode string) error {
+	request := &models.AudioDSPControlsRequest{
+		AudioMode: mode,
+	}
+
+	// Validate against current capabilities if possible
+	capabilities, err := c.GetAudioDSPControls()
+	if err == nil {
+		if validationErr := request.Validate(capabilities); validationErr != nil {
+			return fmt.Errorf("invalid audio mode: %w", validationErr)
+		}
+	}
+
+	return c.post("/audiodspcontrols", request)
+}
+
+// SetVideoSyncAudioDelay sets only the video sync audio delay (leaving audio mode unchanged)
+func (c *Client) SetVideoSyncAudioDelay(delay int) error {
+	request := &models.AudioDSPControlsRequest{
+		VideoSyncAudioDelay: delay,
+	}
+
+	if err := request.Validate(nil); err != nil {
+		return fmt.Errorf("invalid video sync delay: %w", err)
+	}
+
+	return c.post("/audiodspcontrols", request)
+}
+
+// GetAudioProductToneControls retrieves the current advanced tone controls (bass/treble)
+func (c *Client) GetAudioProductToneControls() (*models.AudioProductToneControls, error) {
+	var toneControls models.AudioProductToneControls
+
+	err := c.get("/audioproducttonecontrols", &toneControls)
+
+	return &toneControls, err
+}
+
+// SetAudioProductToneControls sets the advanced tone controls (bass and/or treble)
+func (c *Client) SetAudioProductToneControls(bass, treble *int) error {
+	request := &models.AudioProductToneControlsRequest{}
+
+	if bass != nil {
+		request.Bass = models.NewBassControlValue(*bass)
+	}
+
+	if treble != nil {
+		request.Treble = models.NewTrebleControlValue(*treble)
+	}
+
+	// Validate against current capabilities if possible
+	capabilities, err := c.GetAudioProductToneControls()
+	if err == nil {
+		if validationErr := request.Validate(capabilities); validationErr != nil {
+			return fmt.Errorf("invalid tone controls request: %w", validationErr)
+		}
+	}
+
+	return c.post("/audioproducttonecontrols", request)
+}
+
+// SetAdvancedBass sets only the advanced bass control
+func (c *Client) SetAdvancedBass(level int) error {
+	return c.SetAudioProductToneControls(&level, nil)
+}
+
+// SetAdvancedTreble sets only the advanced treble control
+func (c *Client) SetAdvancedTreble(level int) error {
+	return c.SetAudioProductToneControls(nil, &level)
+}
+
+// GetAudioProductLevelControls retrieves the current speaker level controls
+func (c *Client) GetAudioProductLevelControls() (*models.AudioProductLevelControls, error) {
+	var levelControls models.AudioProductLevelControls
+
+	err := c.get("/audioproductlevelcontrols", &levelControls)
+
+	return &levelControls, err
+}
+
+// SetAudioProductLevelControls sets the speaker level controls
+func (c *Client) SetAudioProductLevelControls(frontCenter, rearSurround *int) error {
+	request := &models.AudioProductLevelControlsRequest{}
+
+	if frontCenter != nil {
+		request.FrontCenterSpeakerLevel = models.NewFrontCenterLevelValue(*frontCenter)
+	}
+
+	if rearSurround != nil {
+		request.RearSurroundSpeakersLevel = models.NewRearSurroundLevelValue(*rearSurround)
+	}
+
+	// Validate against current capabilities if possible
+	capabilities, err := c.GetAudioProductLevelControls()
+	if err == nil {
+		if validationErr := request.Validate(capabilities); validationErr != nil {
+			return fmt.Errorf("invalid level controls request: %w", validationErr)
+		}
+	}
+
+	return c.post("/audioproductlevelcontrols", request)
+}
+
+// SetFrontCenterSpeakerLevel sets only the front-center speaker level
+func (c *Client) SetFrontCenterSpeakerLevel(level int) error {
+	return c.SetAudioProductLevelControls(&level, nil)
+}
+
+// SetRearSurroundSpeakersLevel sets only the rear-surround speakers level
+func (c *Client) SetRearSurroundSpeakersLevel(level int) error {
+	return c.SetAudioProductLevelControls(nil, &level)
+}
+
 // AddZoneSlave adds a single device to an existing zone using the official /addZoneSlave endpoint
 func (c *Client) AddZoneSlave(masterDeviceID, slaveDeviceID, slaveIP string) error {
 	request := models.NewZoneSlaveRequest(masterDeviceID)
