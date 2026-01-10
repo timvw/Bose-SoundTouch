@@ -222,11 +222,14 @@ func TestBassMarshalXML(t *testing.T) {
 	}
 
 	var buf strings.Builder
+
 	encoder := xml.NewEncoder(&buf)
+
 	err := bass.MarshalXML(encoder, xml.StartElement{Name: xml.Name{Local: "bass"}})
 	if err != nil {
 		t.Fatalf("MarshalXML failed: %v", err)
 	}
+
 	encoder.Flush()
 
 	// Convert to string for easier testing

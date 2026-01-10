@@ -14,11 +14,14 @@ func TestBalanceMarshalXML(t *testing.T) {
 	}
 
 	var buf strings.Builder
+
 	encoder := xml.NewEncoder(&buf)
+
 	err := balance.MarshalXML(encoder, xml.StartElement{Name: xml.Name{Local: "balance"}})
 	if err != nil {
 		t.Fatalf("MarshalXML failed: %v", err)
 	}
+
 	encoder.Flush()
 
 	// Convert to string for easier testing
@@ -46,11 +49,14 @@ func TestBalanceMarshalXML_PositiveValue(t *testing.T) {
 	}
 
 	var buf strings.Builder
+
 	encoder := xml.NewEncoder(&buf)
+
 	err := balance.MarshalXML(encoder, xml.StartElement{Name: xml.Name{Local: "balance"}})
 	if err != nil {
 		t.Fatalf("MarshalXML failed: %v", err)
 	}
+
 	encoder.Flush()
 
 	xmlStr := buf.String()
@@ -76,11 +82,14 @@ func TestBalanceMarshalXML_ZeroValue(t *testing.T) {
 	}
 
 	var buf strings.Builder
+
 	encoder := xml.NewEncoder(&buf)
+
 	err := balance.MarshalXML(encoder, xml.StartElement{Name: xml.Name{Local: "balance"}})
 	if err != nil {
 		t.Fatalf("MarshalXML failed: %v", err)
 	}
+
 	encoder.Flush()
 
 	xmlStr := buf.String()
@@ -106,11 +115,14 @@ func TestBalanceMarshalXML_ExtremeValues(t *testing.T) {
 	}
 
 	var buf strings.Builder
+
 	encoder := xml.NewEncoder(&buf)
+
 	err := balance.MarshalXML(encoder, xml.StartElement{Name: xml.Name{Local: "balance"}})
 	if err != nil {
 		t.Fatalf("MarshalXML failed: %v", err)
 	}
+
 	encoder.Flush()
 
 	xmlStr := buf.String()
