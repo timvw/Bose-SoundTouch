@@ -14,6 +14,72 @@ import (
 	"github.com/hashicorp/mdns"
 )
 
+func displayResults(services []ServiceInfo) {
+	if len(services) == 0 {
+		fmt.Println("No services found.")
+		fmt.Println()
+		fmt.Println("This could mean:")
+		fmt.Println("- No mDNS services on network")
+		fmt.Println("- Network blocks multicast traffic")
+		fmt.Println("- Firewall blocks mDNS port 5353")
+		fmt.Println("- Try different service types or increase timeout")
+
+		return
+	}
+
+	// Group services by type for better display
+	serviceGroups := make(map[string][]ServiceInfo)
+	for _, s := range services {
+		serviceGroups[s.ServiceType] = append(serviceGroups[s.ServiceType], s)
+	}
+
+	// Display grouped services
+	for serviceType, serviceList := range serviceGroups {
+		fmt.Printf("Service Type: %s\n", serviceType)
+		fmt.Printf("  Found %d instance(s):\n", len(serviceList))
+
+		for i, s := range serviceList {
+			fmt.Printf("  %d. %s\n", i+1, s.Name)
+
+			if s.Host != "" {
+				fmt.Printf("     Host: %s\n", s.Host)
+			}
+
+			if s.IPv4 != "" {
+				fmt.Printf("     IPv4: %s\n", s.IPv4)
+			}
+
+			if s.IPv6 != "" {
+				fmt.Printf("     IPv6: %s\n", s.IPv6)
+			}
+
+			if s.Port > 0 {
+				fmt.Printf("     Port: %d\n", s.Port)
+			}
+
+			if len(s.TxtRecords) > 0 {
+				fmt.Printf("     TXT Records: %v\n", s.TxtRecords)
+			}
+		}
+
+		fmt.Println()
+	}
+}
+
+func showSuggestions(service string) {
+	if service == "_services._dns-sd._udp" {
+		fmt.Println("Common services to look for SoundTouch devices:")
+		fmt.Println("- _soundtouch._tcp.local.")
+		fmt.Println("- _http._tcp.local.")
+		fmt.Println("- _upnp._tcp.local.")
+		fmt.Println("- _device-info._tcp.local.")
+		fmt.Println()
+		fmt.Println("Try scanning specific services:")
+		fmt.Println("  ./mdns-scanner -service _soundtouch._tcp -v")
+		fmt.Println("  ./mdns-scanner -service _http._tcp -v")
+	}
+}
+
 func main() {
 	verbose := flag.Bool("verbose", false, "Enable verbose logging")
 	timeout := flag.Duration("timeout", 10*time.Second, "Discovery timeout")
@@ -107,68 +173,10 @@ done:
 	})
 
 	// Display results
-	if len(services) == 0 {
-		fmt.Println("No services found.")
-		fmt.Println()
-		fmt.Println("This could mean:")
-		fmt.Println("- No mDNS services on network")
-		fmt.Println("- Network blocks multicast traffic")
-		fmt.Println("- Firewall blocks mDNS port 5353")
-		fmt.Println("- Try different service types or increase timeout")
-	} else {
-		// Group services by type for better display
-		serviceGroups := make(map[string][]ServiceInfo)
-
-		for _, service := range services {
-			serviceType := service.ServiceType
-			serviceGroups[serviceType] = append(serviceGroups[serviceType], service)
-		}
-
-		// Display grouped services
-		for serviceType, serviceList := range serviceGroups {
-			fmt.Printf("Service Type: %s\n", serviceType)
-			fmt.Printf("  Found %d instance(s):\n", len(serviceList))
-
-			for i, service := range serviceList {
-				fmt.Printf("  %d. %s\n", i+1, service.Name)
-
-				if service.Host != "" {
-					fmt.Printf("     Host: %s\n", service.Host)
-				}
-
-				if service.IPv4 != "" {
-					fmt.Printf("     IPv4: %s\n", service.IPv4)
-				}
-
-				if service.IPv6 != "" {
-					fmt.Printf("     IPv6: %s\n", service.IPv6)
-				}
-
-				if service.Port > 0 {
-					fmt.Printf("     Port: %d\n", service.Port)
-				}
-
-				if len(service.TxtRecords) > 0 {
-					fmt.Printf("     TXT Records: %v\n", service.TxtRecords)
-				}
-			}
-
-			fmt.Println()
-		}
-	}
+	displayResults(services)
 
 	// Show suggestions for common SoundTouch-related services
-	if *service == "_services._dns-sd._udp" {
-		fmt.Println("Common services to look for SoundTouch devices:")
-		fmt.Println("- _soundtouch._tcp.local.")
-		fmt.Println("- _http._tcp.local.")
-		fmt.Println("- _upnp._tcp.local.")
-		fmt.Println("- _device-info._tcp.local.")
-		fmt.Println()
-		fmt.Println("Try scanning specific services:")
-		fmt.Println("  ./mdns-scanner -service _soundtouch._tcp -v")
-		fmt.Println("  ./mdns-scanner -service _http._tcp -v")
-	}
+	showSuggestions(*service)
 }
 
 type ServiceInfo struct {

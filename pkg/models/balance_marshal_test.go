@@ -22,7 +22,9 @@ func TestBalanceMarshalXML(t *testing.T) {
 		t.Fatalf("MarshalXML failed: %v", err)
 	}
 
-	encoder.Flush()
+	if err := encoder.Flush(); err != nil {
+		t.Fatalf("Flush failed: %v", err)
+	}
 
 	// Convert to string for easier testing
 	xmlStr := buf.String()
@@ -57,10 +59,11 @@ func TestBalanceMarshalXML_PositiveValue(t *testing.T) {
 		t.Fatalf("MarshalXML failed: %v", err)
 	}
 
-	encoder.Flush()
+	if err := encoder.Flush(); err != nil {
+		t.Fatalf("Flush failed: %v", err)
+	}
 
 	xmlStr := buf.String()
-
 	expectedElements := []string{
 		`deviceID="ABCDEF123456"`,
 		`<targetbalance>30</targetbalance>`,
@@ -90,10 +93,11 @@ func TestBalanceMarshalXML_ZeroValue(t *testing.T) {
 		t.Fatalf("MarshalXML failed: %v", err)
 	}
 
-	encoder.Flush()
+	if err := encoder.Flush(); err != nil {
+		t.Fatalf("Flush failed: %v", err)
+	}
 
 	xmlStr := buf.String()
-
 	expectedElements := []string{
 		`deviceID="ZERO0000TEST"`,
 		`<targetbalance>0</targetbalance>`,
@@ -123,10 +127,11 @@ func TestBalanceMarshalXML_ExtremeValues(t *testing.T) {
 		t.Fatalf("MarshalXML failed: %v", err)
 	}
 
-	encoder.Flush()
+	if err := encoder.Flush(); err != nil {
+		t.Fatalf("Flush failed: %v", err)
+	}
 
 	xmlStr := buf.String()
-
 	expectedElements := []string{
 		`deviceID="EXTREME_TEST"`,
 		`<targetbalance>-50</targetbalance>`,

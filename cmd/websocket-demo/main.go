@@ -43,6 +43,88 @@ func parseHostPort(hostPort string, defaultPort int) (string, int) {
 	return hostPort, defaultPort
 }
 
+func parseFilters(eventFilter string) map[string]bool {
+	validFilters := map[string]bool{
+		"nowPlaying": true, "volume": true, "connection": true,
+		"preset": true, "zone": true, "bass": true,
+	}
+
+	if eventFilter == "" {
+		return nil
+	}
+
+	filters := make(map[string]bool)
+	filterList := strings.Split(eventFilter, ",")
+
+	for _, f := range filterList {
+		f = strings.TrimSpace(f)
+		if !validFilters[f] {
+			fmt.Printf("Invalid filter '%s'. Valid filters: nowPlaying, volume, connection, preset, zone, bass\n", f)
+			os.Exit(1)
+		}
+
+		filters[f] = true
+	}
+
+	return filters
+}
+
+func discoverDevice(discoverFlag bool, hostPort string, defaultPort int) (string, int, error) {
+	if hostPort != "" && !discoverFlag {
+		deviceHost, devicePort := parseHostPort(hostPort, defaultPort)
+		fmt.Printf("Connecting to: %s:%d\n", deviceHost, devicePort)
+
+		return deviceHost, devicePort, nil
+	}
+
+	fmt.Println("Discovering SoundTouch devices...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cfg := &config.Config{
+		DiscoveryTimeout: 10 * time.Second,
+		CacheEnabled:     false,
+	}
+	discoveryService := discovery.NewUnifiedDiscoveryService(cfg)
+
+	devices, err := discoveryService.DiscoverDevices(ctx)
+	if err != nil || len(devices) == 0 {
+		if err != nil {
+			return "", 0, fmt.Errorf("discovery failed: %w", err)
+		}
+
+		return "", 0, fmt.Errorf("no SoundTouch devices found")
+	}
+
+	device := devices[0]
+	fmt.Printf("Found %d device(s), connecting to: %s (%s:%d)\n",
+		len(devices), device.Name, device.Host, device.Port)
+
+	return device.Host, device.Port, nil
+}
+
+func setupWebSocket(soundTouchClient *client.Client, reconnect, verbose bool) *client.WebSocketClient {
+	wsConfig := &client.WebSocketConfig{
+		ReconnectInterval:    5 * time.Second,
+		MaxReconnectAttempts: 0, // Unlimited if reconnect enabled
+		PingInterval:         30 * time.Second,
+		PongTimeout:          10 * time.Second,
+		ReadBufferSize:       2048,
+		WriteBufferSize:      2048,
+	}
+
+	if verbose {
+		wsConfig.Logger = &VerboseLogger{}
+	}
+
+	if !reconnect {
+		wsConfig.MaxReconnectAttempts = 1
+	}
+
+	return soundTouchClient.NewWebSocketClient(wsConfig)
+}
+
 func main() {
 	var (
 		host = flag.String("host", "", "SoundTouch device host/IP address (can include port like host:8090)")
@@ -64,69 +146,13 @@ func main() {
 	}
 
 	// Validate filter if provided
-	validFilters := map[string]bool{
-		"nowPlaying": true, "volume": true, "connection": true,
-		"preset": true, "zone": true, "bass": true,
-	}
-
-	var filters map[string]bool
-	if *eventFilter != "" {
-		filters = make(map[string]bool)
-
-		filterList := strings.Split(*eventFilter, ",")
-		for _, f := range filterList {
-			f = strings.TrimSpace(f)
-			if !validFilters[f] {
-				fmt.Printf("Invalid filter '%s'. Valid filters: nowPlaying, volume, connection, preset, zone, bass\n", f)
-				os.Exit(1)
-			}
-
-			filters[f] = true
-		}
-	}
-
-	var (
-		deviceHost string
-		devicePort int
-	)
+	filters := parseFilters(*eventFilter)
 
 	// Discover devices if no host specified or discover flag used
-
-	if *host == "" || *discover {
-		fmt.Println("Discovering SoundTouch devices...")
-
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		// Create unified discovery service
-		cfg := &config.Config{
-			DiscoveryTimeout: 10 * time.Second,
-			CacheEnabled:     false,
-		}
-		discoveryService := discovery.NewUnifiedDiscoveryService(cfg)
-
-		devices, err := discoveryService.DiscoverDevices(ctx)
-		if err != nil {
-			fmt.Printf("Discovery failed: %v\n", err)
-			return
-		}
-
-		if len(devices) == 0 {
-			fmt.Println("No SoundTouch devices found")
-			return
-		}
-
-		// Use first discovered device
-		device := devices[0]
-		deviceHost = device.Host
-		devicePort = device.Port
-
-		fmt.Printf("Found %d device(s), connecting to: %s (%s:%d)\n",
-			len(devices), device.Name, device.Host, device.Port)
-	} else {
-		// Parse provided host
-		deviceHost, devicePort = parseHostPort(*host, *port)
-		fmt.Printf("Connecting to: %s:%d\n", deviceHost, devicePort)
+	deviceHost, devicePort, err := discoverDevice(*discover, *host, *port)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
 	}
 
 	// Create client
@@ -156,24 +182,7 @@ func main() {
 		deviceInfo.Name, deviceInfo.Type, macAddress)
 
 	// Create WebSocket client
-	wsConfig := &client.WebSocketConfig{
-		ReconnectInterval:    5 * time.Second,
-		MaxReconnectAttempts: 0, // Unlimited if reconnect enabled
-		PingInterval:         30 * time.Second,
-		PongTimeout:          10 * time.Second,
-		ReadBufferSize:       2048,
-		WriteBufferSize:      2048,
-	}
-
-	if *verbose {
-		wsConfig.Logger = &VerboseLogger{}
-	}
-
-	if !*reconnect {
-		wsConfig.MaxReconnectAttempts = 1
-	}
-
-	wsClient := soundTouchClient.NewWebSocketClient(wsConfig)
+	wsClient := setupWebSocket(soundTouchClient, *reconnect, *verbose)
 
 	// Set up event handlers
 	setupEventHandlers(wsClient, filters, *verbose)
@@ -181,9 +190,10 @@ func main() {
 	// Connect to WebSocket
 	fmt.Println("Connecting to WebSocket...")
 
-	err = wsClient.ConnectWithConfig(wsConfig)
+	err = wsClient.Connect()
 	if err != nil {
 		fmt.Printf("Failed to connect to WebSocket: %v\n", err)
+
 		return
 	}
 
@@ -243,150 +253,175 @@ func main() {
 	fmt.Println("Disconnected successfully")
 }
 
+func handleNowPlaying(event *models.NowPlayingUpdatedEvent, verbose bool) {
+	fmt.Printf("\n🎵 Now Playing Update [%s]:\n", event.DeviceID)
+	np := &event.NowPlaying
+
+	if np.IsEmpty() {
+		fmt.Println("  ⏹️  Nothing playing")
+		return
+	}
+
+	fmt.Printf("  🎵 %s\n", np.GetDisplayTitle())
+
+	if artist := np.GetDisplayArtist(); artist != "" {
+		fmt.Printf("  👤 %s\n", artist)
+	}
+
+	if np.Album != "" {
+		fmt.Printf("  💿 %s\n", np.Album)
+	}
+
+	fmt.Printf("  📻 Source: %s\n", np.Source)
+	fmt.Printf("  ▶️  Status: %s\n", np.PlayStatus.String())
+
+	if np.HasTimeInfo() {
+		fmt.Printf("  ⏱️  Duration: %s\n", np.FormatDuration())
+	}
+
+	if np.ShuffleSetting != "" {
+		fmt.Printf("  🔀 Shuffle: %s\n", np.ShuffleSetting.String())
+	}
+
+	if np.RepeatSetting != "" {
+		fmt.Printf("  🔁 Repeat: %s\n", np.RepeatSetting.String())
+	}
+
+	if verbose {
+		fmt.Printf("  📱 Raw Source: %s, Account: %s\n", np.Source, np.SourceAccount)
+
+		if np.Art != nil && np.Art.URL != "" {
+			fmt.Printf("  🖼️  Artwork: %s\n", np.Art.URL)
+		}
+	}
+}
+
+func handleVolume(event *models.VolumeUpdatedEvent, verbose bool) {
+	vol := &event.Volume
+	fmt.Printf("\n🔊 Volume Update [%s]:\n", event.DeviceID)
+
+	if vol.IsMuted() {
+		fmt.Println("  🔇 Muted")
+	} else {
+		fmt.Printf("  🔊 Level: %d\n", vol.ActualVolume)
+
+		if vol.TargetVolume != vol.ActualVolume {
+			fmt.Printf("  🎯 Target: %d\n", vol.TargetVolume)
+		}
+
+		fmt.Printf("  📊 %s\n", models.GetVolumeLevelName(vol.ActualVolume))
+	}
+
+	if verbose {
+		fmt.Printf("  📱 Sync: %v\n", vol.IsVolumeSync())
+	}
+}
+
+func handleConnection(event *models.ConnectionStateUpdatedEvent) {
+	cs := &event.ConnectionState
+	fmt.Printf("\n🌐 Connection Update [%s]:\n", event.DeviceID)
+
+	if cs.IsConnected() {
+		fmt.Println("  ✅ Connected")
+	} else {
+		fmt.Printf("  ❌ State: %s\n", cs.State)
+	}
+
+	if cs.Signal != "" {
+		fmt.Printf("  📶 Signal: %s\n", cs.GetSignalStrength())
+	}
+}
+
+func handlePreset(event *models.PresetUpdatedEvent, verbose bool) {
+	preset := &event.Preset
+	fmt.Printf("\n📻 Preset Update [%s]:\n", event.DeviceID)
+	fmt.Printf("  📻 Preset: %d\n", preset.ID)
+
+	if preset.ContentItem != nil {
+		fmt.Printf("  🎵 %s\n", preset.ContentItem.ItemName)
+		fmt.Printf("  📻 Source: %s\n", preset.ContentItem.Source)
+	}
+
+	if verbose {
+		fmt.Printf("  📱 Raw preset data: ID=%d\n", preset.ID)
+	}
+}
+
+func handleZone(event *models.ZoneUpdatedEvent) {
+	zone := &event.Zone
+	fmt.Printf("\n🏠 Zone Update [%s]:\n", event.DeviceID)
+	fmt.Printf("  👑 Master: %s\n", zone.Master)
+
+	if len(zone.Members) > 0 {
+		fmt.Printf("  👥 Members (%d):\n", len(zone.Members))
+
+		for i, member := range zone.Members {
+			fmt.Printf("    %d. %s (%s)\n", i+1, member.DeviceID, member.IP)
+		}
+	} else {
+		fmt.Println("  👤 Single device (no zone)")
+	}
+}
+
+func handleBass(event *models.BassUpdatedEvent) {
+	bass := &event.Bass
+	fmt.Printf("\n🎵 Bass Update [%s]:\n", event.DeviceID)
+	fmt.Printf("  🎚️  Level: %d\n", bass.ActualBass)
+
+	if bass.TargetBass != bass.ActualBass {
+		fmt.Printf("  🎯 Target: %d\n", bass.TargetBass)
+	}
+
+	levelDesc := "Neutral"
+	if bass.ActualBass > 0 {
+		levelDesc = "Boosted"
+	} else if bass.ActualBass < 0 {
+		levelDesc = "Reduced"
+	}
+
+	fmt.Printf("  📊 %s\n", levelDesc)
+}
+
 func setupEventHandlers(wsClient *client.WebSocketClient, filters map[string]bool, verbose bool) {
 	// Now Playing events
 	if filters == nil || filters["nowPlaying"] {
 		wsClient.OnNowPlaying(func(event *models.NowPlayingUpdatedEvent) {
-			fmt.Printf("\n🎵 Now Playing Update [%s]:\n", event.DeviceID)
-			np := &event.NowPlaying
-
-			if np.IsEmpty() {
-				fmt.Println("  ⏹️  Nothing playing")
-			} else {
-				fmt.Printf("  🎵 %s\n", np.GetDisplayTitle())
-
-				if artist := np.GetDisplayArtist(); artist != "" {
-					fmt.Printf("  👤 %s\n", artist)
-				}
-
-				if np.Album != "" {
-					fmt.Printf("  💿 %s\n", np.Album)
-				}
-
-				fmt.Printf("  📻 Source: %s\n", np.Source)
-				fmt.Printf("  ▶️  Status: %s\n", np.PlayStatus.String())
-
-				if np.HasTimeInfo() {
-					fmt.Printf("  ⏱️  Duration: %s\n", np.FormatDuration())
-				}
-
-				if np.ShuffleSetting != "" {
-					fmt.Printf("  🔀 Shuffle: %s\n", np.ShuffleSetting.String())
-				}
-
-				if np.RepeatSetting != "" {
-					fmt.Printf("  🔁 Repeat: %s\n", np.RepeatSetting.String())
-				}
-			}
-
-			if verbose {
-				fmt.Printf("  📱 Raw Source: %s, Account: %s\n", np.Source, np.SourceAccount)
-
-				if np.Art != nil && np.Art.URL != "" {
-					fmt.Printf("  🖼️  Artwork: %s\n", np.Art.URL)
-				}
-			}
+			handleNowPlaying(event, verbose)
 		})
 	}
 
 	// Volume events
 	if filters == nil || filters["volume"] {
 		wsClient.OnVolumeUpdated(func(event *models.VolumeUpdatedEvent) {
-			vol := &event.Volume
-			fmt.Printf("\n🔊 Volume Update [%s]:\n", event.DeviceID)
-
-			if vol.IsMuted() {
-				fmt.Println("  🔇 Muted")
-			} else {
-				fmt.Printf("  🔊 Level: %d\n", vol.ActualVolume)
-
-				if vol.TargetVolume != vol.ActualVolume {
-					fmt.Printf("  🎯 Target: %d\n", vol.TargetVolume)
-				}
-
-				fmt.Printf("  📊 %s\n", models.GetVolumeLevelName(vol.ActualVolume))
-			}
-
-			if verbose {
-				fmt.Printf("  📱 Sync: %v\n", vol.IsVolumeSync())
-			}
+			handleVolume(event, verbose)
 		})
 	}
 
 	// Connection state events
 	if filters == nil || filters["connection"] {
 		wsClient.OnConnectionState(func(event *models.ConnectionStateUpdatedEvent) {
-			cs := &event.ConnectionState
-			fmt.Printf("\n🌐 Connection Update [%s]:\n", event.DeviceID)
-
-			if cs.IsConnected() {
-				fmt.Println("  ✅ Connected")
-			} else {
-				fmt.Printf("  ❌ State: %s\n", cs.State)
-			}
-
-			if cs.Signal != "" {
-				fmt.Printf("  📶 Signal: %s\n", cs.GetSignalStrength())
-			}
+			handleConnection(event)
 		})
 	}
 
 	// Preset events
 	if filters == nil || filters["preset"] {
 		wsClient.OnPresetUpdated(func(event *models.PresetUpdatedEvent) {
-			preset := &event.Preset
-			fmt.Printf("\n📻 Preset Update [%s]:\n", event.DeviceID)
-			fmt.Printf("  📻 Preset: %d\n", preset.ID)
-
-			if preset.ContentItem != nil {
-				fmt.Printf("  🎵 %s\n", preset.ContentItem.ItemName)
-				fmt.Printf("  📻 Source: %s\n", preset.ContentItem.Source)
-			}
-
-			if verbose {
-				fmt.Printf("  📱 Raw preset data: ID=%d\n", preset.ID)
-			}
+			handlePreset(event, verbose)
 		})
 	}
 
 	// Zone/Multiroom events
 	if filters == nil || filters["zone"] {
 		wsClient.OnZoneUpdated(func(event *models.ZoneUpdatedEvent) {
-			zone := &event.Zone
-			fmt.Printf("\n🏠 Zone Update [%s]:\n", event.DeviceID)
-			fmt.Printf("  👑 Master: %s\n", zone.Master)
-
-			if len(zone.Members) > 0 {
-				fmt.Printf("  👥 Members (%d):\n", len(zone.Members))
-
-				for i, member := range zone.Members {
-					fmt.Printf("    %d. %s (%s)\n", i+1, member.DeviceID, member.IP)
-				}
-			} else {
-				fmt.Println("  👤 Single device (no zone)")
-			}
+			handleZone(event)
 		})
 	}
 
 	// Bass events
 	if filters == nil || filters["bass"] {
 		wsClient.OnBassUpdated(func(event *models.BassUpdatedEvent) {
-			bass := &event.Bass
-			fmt.Printf("\n🎵 Bass Update [%s]:\n", event.DeviceID)
-			fmt.Printf("  🎚️  Level: %d\n", bass.ActualBass)
-
-			if bass.TargetBass != bass.ActualBass {
-				fmt.Printf("  🎯 Target: %d\n", bass.TargetBass)
-			}
-
-			levelDesc := "Neutral"
-			if bass.ActualBass > 0 {
-				levelDesc = "Boosted"
-			} else if bass.ActualBass < 0 {
-				levelDesc = "Reduced"
-			}
-
-			fmt.Printf("  📊 %s\n", levelDesc)
+			handleBass(event)
 		})
 	}
 

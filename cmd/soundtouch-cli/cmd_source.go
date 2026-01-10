@@ -4,8 +4,29 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gesellix/bose-soundtouch/pkg/models"
 	"github.com/urfave/cli/v2"
 )
+
+func printSource(source models.SourceItem) {
+	fmt.Printf("    • %s", source.GetDisplayName())
+
+	if source.SourceAccount != "" && source.SourceAccount != source.Source {
+		fmt.Printf(" (%s)", source.SourceAccount)
+	}
+
+	var attributes []string
+	if source.IsLocalSource() {
+		attributes = append(attributes, "Local")
+		attributes = append(attributes, "Available")
+	}
+
+	if len(attributes) > 0 {
+		fmt.Printf(" [%s]", strings.Join(attributes, ", "))
+	}
+
+	fmt.Println()
+}
 
 // listSources handles listing available audio sources
 func listSources(c *cli.Context) error {
@@ -32,26 +53,7 @@ func listSources(c *cli.Context) error {
 		fmt.Printf("  Ready Sources:\n")
 
 		for _, source := range availableSources {
-			fmt.Printf("    • %s", source.GetDisplayName())
-
-			if source.SourceAccount != "" && source.SourceAccount != source.Source {
-				fmt.Printf(" (%s)", source.SourceAccount)
-			}
-
-			var attributes []string
-			if source.IsLocalSource() {
-				attributes = append(attributes, "Local")
-			}
-
-			if source.IsLocalSource() {
-				attributes = append(attributes, "Available")
-			}
-
-			if len(attributes) > 0 {
-				fmt.Printf(" [%s]", strings.Join(attributes, ", "))
-			}
-
-			fmt.Println()
+			printSource(source)
 		}
 	}
 

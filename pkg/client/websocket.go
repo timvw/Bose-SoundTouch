@@ -368,6 +368,68 @@ func (ws *WebSocketClient) handleMessage(data []byte) {
 	ws.handleEvent(event)
 }
 
+func (ws *WebSocketClient) dispatchTypedEvent(handlers *models.WebSocketEventHandlers, eventType models.WebSocketEventType, event *models.WebSocketEvent) bool {
+	switch eventType {
+	case models.EventTypeNowPlaying:
+		if handlers.OnNowPlaying != nil && event.NowPlayingUpdated != nil {
+			handlers.OnNowPlaying(event.NowPlayingUpdated)
+		}
+
+		return true
+
+	case models.EventTypeVolumeUpdated:
+		if handlers.OnVolumeUpdated != nil && event.VolumeUpdated != nil {
+			handlers.OnVolumeUpdated(event.VolumeUpdated)
+		}
+
+		return true
+
+	case models.EventTypeConnectionState:
+		if handlers.OnConnectionState != nil && event.ConnectionStateUpdated != nil {
+			handlers.OnConnectionState(event.ConnectionStateUpdated)
+		}
+
+		return true
+
+	case models.EventTypePresetUpdated:
+		if handlers.OnPresetUpdated != nil && event.PresetUpdated != nil {
+			handlers.OnPresetUpdated(event.PresetUpdated)
+		}
+
+		return true
+
+	default:
+		return ws.dispatchTypedEventContinued(handlers, eventType, event)
+	}
+}
+
+func (ws *WebSocketClient) dispatchTypedEventContinued(handlers *models.WebSocketEventHandlers, eventType models.WebSocketEventType, event *models.WebSocketEvent) bool {
+	switch eventType {
+	case models.EventTypeZoneUpdated:
+		if handlers.OnZoneUpdated != nil && event.ZoneUpdated != nil {
+			handlers.OnZoneUpdated(event.ZoneUpdated)
+		}
+
+		return true
+
+	case models.EventTypeBassUpdated:
+		if handlers.OnBassUpdated != nil && event.BassUpdated != nil {
+			handlers.OnBassUpdated(event.BassUpdated)
+		}
+
+		return true
+
+	case models.EventTypeRecentsUpdated:
+		return true
+
+	case models.EventTypeLanguageUpdated:
+		return true
+
+	default:
+		return false
+	}
+}
+
 // handleEvent dispatches events to appropriate handlers
 func (ws *WebSocketClient) handleEvent(event *models.WebSocketEvent) {
 	ws.mu.RLock()
@@ -378,41 +440,8 @@ func (ws *WebSocketClient) handleEvent(event *models.WebSocketEvent) {
 	hasKnownEvent := false
 
 	for _, eventType := range eventTypes {
-		hasKnownEvent = true
-
-		switch eventType {
-		case models.EventTypeNowPlaying:
-			if handlers.OnNowPlaying != nil && event.NowPlayingUpdated != nil {
-				handlers.OnNowPlaying(event.NowPlayingUpdated)
-			}
-
-		case models.EventTypeVolumeUpdated:
-			if handlers.OnVolumeUpdated != nil && event.VolumeUpdated != nil {
-				handlers.OnVolumeUpdated(event.VolumeUpdated)
-			}
-
-		case models.EventTypeConnectionState:
-			if handlers.OnConnectionState != nil && event.ConnectionStateUpdated != nil {
-				handlers.OnConnectionState(event.ConnectionStateUpdated)
-			}
-
-		case models.EventTypePresetUpdated:
-			if handlers.OnPresetUpdated != nil && event.PresetUpdated != nil {
-				handlers.OnPresetUpdated(event.PresetUpdated)
-			}
-
-		case models.EventTypeZoneUpdated:
-			if handlers.OnZoneUpdated != nil && event.ZoneUpdated != nil {
-				handlers.OnZoneUpdated(event.ZoneUpdated)
-			}
-
-		case models.EventTypeBassUpdated:
-			if handlers.OnBassUpdated != nil && event.BassUpdated != nil {
-				handlers.OnBassUpdated(event.BassUpdated)
-			}
-
-		default:
-			hasKnownEvent = false
+		if ws.dispatchTypedEvent(handlers, eventType, event) {
+			hasKnownEvent = true
 		}
 	}
 

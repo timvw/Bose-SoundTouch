@@ -334,83 +334,98 @@ func ParseWebSocketEvent(data []byte) (*WebSocketEvent, error) {
 	return &event, nil
 }
 
+func (e *WebSocketEvent) getFieldByEventType(eventType WebSocketEventType) interface{} {
+	var field interface{}
+
+	switch eventType {
+	case EventTypeNowPlaying:
+		field = e.NowPlayingUpdated
+	case EventTypeVolumeUpdated:
+		field = e.VolumeUpdated
+	case EventTypeConnectionState:
+		field = e.ConnectionStateUpdated
+	case EventTypePresetUpdated:
+		field = e.PresetUpdated
+	case EventTypeZoneUpdated:
+		field = e.ZoneUpdated
+	case EventTypeBassUpdated:
+		field = e.BassUpdated
+	case EventTypeClockTimeUpdated:
+		field = e.ClockTimeUpdated
+	case EventTypeClockDisplayUpdated:
+		field = e.ClockDisplayUpdated
+	case EventTypeNameUpdated:
+		field = e.NameUpdated
+	case EventTypeErrorUpdated:
+		field = e.ErrorUpdated
+	case EventTypeRecentsUpdated:
+		field = e.RecentsUpdated
+	case EventTypeLanguageUpdated:
+		field = e.LanguageUpdated
+	}
+
+	// Use reflection or a type-safe check to ensure we only return non-nil interfaces
+	// In Go, an interface is nil only if both its type and value are nil.
+	// If e.NowPlayingUpdated is a nil pointer, field will be a non-nil interface containing a nil pointer.
+	// We need to return a literal nil if the field is empty to satisfy expectations.
+
+	if field == nil {
+		return nil
+	}
+
+	// We know all these fields are pointers.
+	// We can't easily check for nil pointer without reflection here in a generic way,
+	// but we can restore the previous logic in a more compact way if needed.
+	// Actually, the previous logic was: if e.NowPlayingUpdated != nil { return e.NowPlayingUpdated }
+	// which returns a non-nil interface.
+
+	return field
+}
+
+// isNil checks if an interface is nil or contains a nil pointer.
+func isNil(i interface{}) bool {
+	if i == nil {
+		return true
+	}
+
+	switch v := i.(type) {
+	case *NowPlayingUpdatedEvent:
+		return v == nil
+	case *VolumeUpdatedEvent:
+		return v == nil
+	case *ConnectionStateUpdatedEvent:
+		return v == nil
+	case *PresetUpdatedEvent:
+		return v == nil
+	case *ZoneUpdatedEvent:
+		return v == nil
+	case *BassUpdatedEvent:
+		return v == nil
+	case *ClockTimeUpdatedEvent:
+		return v == nil
+	case *ClockDisplayUpdatedEvent:
+		return v == nil
+	case *NameUpdatedEvent:
+		return v == nil
+	case *ErrorUpdatedEvent:
+		return v == nil
+	case *RecentsUpdatedEvent:
+		return v == nil
+	case *LanguageUpdatedEvent:
+		return v == nil
+	}
+
+	return false
+}
+
 // ParseTypedEvent attempts to parse a WebSocket event into a specific typed event
 func ParseTypedEvent[T any](event *WebSocketEvent, eventType WebSocketEventType) (T, error) {
 	var result T
 
-	// Get the event directly from the parsed structure
-	switch eventType {
-	case EventTypeNowPlaying:
-		if event.NowPlayingUpdated != nil {
-			if typedResult, ok := interface{}(event.NowPlayingUpdated).(T); ok {
-				return typedResult, nil
-			}
-		}
-	case EventTypeVolumeUpdated:
-		if event.VolumeUpdated != nil {
-			if typedResult, ok := interface{}(event.VolumeUpdated).(T); ok {
-				return typedResult, nil
-			}
-		}
-	case EventTypeConnectionState:
-		if event.ConnectionStateUpdated != nil {
-			if typedResult, ok := interface{}(event.ConnectionStateUpdated).(T); ok {
-				return typedResult, nil
-			}
-		}
-	case EventTypePresetUpdated:
-		if event.PresetUpdated != nil {
-			if typedResult, ok := interface{}(event.PresetUpdated).(T); ok {
-				return typedResult, nil
-			}
-		}
-	case EventTypeZoneUpdated:
-		if event.ZoneUpdated != nil {
-			if typedResult, ok := interface{}(event.ZoneUpdated).(T); ok {
-				return typedResult, nil
-			}
-		}
-	case EventTypeBassUpdated:
-		if event.BassUpdated != nil {
-			if typedResult, ok := interface{}(event.BassUpdated).(T); ok {
-				return typedResult, nil
-			}
-		}
-	case EventTypeClockTimeUpdated:
-		if event.ClockTimeUpdated != nil {
-			if typedResult, ok := interface{}(event.ClockTimeUpdated).(T); ok {
-				return typedResult, nil
-			}
-		}
-	case EventTypeClockDisplayUpdated:
-		if event.ClockDisplayUpdated != nil {
-			if typedResult, ok := interface{}(event.ClockDisplayUpdated).(T); ok {
-				return typedResult, nil
-			}
-		}
-	case EventTypeNameUpdated:
-		if event.NameUpdated != nil {
-			if typedResult, ok := interface{}(event.NameUpdated).(T); ok {
-				return typedResult, nil
-			}
-		}
-	case EventTypeErrorUpdated:
-		if event.ErrorUpdated != nil {
-			if typedResult, ok := interface{}(event.ErrorUpdated).(T); ok {
-				return typedResult, nil
-			}
-		}
-	case EventTypeRecentsUpdated:
-		if event.RecentsUpdated != nil {
-			if typedResult, ok := interface{}(event.RecentsUpdated).(T); ok {
-				return typedResult, nil
-			}
-		}
-	case EventTypeLanguageUpdated:
-		if event.LanguageUpdated != nil {
-			if typedResult, ok := interface{}(event.LanguageUpdated).(T); ok {
-				return typedResult, nil
-			}
+	field := event.getFieldByEventType(eventType)
+	if !isNil(field) {
+		if typedResult, ok := field.(T); ok {
+			return typedResult, nil
 		}
 	}
 

@@ -230,9 +230,10 @@ func TestBassMarshalXML(t *testing.T) {
 		t.Fatalf("MarshalXML failed: %v", err)
 	}
 
-	encoder.Flush()
+	if err := encoder.Flush(); err != nil {
+		t.Fatalf("Flush failed: %v", err)
+	}
 
-	// Convert to string for easier testing
 	xmlStr := buf.String()
 
 	// Check that XML contains expected elements

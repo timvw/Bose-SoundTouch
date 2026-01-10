@@ -3,8 +3,46 @@ package main
 import (
 	"fmt"
 
+	"github.com/gesellix/bose-soundtouch/pkg/models"
 	"github.com/urfave/cli/v2"
 )
+
+func printNetworkInterface(i int, iface *models.NetworkInterface) {
+	fmt.Printf("\n  Interface %d:\n", i+1)
+	fmt.Printf("    Type: %s\n", iface.GetType())
+
+	if iface.GetName() != "" {
+		fmt.Printf("    Name: %s\n", iface.GetName())
+	}
+
+	if iface.GetIPAddress() != "" {
+		fmt.Printf("    IP Address: %s\n", iface.GetIPAddress())
+	}
+
+	if iface.GetMacAddress() != "" {
+		fmt.Printf("    MAC Address: %s\n", iface.GetMacAddress())
+	}
+
+	fmt.Printf("    State: %s\n", iface.GetStateDescription())
+
+	if iface.IsWiFi() {
+		if iface.GetSSID() != "" {
+			fmt.Printf("    SSID: %s\n", iface.GetSSID())
+		}
+
+		if iface.GetSignal() != "" {
+			fmt.Printf("    Signal: %s (%d%%)\n", iface.GetSignalDescription(), iface.GetSignalQuality())
+		}
+
+		if iface.GetFrequencyKHz() > 0 {
+			fmt.Printf("    Frequency: %s (%s)\n", iface.FormatFrequency(), iface.GetFrequencyBand())
+		}
+
+		if iface.GetMode() != "" {
+			fmt.Printf("    Mode: %s\n", iface.GetModeDescription())
+		}
+	}
+}
 
 // getNetworkInfo retrieves network information from the device
 func getNetworkInfo(c *cli.Context) error {
@@ -38,41 +76,7 @@ func getNetworkInfo(c *cli.Context) error {
 	fmt.Printf("  Interfaces (%d):\n", len(interfaces))
 
 	for i := range interfaces {
-		iface := &interfaces[i]
-		fmt.Printf("\n  Interface %d:\n", i+1)
-		fmt.Printf("    Type: %s\n", iface.GetType())
-
-		if iface.GetName() != "" {
-			fmt.Printf("    Name: %s\n", iface.GetName())
-		}
-
-		if iface.GetIPAddress() != "" {
-			fmt.Printf("    IP Address: %s\n", iface.GetIPAddress())
-		}
-
-		if iface.GetMacAddress() != "" {
-			fmt.Printf("    MAC Address: %s\n", iface.GetMacAddress())
-		}
-
-		fmt.Printf("    State: %s\n", iface.GetStateDescription())
-
-		if iface.IsWiFi() {
-			if iface.GetSSID() != "" {
-				fmt.Printf("    SSID: %s\n", iface.GetSSID())
-			}
-
-			if iface.GetSignal() != "" {
-				fmt.Printf("    Signal: %s (%d%%)\n", iface.GetSignalDescription(), iface.GetSignalQuality())
-			}
-
-			if iface.GetFrequencyKHz() > 0 {
-				fmt.Printf("    Frequency: %s (%s)\n", iface.FormatFrequency(), iface.GetFrequencyBand())
-			}
-
-			if iface.GetMode() != "" {
-				fmt.Printf("    Mode: %s\n", iface.GetModeDescription())
-			}
-		}
+		printNetworkInterface(i, &interfaces[i])
 	}
 
 	// Show active connections summary
