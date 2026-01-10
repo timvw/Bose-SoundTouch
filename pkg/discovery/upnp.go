@@ -79,7 +79,7 @@ func (d *Service) DiscoverDevices(ctx context.Context) ([]*models.DiscoveredDevi
 
 	// Perform UPnP discovery if enabled
 	if d.config.UPnPEnabled {
-		upnpDevices, err := d.performDiscovery(ctx)
+		upnpDevices, err := d.PerformDiscovery(ctx)
 		if err != nil {
 			log.Printf("UPnP: Discovery failed: %v", err)
 			// Don't fail completely if UPnP fails, just log and continue with configured devices
@@ -137,86 +137,35 @@ func (d *Service) ClearCache() {
 	d.cache = make(map[string]*models.DiscoveredDevice)
 }
 
-// performDiscovery performs the actual UPnP SSDP discovery
-func (d *Service) performDiscovery(ctx context.Context) ([]*models.DiscoveredDevice, error) {
+// PerformDiscovery performs the actual UPnP SSDP discovery
+func (d *Service) PerformDiscovery(ctx context.Context) ([]*models.DiscoveredDevice, error) {
 	log.Printf("UPnP: Starting SSDP discovery for '%s' with timeout %v", soundTouchURN, d.timeout)
 
-	// Create UDP connection for multicast
-	conn, err := net.Dial("udp", ssdpAddr)
+	listener, err := d.setupUDPListener()
 	if err != nil {
-		log.Printf("UPnP: Failed to create UDP connection to %s: %v", ssdpAddr, err)
-		return nil, fmt.Errorf("failed to create UDP connection: %w", err)
+		return nil, err
 	}
 
 	defer func() {
-		_ = conn.Close()
+		_ = listener.Close()
 	}()
 
-	log.Printf("UPnP: Successfully connected to SSDP multicast address %s", ssdpAddr)
-
-	// Send M-SEARCH request
-	msearchRequest := d.buildMSearchRequest()
-	log.Printf("UPnP: Sending M-SEARCH request:\n%s", strings.TrimSpace(msearchRequest))
-
-	bytesWritten, err := conn.Write([]byte(msearchRequest))
+	multicastAddr, err := net.ResolveUDPAddr("udp4", ssdpAddr)
 	if err != nil {
-		log.Printf("UPnP: Failed to send M-SEARCH request: %v", err)
-		return nil, fmt.Errorf("failed to send M-SEARCH: %w", err)
+		log.Printf("UPnP: Failed to resolve multicast address %s: %v", ssdpAddr, err)
+		return nil, fmt.Errorf("failed to resolve multicast address: %w", err)
 	}
 
-	log.Printf("UPnP: Successfully sent M-SEARCH request (%d bytes)", bytesWritten)
+	if err = d.sendMSearch(listener, multicastAddr); err != nil {
+		return nil, err
+	}
 
 	// Listen for responses
 	devices := make(map[string]*models.DiscoveredDevice)
-	responseCount := 0
 
-	// Set read deadline
-	deadline := time.Now().Add(d.timeout)
-	if err := conn.SetReadDeadline(deadline); err != nil {
-		log.Printf("UPnP: Failed to set read deadline: %v", err)
-		return nil, fmt.Errorf("failed to set read deadline: %w", err)
-	}
-
-	log.Printf("UPnP: Set read deadline to %v, now listening for responses...", deadline.Format("15:04:05.000"))
-
-	buffer := make([]byte, 4096)
-
-	for time.Now().Before(deadline) {
-		select {
-		case <-ctx.Done():
-			log.Printf("UPnP: Discovery cancelled by context")
-			return nil, ctx.Err()
-		default:
-			n, err := conn.Read(buffer)
-			if err != nil {
-				var netErr net.Error
-				if errors.As(err, &netErr) && netErr.Timeout() {
-					log.Printf("UPnP: Read timeout reached after %v, stopping discovery", d.timeout)
-					break // Timeout reached, stop reading
-				}
-
-				log.Printf("UPnP: Error reading response: %v", err)
-
-				return nil, fmt.Errorf("failed to read response: %w", err)
-			}
-
-			responseCount++
-			responseText := string(buffer[:n])
-			log.Printf("UPnP: Received response #%d (%d bytes):\n%s", responseCount, n, strings.TrimSpace(responseText))
-
-			device, err := d.parseResponse(responseText)
-			if err != nil {
-				log.Printf("UPnP: Failed to parse response #%d: %v", responseCount, err)
-				continue // Skip invalid responses
-			}
-
-			if device != nil {
-				log.Printf("UPnP: Successfully parsed device from response #%d: %s at %s:%d", responseCount, device.Name, device.Host, device.Port)
-				devices[device.Host] = device
-			} else {
-				log.Printf("UPnP: Response #%d did not contain a valid SoundTouch device", responseCount)
-			}
-		}
+	responseCount, err := d.listenForResponses(ctx, listener, devices)
+	if err != nil {
+		return nil, err
 	}
 
 	// Convert map to slice
@@ -228,10 +177,109 @@ func (d *Service) performDiscovery(ctx context.Context) ([]*models.DiscoveredDev
 	log.Printf("UPnP: Discovery completed. Processed %d responses, found %d unique devices", responseCount, len(result))
 
 	for i, device := range result {
-		log.Printf("UPnP: Device #%d: %s at %s:%d (Location: %s)", i+1, device.Name, device.Host, device.Port, device.Location)
+		log.Printf("UPnP: Device #%d: %s at %s:%d (UPnP Location: %s)", i+1, device.Name, device.Host, device.Port, device.UPnPLocation)
 	}
 
 	return result, nil
+}
+
+func (d *Service) setupUDPListener() (*net.UDPConn, error) {
+	listenAddr, err := net.ResolveUDPAddr("udp4", ":0")
+	if err != nil {
+		log.Printf("UPnP: Failed to resolve listen address: %v", err)
+		return nil, fmt.Errorf("failed to resolve listen address: %w", err)
+	}
+
+	listener, err := net.ListenUDP("udp4", listenAddr)
+	if err != nil {
+		log.Printf("UPnP: Failed to create UDP listener: %v", err)
+		return nil, fmt.Errorf("failed to create UDP listener: %w", err)
+	}
+
+	addr := listener.LocalAddr()
+
+	localAddr, ok := addr.(*net.UDPAddr)
+	if !ok {
+		_ = listener.Close()
+
+		log.Printf("UPnP: Failed to cast local address to UDPAddr: %v", addr)
+
+		return nil, fmt.Errorf("failed to cast local address to UDPAddr: %v", addr)
+	}
+
+	log.Printf("UPnP: Created UDP listener on %s", localAddr.String())
+
+	return listener, nil
+}
+
+func (d *Service) sendMSearch(listener *net.UDPConn, multicastAddr *net.UDPAddr) error {
+	msearchRequest := d.buildMSearchRequest()
+	log.Printf("UPnP: Sending M-SEARCH request to %s:\n%s", ssdpAddr, strings.TrimSpace(msearchRequest))
+
+	bytesWritten, err := listener.WriteToUDP([]byte(msearchRequest), multicastAddr)
+	if err != nil {
+		log.Printf("UPnP: Failed to send M-SEARCH request: %v", err)
+		return fmt.Errorf("failed to send M-SEARCH: %w", err)
+	}
+
+	log.Printf("UPnP: Successfully sent M-SEARCH request (%d bytes)", bytesWritten)
+
+	return nil
+}
+
+func (d *Service) listenForResponses(ctx context.Context, listener *net.UDPConn, devices map[string]*models.DiscoveredDevice) (int, error) {
+	responseCount := 0
+
+	// Set read deadline
+	deadline := time.Now().Add(d.timeout)
+	if err := listener.SetReadDeadline(deadline); err != nil {
+		log.Printf("UPnP: Failed to set read deadline: %v", err)
+		return 0, fmt.Errorf("failed to set read deadline: %w", err)
+	}
+
+	log.Printf("UPnP: Set read deadline to %v, now listening for responses...", deadline.Format("15:04:05.000"))
+
+	buffer := make([]byte, 4096)
+
+	for time.Now().Before(deadline) {
+		select {
+		case <-ctx.Done():
+			log.Printf("UPnP: Discovery cancelled by context")
+			return responseCount, ctx.Err()
+		default:
+			n, remoteAddr, err := listener.ReadFromUDP(buffer)
+			if err != nil {
+				var netErr net.Error
+				if errors.As(err, &netErr) && netErr.Timeout() {
+					log.Printf("UPnP: Read timeout reached after %v, stopping discovery", d.timeout)
+					return responseCount, nil
+				}
+
+				log.Printf("UPnP: Error reading response: %v", err)
+
+				return responseCount, fmt.Errorf("failed to read response: %w", err)
+			}
+
+			responseCount++
+			responseText := string(buffer[:n])
+			log.Printf("UPnP: Received response #%d (%d bytes) from %s:\n%s", responseCount, n, remoteAddr.String(), strings.TrimSpace(responseText))
+
+			device, err := d.parseResponse(responseText)
+			if err != nil {
+				log.Printf("UPnP: Failed to parse response #%d from %s: %v", responseCount, remoteAddr.String(), err)
+				continue // Skip invalid responses
+			}
+
+			if device != nil {
+				log.Printf("UPnP: Successfully parsed device from response #%d: %s at %s:%d", responseCount, device.Name, device.Host, device.Port)
+				devices[device.Host] = device
+			} else {
+				log.Printf("UPnP: Response #%d from %s did not contain a valid SoundTouch device", responseCount, remoteAddr.String())
+			}
+		}
+	}
+
+	return responseCount, nil
 }
 
 // buildMSearchRequest builds the M-SEARCH request for SoundTouch devices
@@ -317,7 +365,7 @@ func (d *Service) parseResponse(response string) (*models.DiscoveredDevice, erro
 	log.Printf("UPnP: Found Location header: %s", location)
 
 	// Extract device information from location URL
-	device, err := d.parseLocationURL(location)
+	device, err := d.parseLocationURL(location, headers["usn"])
 	if err != nil {
 		log.Printf("UPnP: Failed to parse location URL '%s': %v", location, err)
 		return nil, fmt.Errorf("failed to parse location URL: %w", err)
@@ -338,7 +386,7 @@ func (d *Service) parseResponse(response string) (*models.DiscoveredDevice, erro
 }
 
 // parseLocationURL extracts basic device info from the location URL
-func (d *Service) parseLocationURL(location string) (*models.DiscoveredDevice, error) {
+func (d *Service) parseLocationURL(location, usn string) (*models.DiscoveredDevice, error) {
 	log.Printf("UPnP: Parsing location URL: %s", location)
 
 	// Parse the URL to extract host and port
@@ -355,11 +403,15 @@ func (d *Service) parseLocationURL(location string) (*models.DiscoveredDevice, e
 	log.Printf("UPnP: Extracted host='%s', using default port=%d", host, port)
 
 	device := &models.DiscoveredDevice{
-		Host:     host,
-		Port:     port,
-		Location: location,
-		LastSeen: time.Now(),
-		Name:     fmt.Sprintf("SoundTouch-%s", host), // Default name
+		Host:            host,
+		Port:            port,
+		LastSeen:        time.Now(),
+		Name:            fmt.Sprintf("SoundTouch-%s", host), // Default name
+		DiscoveryMethod: "SSDP/UPnP",
+		APIBaseURL:      fmt.Sprintf("http://%s:%d/", host, port),
+		InfoURL:         fmt.Sprintf("http://%s:%d/info", host, port),
+		UPnPLocation:    location,
+		UPnPUSN:         usn,
 	}
 
 	return device, nil

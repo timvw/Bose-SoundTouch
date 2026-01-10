@@ -54,7 +54,7 @@ func ExampleService_DiscoverDevices() {
 		fmt.Printf("Device: %s\n", device.Name)
 		fmt.Printf("  Address: %s:%d\n", device.Host, device.Port)
 		fmt.Printf("  Serial: %s\n", device.SerialNo)
-		fmt.Printf("  Location: %s\n", device.Location)
+		fmt.Printf("  Info URL: %s\n", device.InfoURL)
 		fmt.Printf("  Host: %s:%d\n", device.Host, device.Port)
 		fmt.Println()
 	}

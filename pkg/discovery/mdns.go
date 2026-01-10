@@ -202,11 +202,15 @@ func (m *MDNSDiscoveryService) serviceEntryToDevice(entry *mdns.ServiceEntry) *m
 	name = strings.ReplaceAll(name, `\\`, `\`)
 
 	device := &models.DiscoveredDevice{
-		Host:     host,
-		Port:     port,
-		Name:     name,
-		Location: fmt.Sprintf("http://%s:%d/info", host, port),
-		LastSeen: time.Now(),
+		Host:            host,
+		Port:            port,
+		Name:            name,
+		LastSeen:        time.Now(),
+		DiscoveryMethod: "mDNS/Bonjour",
+		APIBaseURL:      fmt.Sprintf("http://%s:%d/", host, port),
+		InfoURL:         fmt.Sprintf("http://%s:%d/info", host, port),
+		MDNSHostname:    entry.Host,
+		MDNSService:     entry.Name,
 	}
 
 	log.Printf("mDNS: Created device '%s' at %s:%d (IP source: %s)", name, host, port, ipSource)

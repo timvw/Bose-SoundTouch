@@ -94,7 +94,12 @@ func main() {
 		fmt.Printf("   Host: %s\n", device.Host)
 		fmt.Printf("   Port: %d\n", device.Port)
 		fmt.Printf("   API URL: http://%s:%d/\n", device.Host, device.Port)
-		fmt.Printf("   Location: %s\n", device.Location)
+		fmt.Printf("   Info URL: %s\n", device.InfoURL)
+
+		if device.MDNSHostname != "" {
+			fmt.Printf("   mDNS Hostname: %s\n", device.MDNSHostname)
+		}
+
 		fmt.Printf("   Last seen: %s\n", device.LastSeen.Format("2006-01-02 15:04:05"))
 		fmt.Println()
 	}

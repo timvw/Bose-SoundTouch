@@ -110,6 +110,7 @@ package discovery
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -179,7 +180,8 @@ func (u *UnifiedDiscoveryService) DiscoverDevices(ctx context.Context) ([]*model
 		go func() {
 			defer wg.Done()
 
-			devices, err := u.ssdpService.DiscoverDevices(ctx)
+			// Use PerformDiscovery directly to avoid double-adding configured devices
+			devices, err := u.ssdpService.PerformDiscovery(ctx)
 			if err == nil {
 				ssdpChan <- devices
 			} else {
@@ -319,26 +321,121 @@ func (u *UnifiedDiscoveryService) getConfiguredDevices() []*models.DiscoveredDev
 	return u.config.GetPreferredDevicesAsDiscovered()
 }
 
-// mergeDevices merges two device lists, avoiding duplicates based on host
+// mergeDevices merges two device lists, combining protocol-specific data when same device found via multiple methods
 func (u *UnifiedDiscoveryService) mergeDevices(existing, newDevices []*models.DiscoveredDevice) []*models.DiscoveredDevice {
-	hostSet := make(map[string]bool)
-	result := make([]*models.DiscoveredDevice, 0, len(existing)+len(newDevices))
+	deviceMap := make(map[string]*models.DiscoveredDevice)
 
-	// Add existing devices
+	// Add existing devices to map
 	for _, device := range existing {
-		if !hostSet[device.Host] {
-			result = append(result, device)
-			hostSet[device.Host] = true
+		deviceMap[device.Host] = device
+	}
+
+	// Merge new devices, combining protocol-specific data for duplicates
+	for _, newDevice := range newDevices {
+		if existingDevice, exists := deviceMap[newDevice.Host]; exists {
+			// Same device found via different protocol - merge the data
+			mergedDevice := u.mergeDeviceData(existingDevice, newDevice)
+			deviceMap[newDevice.Host] = mergedDevice
+		} else {
+			// New device
+			deviceMap[newDevice.Host] = newDevice
 		}
 	}
 
-	// Add new devices if not already present
-	for _, device := range newDevices {
-		if !hostSet[device.Host] {
-			result = append(result, device)
-			hostSet[device.Host] = true
-		}
+	// Convert map back to slice
+	result := make([]*models.DiscoveredDevice, 0, len(deviceMap))
+	for _, device := range deviceMap {
+		result = append(result, device)
 	}
 
 	return result
+}
+
+// mergeDeviceData combines data from two DiscoveredDevice instances representing the same physical device
+func (u *UnifiedDiscoveryService) mergeDeviceData(existing, newDevice *models.DiscoveredDevice) *models.DiscoveredDevice {
+	// Start with the existing device as base
+	merged := *existing
+
+	// Update last seen to the most recent
+	if newDevice.LastSeen.After(existing.LastSeen) {
+		merged.LastSeen = newDevice.LastSeen
+	}
+
+	// Prefer more descriptive names
+	merged.Name = u.pickBestName(existing, newDevice)
+
+	// Combine discovery methods
+	if !strings.Contains(merged.DiscoveryMethod, newDevice.DiscoveryMethod) {
+		merged.DiscoveryMethod = merged.DiscoveryMethod + "+" + newDevice.DiscoveryMethod
+	}
+
+	// Merge protocol-specific data
+	u.mergeProtocolData(&merged, newDevice)
+
+	// Merge metadata if it exists
+	u.mergeMetadata(&merged, newDevice)
+
+	// Keep model info if available
+	u.mergeModelInfo(&merged, newDevice)
+
+	return &merged
+}
+
+func (u *UnifiedDiscoveryService) pickBestName(existing, newDevice *models.DiscoveredDevice) string {
+	// mDNS usually has better names than SSDP
+	switch {
+	case newDevice.DiscoveryMethod == "mDNS/Bonjour" && existing.DiscoveryMethod == "SSDP/UPnP":
+		return newDevice.Name
+	case existing.DiscoveryMethod == "Configuration":
+		// Keep user-configured name
+		return existing.Name
+	case newDevice.DiscoveryMethod == "Configuration":
+		return newDevice.Name
+	default:
+		return existing.Name
+	}
+}
+
+func (u *UnifiedDiscoveryService) mergeProtocolData(merged, newDevice *models.DiscoveredDevice) {
+	if newDevice.UPnPLocation != "" {
+		merged.UPnPLocation = newDevice.UPnPLocation
+	}
+
+	if newDevice.UPnPUSN != "" {
+		merged.UPnPUSN = newDevice.UPnPUSN
+	}
+
+	if newDevice.MDNSHostname != "" {
+		merged.MDNSHostname = newDevice.MDNSHostname
+	}
+
+	if newDevice.MDNSService != "" {
+		merged.MDNSService = newDevice.MDNSService
+	}
+
+	if newDevice.ConfigName != "" {
+		merged.ConfigName = newDevice.ConfigName
+	}
+}
+
+func (u *UnifiedDiscoveryService) mergeMetadata(merged, newDevice *models.DiscoveredDevice) {
+	if merged.Metadata == nil {
+		merged.Metadata = make(map[string]string)
+	}
+
+	if newDevice.Metadata != nil {
+		for k, v := range newDevice.Metadata {
+			merged.Metadata[k] = v
+		}
+	}
+}
+
+func (u *UnifiedDiscoveryService) mergeModelInfo(merged, newDevice *models.DiscoveredDevice) {
+	if newDevice.ModelID != "" && merged.ModelID == "" {
+		merged.ModelID = newDevice.ModelID
+	}
+
+	if newDevice.SerialNo != "" && merged.SerialNo == "" {
+		merged.SerialNo = newDevice.SerialNo
+	}
 }

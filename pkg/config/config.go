@@ -112,11 +112,14 @@ func (c *Config) GetPreferredDevicesAsDiscovered() []*models.DiscoveredDevice {
 
 	for _, device := range c.PreferredDevices {
 		discovered := &models.DiscoveredDevice{
-			Name:     device.Name,
-			Host:     device.Host,
-			Port:     device.Port,
-			Location: fmt.Sprintf("http://%s:%d/info", device.Host, device.Port),
-			LastSeen: time.Now(),
+			Name:            device.Name,
+			Host:            device.Host,
+			Port:            device.Port,
+			LastSeen:        time.Now(),
+			DiscoveryMethod: "Configuration",
+			APIBaseURL:      fmt.Sprintf("http://%s:%d/", device.Host, device.Port),
+			InfoURL:         fmt.Sprintf("http://%s:%d/info", device.Host, device.Port),
+			ConfigName:      device.Name,
 		}
 		devices = append(devices, discovered)
 	}

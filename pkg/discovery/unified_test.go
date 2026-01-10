@@ -111,8 +111,8 @@ func TestUnifiedDiscoverDevices(t *testing.T) {
 			t.Error("Device name should not be empty")
 		}
 
-		if device.Location == "" {
-			t.Error("Device location should not be empty")
+		if device.InfoURL == "" {
+			t.Error("Device info URL should not be empty")
 		}
 	}
 }

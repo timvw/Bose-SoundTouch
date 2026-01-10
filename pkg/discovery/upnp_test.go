@@ -63,7 +63,7 @@ func TestParseLocationURL_Valid(t *testing.T) {
 	service := NewService(1 * time.Second)
 	location := "http://192.168.1.100:8090/device.xml"
 
-	device, err := service.parseLocationURL(location)
+	device, err := service.parseLocationURL(location, "")
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
@@ -76,8 +76,8 @@ func TestParseLocationURL_Valid(t *testing.T) {
 		t.Errorf("Expected port 8090, got %d", device.Port)
 	}
 
-	if device.Location != location {
-		t.Errorf("Expected location '%s', got '%s'", location, device.Location)
+	if device.UPnPLocation != location {
+		t.Errorf("Expected UPnP location '%s', got '%s'", location, device.UPnPLocation)
 	}
 
 	if device.Name == "" {
@@ -101,7 +101,7 @@ func TestParseLocationURL_Invalid(t *testing.T) {
 	}
 
 	for _, url := range invalidURLs {
-		_, err := service.parseLocationURL(url)
+		_, err := service.parseLocationURL(url, "")
 		if err == nil {
 			t.Errorf("Expected error for invalid URL '%s', got nil", url)
 		}
@@ -135,8 +135,8 @@ USN: uuid:12345678-1234-5678-9012-123456789012::urn:schemas-upnp-org:device:Medi
 		t.Errorf("Expected host '192.168.1.100', got '%s'", device.Host)
 	}
 
-	if device.Location != "http://192.168.1.100:8090/device.xml" {
-		t.Errorf("Expected location 'http://192.168.1.100:8090/device.xml', got '%s'", device.Location)
+	if device.UPnPLocation != "http://192.168.1.100:8090/device.xml" {
+		t.Errorf("Expected UPnP location 'http://192.168.1.100:8090/device.xml', got '%s'", device.UPnPLocation)
 	}
 }
 

@@ -348,9 +348,9 @@ func TestGetPreferredDevicesAsDiscovered(t *testing.T) {
 		t.Errorf("Expected port 8090, got %d", devices[0].Port)
 	}
 
-	expectedLocation := "http://192.168.1.100:8090/info"
-	if devices[0].Location != expectedLocation {
-		t.Errorf("Expected location '%s', got '%s'", expectedLocation, devices[0].Location)
+	expectedInfoURL := "http://192.168.1.100:8090/info"
+	if devices[0].InfoURL != expectedInfoURL {
+		t.Errorf("Expected info URL '%s', got '%s'", expectedInfoURL, devices[0].InfoURL)
 	}
 }
 
