@@ -12,17 +12,10 @@ import (
 
 // discoverDevices handles device discovery command
 func discoverDevices(c *cli.Context) error {
-	timeout := c.Duration("timeout")
+	httpTimeout := c.Duration("timeout")
 	showAll := c.Bool("all")
 
 	fmt.Printf("Discovering SoundTouch devices...\n")
-
-	if showAll {
-		fmt.Printf("Timeout: %v\n", timeout)
-		fmt.Printf("Mode: Detailed information\n")
-	}
-
-	fmt.Println()
 
 	// Load configuration
 	cfg, err := config.LoadFromEnv()
@@ -30,10 +23,30 @@ func discoverDevices(c *cli.Context) error {
 		cfg = config.DefaultConfig()
 	}
 
-	// Override discovery timeout if provided
-	if timeout > 0 {
-		cfg.DiscoveryTimeout = timeout
+	// Only override discovery timeout if user explicitly provided --timeout flag
+	// This respects DISCOVERY_TIMEOUT from .env file when no flag is provided
+	if c.IsSet("timeout") {
+		cfg.HTTPTimeout = httpTimeout
+		// Set discovery timeout to be 2x HTTP timeout (min 5s, max 30s)
+		discoveryTimeout := httpTimeout * 2
+		if discoveryTimeout < 5*time.Second {
+			discoveryTimeout = 5 * time.Second
+		}
+
+		if discoveryTimeout > 30*time.Second {
+			discoveryTimeout = 30 * time.Second
+		}
+
+		cfg.DiscoveryTimeout = discoveryTimeout
 	}
+
+	if showAll {
+		fmt.Printf("HTTP Timeout: %v\n", cfg.HTTPTimeout)
+		fmt.Printf("Discovery Timeout: %v\n", cfg.DiscoveryTimeout)
+		fmt.Printf("Mode: Detailed information\n")
+	}
+
+	fmt.Println()
 
 	// Create discovery service
 	discoveryService := discovery.NewUnifiedDiscoveryService(cfg)

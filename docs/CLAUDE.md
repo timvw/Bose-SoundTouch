@@ -80,6 +80,14 @@ When creating test data for API endpoints, prefer real device responses over hyp
 - **Coverage**: Use multiple real devices to cover different response variations
 - **Non-responsive endpoints**: Some endpoints like `/trackInfo` may not respond or exist on all devices
 
+### 9. File Operations Safety
+
+- **Never delete files** - use move/rename instead when possible
+- **Ask before destructive operations** - especially for config files (.env, *.config, etc.)
+- **Prefer non-destructive operations** - copy, move, rename over delete
+- **Respect user data** - treat all user files as potentially containing sensitive data
+- **Configuration files are sacred** - .env, config files may contain secrets and personal settings
+
 ## Additional Notes
 
 - **Language: English** for code, commits, labels, and text in code

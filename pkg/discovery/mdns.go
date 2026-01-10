@@ -47,18 +47,38 @@ func (m *MDNSDiscoveryService) DiscoverDevices(ctx context.Context) ([]*models.D
 		log.Printf("mDNS: Starting discovery for service '%s.%s' with timeout %v",
 			soundTouchServiceType, soundTouchDomain, m.timeout)
 
-		// Query for SoundTouch devices
-		// Note: hashicorp/mdns expects service and domain separately
+		// IPv4-only query to fix "no route to host" errors on IPv6
+		// This addresses the issue where hashicorp/mdns fails with:
+		// "write udp6 [::]:port->[ff02::fb]:5353: sendto: no route to host"
+		// The trailing dot in service names is handled correctly by separating
+		// service and domain parameters as expected by the library.
 		err := mdns.Query(&mdns.QueryParam{
-			Service: "_soundtouch._tcp",
-			Domain:  "local.",
-			Timeout: m.timeout,
-			Entries: entries,
+			Service:     "_soundtouch._tcp",
+			Domain:      "local.",
+			Timeout:     m.timeout,
+			Entries:     entries,
+			DisableIPv6: true,                 // Force IPv4 only to avoid routing issues
+			Interface:   m.getIPv4Interface(), // Use specific interface if available
 		})
 		if err != nil {
-			log.Printf("mDNS query completed with error: %v", err)
+			log.Printf("mDNS IPv4 query failed: %v", err)
+
+			// Fallback to standard query (both IPv4 and IPv6)
+			log.Printf("mDNS: Falling back to standard query...")
+
+			err = mdns.Query(&mdns.QueryParam{
+				Service: "_soundtouch._tcp",
+				Domain:  "local.",
+				Timeout: m.timeout,
+				Entries: entries,
+			})
+			if err != nil {
+				log.Printf("mDNS query completed with error: %v", err)
+			} else {
+				log.Printf("mDNS query completed successfully")
+			}
 		} else {
-			log.Printf("mDNS query completed successfully")
+			log.Printf("mDNS IPv4 query completed successfully")
 		}
 	}()
 
@@ -77,6 +97,12 @@ func (m *MDNSDiscoveryService) DiscoverDevices(ctx context.Context) ([]*models.D
 
 			log.Printf("mDNS: Received service entry: Name='%s', Host='%s', Port=%d, AddrV4=%v, AddrV6=%v",
 				entry.Name, entry.Host, entry.Port, entry.AddrV4, entry.AddrV6)
+
+			// Only process SoundTouch devices
+			if !strings.Contains(entry.Name, "_soundtouch._tcp") {
+				log.Printf("mDNS: Skipping non-SoundTouch service: %s", entry.Name)
+				continue
+			}
 
 			device := m.serviceEntryToDevice(entry)
 			if device != nil {
@@ -170,6 +196,11 @@ func (m *MDNSDiscoveryService) serviceEntryToDevice(entry *mdns.ServiceEntry) *m
 		name = strings.TrimSuffix(name, "."+soundTouchServiceType+"."+soundTouchDomain)
 	}
 
+	// Unescape any escaped characters in the name (common in mDNS)
+	name = strings.ReplaceAll(name, `\ `, " ")
+	name = strings.ReplaceAll(name, `\.`, ".")
+	name = strings.ReplaceAll(name, `\\`, `\`)
+
 	device := &models.DiscoveredDevice{
 		Host:     host,
 		Port:     port,
@@ -181,4 +212,48 @@ func (m *MDNSDiscoveryService) serviceEntryToDevice(entry *mdns.ServiceEntry) *m
 	log.Printf("mDNS: Created device '%s' at %s:%d (IP source: %s)", name, host, port, ipSource)
 
 	return device
+}
+
+// getIPv4Interface returns the first suitable IPv4 network interface
+func (m *MDNSDiscoveryService) getIPv4Interface() *net.Interface {
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		log.Printf("mDNS: Failed to get network interfaces: %v", err)
+		return nil
+	}
+
+	for _, iface := range interfaces {
+		// Skip loopback, down interfaces, and point-to-point interfaces
+		if iface.Flags&net.FlagLoopback != 0 ||
+			iface.Flags&net.FlagUp == 0 ||
+			iface.Flags&net.FlagPointToPoint != 0 {
+			continue
+		}
+
+		// Check if this interface has IPv4 addresses
+		addrs, err := iface.Addrs()
+		if err != nil {
+			continue
+		}
+
+		hasIPv4 := false
+
+		for _, addr := range addrs {
+			if ipNet, ok := addr.(*net.IPNet); ok {
+				if ipNet.IP.To4() != nil && !ipNet.IP.IsLoopback() {
+					hasIPv4 = true
+					break
+				}
+			}
+		}
+
+		if hasIPv4 {
+			log.Printf("mDNS: Using IPv4 interface: %s", iface.Name)
+			return &iface
+		}
+	}
+
+	log.Printf("mDNS: No suitable IPv4 interface found")
+
+	return nil
 }

@@ -68,7 +68,6 @@ func main() {
 			{
 				Name:   "name",
 				Usage:  "Get or set device name",
-				Flags:  CommonFlags,
 				Before: RequireHost,
 				Subcommands: []*cli.Command{
 					{
