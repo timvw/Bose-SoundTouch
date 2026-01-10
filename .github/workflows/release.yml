@@ -132,11 +132,26 @@ jobs:
 
           echo "Building: $OUTPUT_NAME"
 
+          # Debug: Show current state
+          echo "Working directory: $(pwd)"
+          echo "Go version: $(go version)"
+          echo "Files before build:"
+          ls -la
+
+          # Ensure clean build environment
+          rm -f "$OUTPUT_NAME" "$OUTPUT_NAME.sha256" "$OUTPUT_NAME.sha512"
+          go clean -cache
+
           # Build with optimizations and version info
-          go build \
+          if ! go build \
             -ldflags="-s -w -X main.version=v${{ needs.validate.outputs.version }} -X main.commit=${{ github.sha }} -X main.date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             -o "$OUTPUT_NAME" \
-            ./cmd/soundtouch-cli
+            ./cmd/soundtouch-cli; then
+            echo "❌ Build failed"
+            echo "Files after failed build:"
+            ls -la
+            exit 1
+          fi
 
           # Verify binary was created and is executable
           ls -la "$OUTPUT_NAME"
@@ -148,12 +163,25 @@ jobs:
       - name: Generate individual checksum
         run: |
           OUTPUT_NAME="${{ steps.build.outputs.binary_name }}"
-          sha256sum "$OUTPUT_NAME" > "$OUTPUT_NAME.sha256"
-          sha512sum "$OUTPUT_NAME" > "$OUTPUT_NAME.sha512"
 
-          echo "📋 Generated individual checksums:"
-          cat "$OUTPUT_NAME.sha256"
-          cat "$OUTPUT_NAME.sha512"
+          # Use atomic operations to avoid conflicts
+          TEMP_DIR=$(mktemp -d)
+
+          echo "Building checksums for: $OUTPUT_NAME"
+          echo "Matrix: ${{ matrix.goos }}-${{ matrix.goarch }}"
+
+          # Generate checksums in temp directory first
+          sha256sum "$OUTPUT_NAME" > "${TEMP_DIR}/$(basename "$OUTPUT_NAME").sha256"
+          sha512sum "$OUTPUT_NAME" > "${TEMP_DIR}/$(basename "$OUTPUT_NAME").sha512"
+
+          # Move to final location atomically
+          mv "${TEMP_DIR}/$(basename "$OUTPUT_NAME").sha256" "$OUTPUT_NAME.sha256"
+          mv "${TEMP_DIR}/$(basename "$OUTPUT_NAME").sha512" "$OUTPUT_NAME.sha512"
+
+          # Cleanup
+          rm -rf "$TEMP_DIR"
+
+          echo "✅ Checksums generated successfully"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v6
