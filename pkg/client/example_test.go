@@ -24,6 +24,7 @@ func Example() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	fmt.Printf("Device: %s\n", info.Name)
 
 	// Control playback
@@ -38,7 +39,7 @@ func Example() {
 		log.Fatal(err)
 	}
 
-	// Output:
+	// Example output:
 	// Device: Living Room Speaker
 }
 
@@ -57,7 +58,7 @@ func ExampleClient_GetNowPlaying() {
 	fmt.Printf("Album: %s\n", nowPlaying.Album)
 	fmt.Printf("Source: %s\n", nowPlaying.Source)
 
-	// Output:
+	// Example output:
 	// Track: Bohemian Rhapsody
 	// Artist: Queen
 	// Album: A Night at the Opera
@@ -84,7 +85,7 @@ func ExampleClient_SetVolume() {
 	fmt.Printf("Volume: %d\n", volume.ActualVolume)
 	fmt.Printf("Muted: %t\n", volume.MuteEnabled)
 
-	// Output:
+	// Example output:
 	// Volume: 75
 	// Muted: false
 }
@@ -114,7 +115,7 @@ func ExampleClient_SelectSource() {
 
 	fmt.Println("Source changed successfully")
 
-	// Output:
+	// Example output:
 	// Source changed successfully
 }
 
@@ -137,7 +138,7 @@ func ExampleClient_SetBass() {
 
 	fmt.Printf("Bass level: %d\n", bass.ActualBass)
 
-	// Output:
+	// Example output:
 	// Bass level: 3
 }
 
@@ -160,7 +161,7 @@ func ExampleClient_SetBalance() {
 
 	fmt.Printf("Balance: %d\n", balance.ActualBalance)
 
-	// Output:
+	// Example output:
 	// Balance: 10
 }
 
@@ -185,7 +186,7 @@ func ExampleClient_SetZone() {
 
 	fmt.Println("Zone created successfully")
 
-	// Output:
+	// Example output:
 	// Zone created successfully
 }
 
@@ -203,7 +204,7 @@ func ExampleClient_GetPresets() {
 		fmt.Printf("Preset %d: %s (%s)\n", preset.ID, preset.GetDisplayName(), preset.GetSource())
 	}
 
-	// Output:
+	// Example output:
 	// Preset 1: Morning Jazz (SPOTIFY)
 	// Preset 2: Classic Rock (SPOTIFY)
 	// Preset 3: NPR News (INTERNET_RADIO)
@@ -222,11 +223,14 @@ func ExampleClient_NewWebSocketClient() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer wsClient.Disconnect()
+
+	defer func() {
+		_ = wsClient.Disconnect()
+	}()
 
 	fmt.Printf("WebSocket connected: %t\n", wsClient.IsConnected())
 
-	// Output:
+	// Example output:
 	// WebSocket connected: true
 }
 
@@ -244,10 +248,11 @@ func ExampleClient_SendKey() {
 			log.Printf("Failed to send %s: %v", cmd, err)
 			continue
 		}
+
 		fmt.Printf("Sent command: %s\n", cmd)
 	}
 
-	// Output:
+	// Example output:
 	// Sent command: PLAY
 	// Sent command: PAUSE
 	// Sent command: NEXT_TRACK
@@ -266,11 +271,12 @@ func ExampleClient_GetCapabilities() {
 	}
 
 	fmt.Printf("Device supports %d capabilities\n", len(capabilities.Capability))
+
 	for _, capability := range capabilities.Capability {
 		fmt.Printf("- %s (URL: %s)\n", capability.Name, capability.URL)
 	}
 
-	// Output:
+	// Example output:
 	// Device supports 5 capabilities
 	// - VOLUME (/volume)
 	// - BASS (/bass)

@@ -22,11 +22,12 @@ func Example() {
 	}
 
 	fmt.Printf("Found %d devices:\n", len(devices))
+
 	for _, device := range devices {
 		fmt.Printf("- %s at %s:%d\n", device.Name, device.Host, device.Port)
 	}
 
-	// Output:
+	// Example output:
 	// Found 2 devices:
 	// - Living Room at 192.168.1.100:8090
 	// - Kitchen at 192.168.1.101:8090
@@ -58,7 +59,7 @@ func ExampleService_DiscoverDevices() {
 		fmt.Println()
 	}
 
-	// Output:
+	// Example output:
 	// Device: Living Room
 	//   Address: 192.168.1.100:8090
 	//   Serial: AA123456789
@@ -85,21 +86,25 @@ func ExampleUnifiedDiscoveryService_DiscoverDevices() {
 
 	// First discovery scan
 	fmt.Println("First scan:")
+
 	devices, err := service.DiscoverDevices(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	fmt.Printf("Found %d devices\n", len(devices))
 
 	// Second scan (should use cache)
 	fmt.Println("Second scan (cached):")
+
 	devices, err = service.DiscoverDevices(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	fmt.Printf("Found %d devices (from cache)\n", len(devices))
 
-	// Output:
+	// Example output:
 	// First scan:
 	// Found 2 devices
 	// Second scan (cached):
@@ -118,11 +123,12 @@ func Example_upnpOnlyDiscovery() {
 	}
 
 	fmt.Printf("UPnP discovered %d devices:\n", len(devices))
+
 	for _, device := range devices {
 		fmt.Printf("- %s at %s:%d\n", device.Name, device.Host, device.Port)
 	}
 
-	// Output:
+	// Example output:
 	// UPnP discovered 1 devices:
 	// - Living Room at 192.168.1.100:8090
 }
@@ -139,11 +145,12 @@ func ExampleMDNSDiscoveryService_DiscoverDevices() {
 	}
 
 	fmt.Printf("mDNS discovered %d devices:\n", len(devices))
+
 	for _, device := range devices {
 		fmt.Printf("- %s at %s:%d\n", device.Name, device.Host, device.Port)
 	}
 
-	// Output:
+	// Example output:
 	// mDNS discovered 1 devices:
 	// - Kitchen at 192.168.1.101:8090
 }
@@ -167,7 +174,7 @@ func Example_errorHandling() {
 
 	fmt.Printf("Found %d devices despite short timeout\n", len(devices))
 
-	// Output:
+	// Example output:
 	// No devices found - check network connectivity
 }
 
@@ -186,11 +193,12 @@ func Example_contextCancellation() {
 		} else {
 			fmt.Printf("Discovery error: %v\n", err)
 		}
+
 		return
 	}
 
 	fmt.Printf("Found %d devices before context cancellation\n", len(devices))
 
-	// Output:
+	// Example output:
 	// Discovery cancelled due to context timeout
 }
