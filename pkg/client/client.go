@@ -1075,6 +1075,7 @@ func (c *Client) GetAudioDSPControls() (*models.AudioDSPControls, error) {
 	}
 
 	var dspControls models.AudioDSPControls
+
 	err = c.get("/audiodspcontrols", &dspControls)
 
 	return &dspControls, err
@@ -1146,6 +1147,7 @@ func (c *Client) GetAudioProductToneControls() (*models.AudioProductToneControls
 	}
 
 	var toneControls models.AudioProductToneControls
+
 	err = c.get("/audioproducttonecontrols", &toneControls)
 
 	return &toneControls, err
@@ -1199,6 +1201,7 @@ func (c *Client) GetAudioProductLevelControls() (*models.AudioProductLevelContro
 	}
 
 	var levelControls models.AudioProductLevelControls
+
 	err = c.get("/audioproductlevelcontrols", &levelControls)
 
 	return &levelControls, err

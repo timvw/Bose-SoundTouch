@@ -452,6 +452,7 @@ func (zsr *ZoneSlaveRequest) GetSlaveDeviceID() string {
 	if len(zsr.Members) > 0 {
 		return zsr.Members[0].DeviceID
 	}
+
 	return ""
 }
 
@@ -460,6 +461,7 @@ func (zsr *ZoneSlaveRequest) GetSlaveIP() string {
 	if len(zsr.Members) > 0 {
 		return zsr.Members[0].IP
 	}
+
 	return ""
 }
 

@@ -44,6 +44,13 @@ func TestClient_GetAudioDSPControls(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == "/capabilities" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`<capabilities><capability name="audiodspcontrols"/></capabilities>`))
+
+					return
+				}
+
 				if r.Method != "GET" {
 					t.Errorf("Expected GET request, got %s", r.Method)
 				}
@@ -53,7 +60,7 @@ func TestClient_GetAudioDSPControls(t *testing.T) {
 				}
 
 				w.WriteHeader(tt.responseStatus)
-				w.Write([]byte(tt.responseBody))
+				_, _ = w.Write([]byte(tt.responseBody))
 			}))
 			defer server.Close()
 
@@ -64,6 +71,7 @@ func TestClient_GetAudioDSPControls(t *testing.T) {
 				if err == nil {
 					t.Errorf("Expected error but got none")
 				}
+
 				return
 			}
 
@@ -125,13 +133,23 @@ func TestClient_SetAudioDSPControls(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			callCount := 0
+
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				callCount++
+
+				// Handle capabilities check
+				if r.URL.Path == "/capabilities" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`<capabilities><capability name="audiodspcontrols"/></capabilities>`))
+
+					return
+				}
 
 				// First call might be GET for validation
 				if r.Method == "GET" && r.URL.Path == "/audiodspcontrols" {
 					w.WriteHeader(http.StatusOK)
-					w.Write([]byte(`<audiodspcontrols audiomode="NORMAL" videosyncaudiodelay="0" supportedaudiomodes="NORMAL|DIALOG|SURROUND|MUSIC"/>`))
+					_, _ = w.Write([]byte(`<audiodspcontrols audiomode="NORMAL" videosyncaudiodelay="0" supportedaudiomodes="NORMAL|DIALOG|SURROUND|MUSIC"/>`))
+
 					return
 				}
 
@@ -145,7 +163,7 @@ func TestClient_SetAudioDSPControls(t *testing.T) {
 				}
 
 				w.WriteHeader(tt.responseStatus)
-				w.Write([]byte(tt.responseBody))
+				_, _ = w.Write([]byte(tt.responseBody))
 			}))
 			defer server.Close()
 
@@ -167,17 +185,27 @@ func TestClient_SetAudioDSPControls(t *testing.T) {
 
 func TestClient_SetAudioMode(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Handle capabilities check
+		if r.URL.Path == "/capabilities" {
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`<capabilities><capability name="audiodspcontrols"/></capabilities>`))
+
+			return
+		}
+
 		// First call might be GET for validation
 		if r.Method == "GET" && r.URL.Path == "/audiodspcontrols" {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`<audiodspcontrols audiomode="NORMAL" videosyncaudiodelay="0" supportedaudiomodes="NORMAL|DIALOG|SURROUND|MUSIC"/>`))
+			_, _ = w.Write([]byte(`<audiodspcontrols audiomode="NORMAL" videosyncaudiodelay="0" supportedaudiomodes="NORMAL|DIALOG|SURROUND|MUSIC"/>`))
+
 			return
 		}
 
 		// POST call for setting
 		if r.Method == "POST" && r.URL.Path == "/audiodspcontrols" {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`<status>OK</status>`))
+			_, _ = w.Write([]byte(`<status>OK</status>`))
+
 			return
 		}
 
@@ -186,8 +214,8 @@ func TestClient_SetAudioMode(t *testing.T) {
 	defer server.Close()
 
 	client := createTestClient(server.URL)
-	err := client.SetAudioMode("MUSIC")
 
+	err := client.SetAudioMode("MUSIC")
 	if err != nil {
 		t.Errorf("Expected no error but got: %v", err)
 	}
@@ -228,18 +256,19 @@ func TestClient_SetVideoSyncAudioDelay(t *testing.T) {
 				if err == nil {
 					t.Errorf("Expected error but got none")
 				}
+
 				return
 			}
 
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(`<status>OK</status>`))
+				_, _ = w.Write([]byte(`<status>OK</status>`))
 			}))
 			defer server.Close()
 
 			client := createTestClient(server.URL)
-			err := client.SetVideoSyncAudioDelay(tt.delay)
 
+			err := client.SetVideoSyncAudioDelay(tt.delay)
 			if err != nil {
 				t.Errorf("Expected no error but got: %v", err)
 			}
@@ -289,6 +318,13 @@ func TestClient_GetAudioProductToneControls(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == "/capabilities" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`<capabilities><capability name="audioproducttonecontrols"/></capabilities>`))
+
+					return
+				}
+
 				if r.Method != "GET" {
 					t.Errorf("Expected GET request, got %s", r.Method)
 				}
@@ -298,7 +334,7 @@ func TestClient_GetAudioProductToneControls(t *testing.T) {
 				}
 
 				w.WriteHeader(tt.responseStatus)
-				w.Write([]byte(tt.responseBody))
+				_, _ = w.Write([]byte(tt.responseBody))
 			}))
 			defer server.Close()
 
@@ -309,6 +345,7 @@ func TestClient_GetAudioProductToneControls(t *testing.T) {
 				if err == nil {
 					t.Errorf("Expected error but got none")
 				}
+
 				return
 			}
 
@@ -374,13 +411,22 @@ func TestClient_SetAudioProductToneControls(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// Handle capabilities check
+				if r.URL.Path == "/capabilities" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`<capabilities><capability name="audioproducttonecontrols"/></capabilities>`))
+
+					return
+				}
+
 				// First call might be GET for validation
 				if r.Method == "GET" && r.URL.Path == "/audioproducttonecontrols" {
 					w.WriteHeader(http.StatusOK)
-					w.Write([]byte(`<audioproducttonecontrols>
+					_, _ = w.Write([]byte(`<audioproducttonecontrols>
 						<bass value="0" minValue="-10" maxValue="10" step="1"/>
 						<treble value="0" minValue="-5" maxValue="5" step="1"/>
 					</audioproducttonecontrols>`))
+
 					return
 				}
 
@@ -394,7 +440,7 @@ func TestClient_SetAudioProductToneControls(t *testing.T) {
 				}
 
 				w.WriteHeader(tt.responseStatus)
-				w.Write([]byte(tt.responseBody))
+				_, _ = w.Write([]byte(tt.responseBody))
 			}))
 			defer server.Close()
 
@@ -416,20 +462,30 @@ func TestClient_SetAudioProductToneControls(t *testing.T) {
 
 func TestClient_SetAdvancedBass(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Handle capabilities check
+		if r.URL.Path == "/capabilities" {
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`<capabilities><capability name="audioproducttonecontrols"/></capabilities>`))
+
+			return
+		}
+
 		// First call might be GET for validation
 		if r.Method == "GET" && r.URL.Path == "/audioproducttonecontrols" {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`<audioproducttonecontrols>
+			_, _ = w.Write([]byte(`<audioproducttonecontrols>
 				<bass value="0" minValue="-10" maxValue="10" step="1"/>
 				<treble value="0" minValue="-5" maxValue="5" step="1"/>
 			</audioproducttonecontrols>`))
+
 			return
 		}
 
 		// POST call for setting
 		if r.Method == "POST" && r.URL.Path == "/audioproducttonecontrols" {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`<status>OK</status>`))
+			_, _ = w.Write([]byte(`<status>OK</status>`))
+
 			return
 		}
 
@@ -438,8 +494,8 @@ func TestClient_SetAdvancedBass(t *testing.T) {
 	defer server.Close()
 
 	client := createTestClient(server.URL)
-	err := client.SetAdvancedBass(5)
 
+	err := client.SetAdvancedBass(5)
 	if err != nil {
 		t.Errorf("Expected no error but got: %v", err)
 	}
@@ -447,20 +503,30 @@ func TestClient_SetAdvancedBass(t *testing.T) {
 
 func TestClient_SetAdvancedTreble(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Handle capabilities check
+		if r.URL.Path == "/capabilities" {
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`<capabilities><capability name="audioproducttonecontrols"/></capabilities>`))
+
+			return
+		}
+
 		// First call might be GET for validation
 		if r.Method == "GET" && r.URL.Path == "/audioproducttonecontrols" {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`<audioproducttonecontrols>
+			_, _ = w.Write([]byte(`<audioproducttonecontrols>
 				<bass value="0" minValue="-10" maxValue="10" step="1"/>
 				<treble value="0" minValue="-5" maxValue="5" step="1"/>
 			</audioproducttonecontrols>`))
+
 			return
 		}
 
 		// POST call for setting
 		if r.Method == "POST" && r.URL.Path == "/audioproducttonecontrols" {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`<status>OK</status>`))
+			_, _ = w.Write([]byte(`<status>OK</status>`))
+
 			return
 		}
 
@@ -469,8 +535,8 @@ func TestClient_SetAdvancedTreble(t *testing.T) {
 	defer server.Close()
 
 	client := createTestClient(server.URL)
-	err := client.SetAdvancedTreble(-2)
 
+	err := client.SetAdvancedTreble(-2)
 	if err != nil {
 		t.Errorf("Expected no error but got: %v", err)
 	}
@@ -518,6 +584,13 @@ func TestClient_GetAudioProductLevelControls(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == "/capabilities" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`<capabilities><capability name="audioproductlevelcontrols"/></capabilities>`))
+
+					return
+				}
+
 				if r.Method != "GET" {
 					t.Errorf("Expected GET request, got %s", r.Method)
 				}
@@ -527,7 +600,7 @@ func TestClient_GetAudioProductLevelControls(t *testing.T) {
 				}
 
 				w.WriteHeader(tt.responseStatus)
-				w.Write([]byte(tt.responseBody))
+				_, _ = w.Write([]byte(tt.responseBody))
 			}))
 			defer server.Close()
 
@@ -538,6 +611,7 @@ func TestClient_GetAudioProductLevelControls(t *testing.T) {
 				if err == nil {
 					t.Errorf("Expected error but got none")
 				}
+
 				return
 			}
 
@@ -605,13 +679,22 @@ func TestClient_SetAudioProductLevelControls(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// Handle capabilities check
+				if r.URL.Path == "/capabilities" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`<capabilities><capability name="audioproductlevelcontrols"/></capabilities>`))
+
+					return
+				}
+
 				// First call might be GET for validation
 				if r.Method == "GET" && r.URL.Path == "/audioproductlevelcontrols" {
 					w.WriteHeader(http.StatusOK)
-					w.Write([]byte(`<audioproductlevelcontrols>
+					_, _ = w.Write([]byte(`<audioproductlevelcontrols>
 						<frontCenterSpeakerLevel value="0" minValue="-10" maxValue="10" step="1"/>
 						<rearSurroundSpeakersLevel value="0" minValue="-8" maxValue="8" step="1"/>
 					</audioproductlevelcontrols>`))
+
 					return
 				}
 
@@ -625,7 +708,7 @@ func TestClient_SetAudioProductLevelControls(t *testing.T) {
 				}
 
 				w.WriteHeader(tt.responseStatus)
-				w.Write([]byte(tt.responseBody))
+				_, _ = w.Write([]byte(tt.responseBody))
 			}))
 			defer server.Close()
 
@@ -647,20 +730,30 @@ func TestClient_SetAudioProductLevelControls(t *testing.T) {
 
 func TestClient_SetFrontCenterSpeakerLevel(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Handle capabilities check
+		if r.URL.Path == "/capabilities" {
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`<capabilities><capability name="audioproductlevelcontrols"/></capabilities>`))
+
+			return
+		}
+
 		// First call might be GET for validation
 		if r.Method == "GET" && r.URL.Path == "/audioproductlevelcontrols" {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`<audioproductlevelcontrols>
+			_, _ = w.Write([]byte(`<audioproductlevelcontrols>
 				<frontCenterSpeakerLevel value="0" minValue="-10" maxValue="10" step="1"/>
 				<rearSurroundSpeakersLevel value="0" minValue="-8" maxValue="8" step="1"/>
 			</audioproductlevelcontrols>`))
+
 			return
 		}
 
 		// POST call for setting
 		if r.Method == "POST" && r.URL.Path == "/audioproductlevelcontrols" {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`<status>OK</status>`))
+			_, _ = w.Write([]byte(`<status>OK</status>`))
+
 			return
 		}
 
@@ -669,8 +762,8 @@ func TestClient_SetFrontCenterSpeakerLevel(t *testing.T) {
 	defer server.Close()
 
 	client := createTestClient(server.URL)
-	err := client.SetFrontCenterSpeakerLevel(5)
 
+	err := client.SetFrontCenterSpeakerLevel(5)
 	if err != nil {
 		t.Errorf("Expected no error but got: %v", err)
 	}
@@ -678,20 +771,30 @@ func TestClient_SetFrontCenterSpeakerLevel(t *testing.T) {
 
 func TestClient_SetRearSurroundSpeakersLevel(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Handle capabilities check
+		if r.URL.Path == "/capabilities" {
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`<capabilities><capability name="audioproductlevelcontrols"/></capabilities>`))
+
+			return
+		}
+
 		// First call might be GET for validation
 		if r.Method == "GET" && r.URL.Path == "/audioproductlevelcontrols" {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`<audioproductlevelcontrols>
+			_, _ = w.Write([]byte(`<audioproductlevelcontrols>
 				<frontCenterSpeakerLevel value="0" minValue="-10" maxValue="10" step="1"/>
 				<rearSurroundSpeakersLevel value="0" minValue="-8" maxValue="8" step="1"/>
 			</audioproductlevelcontrols>`))
+
 			return
 		}
 
 		// POST call for setting
 		if r.Method == "POST" && r.URL.Path == "/audioproductlevelcontrols" {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`<status>OK</status>`))
+			_, _ = w.Write([]byte(`<status>OK</status>`))
+
 			return
 		}
 
@@ -700,8 +803,8 @@ func TestClient_SetRearSurroundSpeakersLevel(t *testing.T) {
 	defer server.Close()
 
 	client := createTestClient(server.URL)
-	err := client.SetRearSurroundSpeakersLevel(-3)
 
+	err := client.SetRearSurroundSpeakersLevel(-3)
 	if err != nil {
 		t.Errorf("Expected no error but got: %v", err)
 	}
@@ -742,6 +845,7 @@ func TestClient_AudioEndpoints_NetworkError(t *testing.T) {
 
 	bass := 5
 	treble := -2
+
 	err = client.SetAudioProductToneControls(&bass, &treble)
 	if err == nil {
 		t.Errorf("Expected network error for SetAudioProductToneControls but got none")
@@ -764,6 +868,7 @@ func TestClient_AudioEndpoints_NetworkError(t *testing.T) {
 
 	frontCenter := 2
 	rearSurround := -1
+
 	err = client.SetAudioProductLevelControls(&frontCenter, &rearSurround)
 	if err == nil {
 		t.Errorf("Expected network error for SetAudioProductLevelControls but got none")

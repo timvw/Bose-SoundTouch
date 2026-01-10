@@ -296,6 +296,18 @@ func TestClient_SetClockDisplay(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.expectError && tt.statusCode == 0 {
+				// For client-side validation errors, we don't need a server
+				client := createTestClient("http://localhost:8080")
+
+				err := client.SetClockDisplay(tt.request)
+				if err == nil {
+					t.Error("Expected error, got none")
+				}
+
+				return
+			}
+
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.URL.Path != "/clockDisplay" {
 					t.Errorf("Expected path '/clockDisplay', got '%s'", r.URL.Path)
@@ -305,7 +317,11 @@ func TestClient_SetClockDisplay(t *testing.T) {
 					t.Errorf("Expected POST method, got '%s'", r.Method)
 				}
 
-				w.WriteHeader(tt.statusCode)
+				if tt.statusCode != 0 {
+					w.WriteHeader(tt.statusCode)
+				} else {
+					w.WriteHeader(http.StatusOK)
+				}
 			}))
 			defer server.Close()
 

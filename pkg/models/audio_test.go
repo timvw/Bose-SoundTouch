@@ -160,6 +160,7 @@ func TestAudioDSPControlsRequest_Validate(t *testing.T) {
 					t.Errorf("Expected error but got none")
 					return
 				}
+
 				if !strings.Contains(err.Error(), tt.errorMsg) {
 					t.Errorf("Expected error message to contain '%s', got '%s'", tt.errorMsg, err.Error())
 				}
@@ -330,6 +331,7 @@ func TestAudioProductToneControlsRequest_Validate(t *testing.T) {
 					t.Errorf("Expected error but got none")
 					return
 				}
+
 				if !strings.Contains(err.Error(), tt.errorMsg) {
 					t.Errorf("Expected error message to contain '%s', got '%s'", tt.errorMsg, err.Error())
 				}
@@ -455,6 +457,7 @@ func TestAudioProductLevelControlsRequest_Validate(t *testing.T) {
 					t.Errorf("Expected error but got none")
 					return
 				}
+
 				if !strings.Contains(err.Error(), tt.errorMsg) {
 					t.Errorf("Expected error message to contain '%s', got '%s'", tt.errorMsg, err.Error())
 				}

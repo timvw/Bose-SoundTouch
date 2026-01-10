@@ -151,6 +151,7 @@ func TestZoneSlaveRequest_HelperMethods(t *testing.T) {
 		request.AddSlave("SLAVE456", "192.168.1.101")
 
 		deviceID := request.GetSlaveDeviceID()
+
 		expected := "SLAVE456"
 		if deviceID != expected {
 			t.Errorf("Expected device ID '%s', got '%s'", expected, deviceID)
@@ -171,6 +172,7 @@ func TestZoneSlaveRequest_HelperMethods(t *testing.T) {
 		request.AddSlave("SLAVE456", "192.168.1.101")
 
 		ip := request.GetSlaveIP()
+
 		expected := "192.168.1.101"
 		if ip != expected {
 			t.Errorf("Expected IP '%s', got '%s'", expected, ip)
@@ -208,6 +210,7 @@ func TestZoneSlaveRequest_String(t *testing.T) {
 			setup: func() *ZoneSlaveRequest {
 				req := NewZoneSlaveRequest("MASTER123")
 				req.AddSlave("SLAVE456", "192.168.1.101")
+
 				return req
 			},
 			expected: "Zone slave operation: master=MASTER123, slave=SLAVE456 (192.168.1.101)",
@@ -217,6 +220,7 @@ func TestZoneSlaveRequest_String(t *testing.T) {
 			setup: func() *ZoneSlaveRequest {
 				req := NewZoneSlaveRequest("MASTER123")
 				req.AddSlave("SLAVE456", "")
+
 				return req
 			},
 			expected: "Zone slave operation: master=MASTER123, slave=SLAVE456",
@@ -330,12 +334,14 @@ func TestZoneSlaveRequest_XMLUnmarshaling(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var request ZoneSlaveRequest
+
 			err := xml.Unmarshal([]byte(tt.xmlData), &request)
 
 			if tt.expectError {
 				if err == nil {
 					t.Errorf("Expected error but got none")
 				}
+
 				return
 			}
 
@@ -381,6 +387,7 @@ func TestZoneSlaveEntry_XMLMarshaling(t *testing.T) {
 		}
 
 		xmlStr := string(xmlData)
+
 		expected := `<member ipaddress="192.168.1.101">SLAVE456</member>`
 		if xmlStr != expected {
 			t.Errorf("Expected XML '%s', got '%s'", expected, xmlStr)
@@ -399,6 +406,7 @@ func TestZoneSlaveEntry_XMLMarshaling(t *testing.T) {
 		}
 
 		xmlStr := string(xmlData)
+
 		expected := `<member>SLAVE456</member>`
 		if xmlStr != expected {
 			t.Errorf("Expected XML '%s', got '%s'", expected, xmlStr)

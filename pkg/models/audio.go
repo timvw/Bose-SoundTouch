@@ -129,6 +129,7 @@ func (adsp *AudioDSPControls) GetSupportedAudioModes() []string {
 	if adsp.SupportedAudioModes == "" {
 		return []string{}
 	}
+
 	return strings.Split(adsp.SupportedAudioModes, "|")
 }
 
@@ -140,12 +141,14 @@ func (adsp *AudioDSPControls) IsAudioModeSupported(mode string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
 // String returns a human-readable string representation of DSP controls
 func (adsp *AudioDSPControls) String() string {
 	supportedModes := strings.Join(adsp.GetSupportedAudioModes(), ", ")
+
 	return fmt.Sprintf("Audio Mode: %s, Video Sync Delay: %d ms, Supported Modes: [%s]",
 		adsp.AudioMode, adsp.VideoSyncAudioDelay, supportedModes)
 }
@@ -171,6 +174,7 @@ func (bc *BassControlSetting) ValidateBass(value int) error {
 	if value < bc.MinValue || value > bc.MaxValue {
 		return fmt.Errorf("bass value %d is outside valid range [%d, %d]", value, bc.MinValue, bc.MaxValue)
 	}
+
 	return nil
 }
 
@@ -179,9 +183,11 @@ func (bc *BassControlSetting) ClampValue(value int) int {
 	if value < bc.MinValue {
 		return bc.MinValue
 	}
+
 	if value > bc.MaxValue {
 		return bc.MaxValue
 	}
+
 	return value
 }
 
@@ -190,6 +196,7 @@ func (tc *TrebleControlSetting) ValidateTreble(value int) error {
 	if value < tc.MinValue || value > tc.MaxValue {
 		return fmt.Errorf("treble value %d is outside valid range [%d, %d]", value, tc.MinValue, tc.MaxValue)
 	}
+
 	return nil
 }
 
@@ -198,9 +205,11 @@ func (tc *TrebleControlSetting) ClampValue(value int) int {
 	if value < tc.MinValue {
 		return tc.MinValue
 	}
+
 	if value > tc.MaxValue {
 		return tc.MaxValue
 	}
+
 	return value
 }
 
@@ -249,6 +258,7 @@ func (fc *FrontCenterLevelSetting) ValidateLevel(value int) error {
 	if value < fc.MinValue || value > fc.MaxValue {
 		return fmt.Errorf("front-center speaker level %d is outside valid range [%d, %d]", value, fc.MinValue, fc.MaxValue)
 	}
+
 	return nil
 }
 
@@ -257,9 +267,11 @@ func (fc *FrontCenterLevelSetting) ClampLevel(value int) int {
 	if value < fc.MinValue {
 		return fc.MinValue
 	}
+
 	if value > fc.MaxValue {
 		return fc.MaxValue
 	}
+
 	return value
 }
 
@@ -268,6 +280,7 @@ func (rs *RearSurroundLevelSetting) ValidateLevel(value int) error {
 	if value < rs.MinValue || value > rs.MaxValue {
 		return fmt.Errorf("rear-surround speaker level %d is outside valid range [%d, %d]", value, rs.MinValue, rs.MaxValue)
 	}
+
 	return nil
 }
 
@@ -276,9 +289,11 @@ func (rs *RearSurroundLevelSetting) ClampLevel(value int) int {
 	if value < rs.MinValue {
 		return rs.MinValue
 	}
+
 	if value > rs.MaxValue {
 		return rs.MaxValue
 	}
+
 	return value
 }
 
@@ -337,15 +352,19 @@ func (ac *AudioCapabilities) HasAdvancedAudioControls() bool {
 // GetAvailableControls returns a list of available advanced audio controls
 func (ac *AudioCapabilities) GetAvailableControls() []string {
 	var controls []string
+
 	if ac.DSPControls {
 		controls = append(controls, "DSP Controls")
 	}
+
 	if ac.ProductToneControls {
 		controls = append(controls, "Tone Controls")
 	}
+
 	if ac.ProductLevelControls {
 		controls = append(controls, "Level Controls")
 	}
+
 	return controls
 }
 
@@ -356,5 +375,6 @@ func (ac *AudioCapabilities) String() string {
 	}
 
 	controls := ac.GetAvailableControls()
+
 	return fmt.Sprintf("Available controls: %s", strings.Join(controls, ", "))
 }

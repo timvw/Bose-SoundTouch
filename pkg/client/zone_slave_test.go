@@ -94,9 +94,11 @@ func TestClient_AddZoneSlave(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var receivedMethod string
-			var receivedPath string
-			var receivedBody string
+			var (
+				receivedMethod string
+				receivedPath   string
+				receivedBody   string
+			)
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				receivedMethod = r.Method
@@ -104,12 +106,12 @@ func TestClient_AddZoneSlave(t *testing.T) {
 
 				if r.Method == "POST" {
 					body := make([]byte, r.ContentLength)
-					r.Body.Read(body)
+					_, _ = r.Body.Read(body)
 					receivedBody = string(body)
 				}
 
 				w.WriteHeader(tt.responseStatus)
-				w.Write([]byte(tt.responseBody))
+				_, _ = w.Write([]byte(tt.responseBody))
 			}))
 			defer server.Close()
 
@@ -122,6 +124,7 @@ func TestClient_AddZoneSlave(t *testing.T) {
 				if err == nil {
 					t.Errorf("Expected error but got none")
 				}
+
 				return
 			}
 
@@ -171,7 +174,7 @@ func TestClient_AddZoneSlaveByDeviceID(t *testing.T) {
 
 		// Read and verify body
 		body := make([]byte, r.ContentLength)
-		r.Body.Read(body)
+		_, _ = r.Body.Read(body)
 		bodyStr := string(body)
 
 		if !strings.Contains(bodyStr, `MASTER123`) {
@@ -188,7 +191,7 @@ func TestClient_AddZoneSlaveByDeviceID(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`<status>OK</status>`))
+		_, _ = w.Write([]byte(`<status>OK</status>`))
 	}))
 	defer server.Close()
 
@@ -255,9 +258,11 @@ func TestClient_RemoveZoneSlave(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var receivedMethod string
-			var receivedPath string
-			var receivedBody string
+			var (
+				receivedMethod string
+				receivedPath   string
+				receivedBody   string
+			)
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				receivedMethod = r.Method
@@ -265,12 +270,12 @@ func TestClient_RemoveZoneSlave(t *testing.T) {
 
 				if r.Method == "POST" {
 					body := make([]byte, r.ContentLength)
-					r.Body.Read(body)
+					_, _ = r.Body.Read(body)
 					receivedBody = string(body)
 				}
 
 				w.WriteHeader(tt.responseStatus)
-				w.Write([]byte(tt.responseBody))
+				_, _ = w.Write([]byte(tt.responseBody))
 			}))
 			defer server.Close()
 
@@ -283,6 +288,7 @@ func TestClient_RemoveZoneSlave(t *testing.T) {
 				if err == nil {
 					t.Errorf("Expected error but got none")
 				}
+
 				return
 			}
 
@@ -332,7 +338,7 @@ func TestClient_RemoveZoneSlaveByDeviceID(t *testing.T) {
 
 		// Read and verify body
 		body := make([]byte, r.ContentLength)
-		r.Body.Read(body)
+		_, _ = r.Body.Read(body)
 		bodyStr := string(body)
 
 		if !strings.Contains(bodyStr, `MASTER123`) {
@@ -344,7 +350,7 @@ func TestClient_RemoveZoneSlaveByDeviceID(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`<status>OK</status>`))
+		_, _ = w.Write([]byte(`<status>OK</status>`))
 	}))
 	defer server.Close()
 
@@ -507,6 +513,7 @@ func TestZoneSlaveRequest_HelperMethods(t *testing.T) {
 		request.AddSlave("SLAVE456", "192.168.1.101")
 
 		str := request.String()
+
 		expected := "Zone slave operation: master=MASTER123, slave=SLAVE456 (192.168.1.101)"
 		if str != expected {
 			t.Errorf("Expected string '%s', got '%s'", expected, str)
@@ -518,6 +525,7 @@ func TestZoneSlaveRequest_HelperMethods(t *testing.T) {
 		request.AddSlave("SLAVE456", "")
 
 		str := request.String()
+
 		expected := "Zone slave operation: master=MASTER123, slave=SLAVE456"
 		if str != expected {
 			t.Errorf("Expected string '%s', got '%s'", expected, str)

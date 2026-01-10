@@ -1,3 +1,4 @@
+// Package main provides an example of using zone slave operations.
 package main
 
 import (

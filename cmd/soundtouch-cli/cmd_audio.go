@@ -62,9 +62,11 @@ func setAudioDSPControls(c *cli.Context) error {
 	}
 
 	fmt.Println("✅ DSP controls updated successfully")
+
 	if audioMode != "" {
 		fmt.Printf("   Audio Mode: %s\n", audioMode)
 	}
+
 	if videoSyncDelay != 0 {
 		fmt.Printf("   Video Sync Delay: %d ms\n", videoSyncDelay)
 	}
@@ -161,21 +163,24 @@ func setAudioToneControls(c *cli.Context) error {
 	}
 
 	var bass, treble *int
+
 	var err error
 
 	if bassStr != "" {
-		bassVal, err := strconv.Atoi(bassStr)
-		if err != nil {
+		bassVal, errVal := strconv.Atoi(bassStr)
+		if errVal != nil {
 			return fmt.Errorf("invalid bass value: %s", bassStr)
 		}
+
 		bass = &bassVal
 	}
 
 	if trebleStr != "" {
-		trebleVal, err := strconv.Atoi(trebleStr)
-		if err != nil {
+		trebleVal, errVal := strconv.Atoi(trebleStr)
+		if errVal != nil {
 			return fmt.Errorf("invalid treble value: %s", trebleStr)
 		}
+
 		treble = &trebleVal
 	}
 
@@ -194,9 +199,11 @@ func setAudioToneControls(c *cli.Context) error {
 	}
 
 	fmt.Println("✅ Advanced tone controls updated successfully")
+
 	if bass != nil {
 		fmt.Printf("   Bass: %d\n", *bass)
 	}
+
 	if treble != nil {
 		fmt.Printf("   Treble: %d\n", *treble)
 	}
@@ -295,21 +302,24 @@ func setAudioLevelControls(c *cli.Context) error {
 	}
 
 	var frontCenter, rearSurround *int
+
 	var err error
 
 	if frontCenterStr != "" {
-		frontCenterVal, err := strconv.Atoi(frontCenterStr)
-		if err != nil {
+		frontCenterVal, errVal := strconv.Atoi(frontCenterStr)
+		if errVal != nil {
 			return fmt.Errorf("invalid front-center value: %s", frontCenterStr)
 		}
+
 		frontCenter = &frontCenterVal
 	}
 
 	if rearSurroundStr != "" {
-		rearSurroundVal, err := strconv.Atoi(rearSurroundStr)
-		if err != nil {
+		rearSurroundVal, errVal := strconv.Atoi(rearSurroundStr)
+		if errVal != nil {
 			return fmt.Errorf("invalid rear-surround value: %s", rearSurroundStr)
 		}
+
 		rearSurround = &rearSurroundVal
 	}
 
@@ -328,9 +338,11 @@ func setAudioLevelControls(c *cli.Context) error {
 	}
 
 	fmt.Println("✅ Speaker level controls updated successfully")
+
 	if frontCenter != nil {
 		fmt.Printf("   Front-Center Speaker: %d\n", *frontCenter)
 	}
+
 	if rearSurround != nil {
 		fmt.Printf("   Rear-Surround Speakers: %d\n", *rearSurround)
 	}
