@@ -6,16 +6,17 @@ import (
 	"log"
 	"time"
 
+	"github.com/gesellix/bose-soundtouch/pkg/config"
 	"github.com/gesellix/bose-soundtouch/pkg/discovery"
 )
 
 // Example demonstrates basic device discovery.
 func Example() {
+	service := discovery.NewService(5 * time.Second)
 	ctx := context.Background()
-	timeout := 5 * time.Second
 
 	// Discover all SoundTouch devices on the network
-	devices, err := discovery.DiscoverDevices(ctx, timeout)
+	devices, err := service.DiscoverDevices(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,12 +32,13 @@ func Example() {
 	// - Kitchen at 192.168.1.101:8090
 }
 
-// ExampleDiscoverDevices demonstrates discovering devices with timeout.
-func ExampleDiscoverDevices() {
+// ExampleService_DiscoverDevices demonstrates discovering devices with timeout.
+func ExampleService_DiscoverDevices() {
+	service := discovery.NewService(3 * time.Second)
 	ctx := context.Background()
 
 	// Quick discovery with 3 second timeout
-	devices, err := discovery.DiscoverDevices(ctx, 3*time.Second)
+	devices, err := service.DiscoverDevices(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,39 +52,40 @@ func ExampleDiscoverDevices() {
 	for _, device := range devices {
 		fmt.Printf("Device: %s\n", device.Name)
 		fmt.Printf("  Address: %s:%d\n", device.Host, device.Port)
-		fmt.Printf("  MAC: %s\n", device.MACAddress)
-		fmt.Printf("  Method: %s\n", device.DiscoveryMethod)
-		fmt.Printf("  URL: %s\n", device.BaseURL)
+		fmt.Printf("  Serial: %s\n", device.SerialNo)
+		fmt.Printf("  Location: %s\n", device.Location)
+		fmt.Printf("  Host: %s:%d\n", device.Host, device.Port)
 		fmt.Println()
 	}
 
 	// Output:
 	// Device: Living Room
 	//   Address: 192.168.1.100:8090
-	//   MAC: AA:BB:CC:DD:EE:FF
-	//   Method: UPnP
-	//   URL: http://192.168.1.100:8090
+	//   Serial: AA123456789
+	//   Location: /device.xml
+	//   Host: 192.168.1.100:8090
 	//
 	// Device: Kitchen
 	//   Address: 192.168.1.101:8090
-	//   MAC: BB:CC:DD:EE:FF:AA
-	//   Method: mDNS
-	//   URL: http://192.168.1.101:8090
+	//   Serial: BB123456789
+	//   Location: /device.xml
+	//   Host: 192.168.1.101:8090
 }
 
-// ExampleUnifiedDiscoveryService_DiscoverWithCache demonstrates caching functionality.
-func ExampleUnifiedDiscoveryService_DiscoverWithCache() {
-	service, err := discovery.NewUnifiedDiscoveryService()
-	if err != nil {
-		log.Fatal(err)
+// ExampleUnifiedDiscoveryService_DiscoverDevices demonstrates caching functionality.
+func ExampleUnifiedDiscoveryService_DiscoverDevices() {
+	cfg := &config.Config{
+		DiscoveryTimeout: 5 * time.Second,
+		CacheEnabled:     true,
+		CacheTTL:         5 * time.Minute,
 	}
+	service := discovery.NewUnifiedDiscoveryService(cfg)
 
 	ctx := context.Background()
-	timeout := 5 * time.Second
 
 	// First discovery scan
 	fmt.Println("First scan:")
-	devices, err := service.DiscoverWithCache(ctx, timeout)
+	devices, err := service.DiscoverDevices(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -90,7 +93,7 @@ func ExampleUnifiedDiscoveryService_DiscoverWithCache() {
 
 	// Second scan (should use cache)
 	fmt.Println("Second scan (cached):")
-	devices, err = service.DiscoverWithCache(ctx, timeout)
+	devices, err = service.DiscoverDevices(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -103,108 +106,55 @@ func ExampleUnifiedDiscoveryService_DiscoverWithCache() {
 	// Found 2 devices (from cache)
 }
 
-// ExampleUnifiedDiscoveryService_DiscoverUPnP demonstrates UPnP-only discovery.
-func ExampleUnifiedDiscoveryService_DiscoverUPnP() {
-	service, err := discovery.NewUnifiedDiscoveryService()
-	if err != nil {
-		log.Fatal(err)
-	}
-
+// Example_upnpOnlyDiscovery demonstrates UPnP-only discovery.
+func Example_upnpOnlyDiscovery() {
+	service := discovery.NewService(3 * time.Second)
 	ctx := context.Background()
-	timeout := 3 * time.Second
 
-	// Use only UPnP/SSDP discovery
-	devices, err := service.DiscoverUPnP(ctx, timeout)
+	// Use UPnP/SSDP discovery
+	devices, err := service.DiscoverDevices(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Printf("UPnP discovered %d devices:\n", len(devices))
 	for _, device := range devices {
-		fmt.Printf("- %s (Method: %s)\n", device.Name, device.DiscoveryMethod)
+		fmt.Printf("- %s at %s:%d\n", device.Name, device.Host, device.Port)
 	}
 
 	// Output:
 	// UPnP discovered 1 devices:
-	// - Living Room (Method: UPnP)
+	// - Living Room at 192.168.1.100:8090
 }
 
-// ExampleUnifiedDiscoveryService_DiscoverMDNS demonstrates mDNS-only discovery.
-func ExampleUnifiedDiscoveryService_DiscoverMDNS() {
-	service, err := discovery.NewUnifiedDiscoveryService()
-	if err != nil {
-		log.Fatal(err)
-	}
-
+// ExampleMDNSDiscoveryService_DiscoverDevices demonstrates mDNS-only discovery.
+func ExampleMDNSDiscoveryService_DiscoverDevices() {
+	service := discovery.NewMDNSDiscoveryService(3 * time.Second)
 	ctx := context.Background()
-	timeout := 3 * time.Second
 
 	// Use only mDNS discovery
-	devices, err := service.DiscoverMDNS(ctx, timeout)
+	devices, err := service.DiscoverDevices(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Printf("mDNS discovered %d devices:\n", len(devices))
 	for _, device := range devices {
-		fmt.Printf("- %s (Method: %s)\n", device.Name, device.DiscoveryMethod)
+		fmt.Printf("- %s at %s:%d\n", device.Name, device.Host, device.Port)
 	}
 
 	// Output:
 	// mDNS discovered 1 devices:
-	// - Kitchen (Method: mDNS)
-}
-
-// ExampleService_Discover demonstrates basic UPnP discovery service.
-func ExampleService_Discover() {
-	service := discovery.NewService()
-	ctx := context.Background()
-	timeout := 5 * time.Second
-
-	devices, err := service.Discover(ctx, timeout)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("UPnP/SSDP found %d devices:\n", len(devices))
-	for _, device := range devices {
-		fmt.Printf("- %s at %s\n", device.Name, device.BaseURL)
-	}
-
-	// Output:
-	// UPnP/SSDP found 1 devices:
-	// - Living Room at http://192.168.1.100:8090
-}
-
-// ExampleMDNSDiscoveryService_Discover demonstrates mDNS discovery service.
-func ExampleMDNSDiscoveryService_Discover() {
-	service := discovery.NewMDNSDiscoveryService()
-	ctx := context.Background()
-	timeout := 5 * time.Second
-
-	devices, err := service.Discover(ctx, timeout)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("mDNS found %d devices:\n", len(devices))
-	for _, device := range devices {
-		fmt.Printf("- %s at %s\n", device.Name, device.BaseURL)
-	}
-
-	// Output:
-	// mDNS found 1 devices:
-	// - Kitchen at http://192.168.1.101:8090
+	// - Kitchen at 192.168.1.101:8090
 }
 
 // Example_errorHandling demonstrates proper error handling in discovery.
 func Example_errorHandling() {
+	// Very short timeout to demonstrate timeout handling
+	service := discovery.NewService(100 * time.Millisecond)
 	ctx := context.Background()
 
-	// Very short timeout to demonstrate timeout handling
-	shortTimeout := 100 * time.Millisecond
-
-	devices, err := discovery.DiscoverDevices(ctx, shortTimeout)
+	devices, err := service.DiscoverDevices(ctx)
 	if err != nil {
 		fmt.Printf("Discovery error: %v\n", err)
 		return
@@ -227,7 +177,9 @@ func Example_contextCancellation() {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	devices, err := discovery.DiscoverDevices(ctx, 10*time.Second)
+	service := discovery.NewService(10 * time.Second)
+
+	devices, err := service.DiscoverDevices(ctx)
 	if err != nil {
 		if ctx.Err() == context.DeadlineExceeded {
 			fmt.Println("Discovery cancelled due to context timeout")

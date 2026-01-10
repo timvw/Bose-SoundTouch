@@ -73,11 +73,11 @@
 //	}
 //
 //	// Create a new zone with multiple speakers
-//	newZone := &models.Zone{
+//	newZone := &models.ZoneRequest{
 //		Master: "192.168.1.100",
-//		Members: []models.ZoneMember{
-//			{IPAddress: "192.168.1.101"},
-//			{IPAddress: "192.168.1.102"},
+//		Members: []models.MemberEntry{
+//			{IP: "192.168.1.101"},
+//			{IP: "192.168.1.102"},
 //		},
 //	}
 //	err = client.SetZone(newZone)

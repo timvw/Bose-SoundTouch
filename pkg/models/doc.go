@@ -88,12 +88,11 @@
 // Device discovery structures:
 //
 //	device := models.DiscoveredDevice{
-//		Name:            "Living Room",
-//		Host:            "192.168.1.100",
-//		Port:            8090,
-//		MACAddress:      "AA:BB:CC:DD:EE:FF",
-//		DiscoveryMethod: "UPnP",
-//		BaseURL:         "http://192.168.1.100:8090",
+//		Name:     "Living Room",
+//		Host:     "192.168.1.100",
+//		Port:     8090,
+//		SerialNo: "AA123456789",
+//		Location: "/device.xml",
 //	}
 //
 // # Validation and Constraints

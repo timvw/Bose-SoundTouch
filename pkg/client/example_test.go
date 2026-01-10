@@ -1,7 +1,6 @@
 package client_test
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"time"
@@ -21,7 +20,7 @@ func Example() {
 	c := client.NewClient(config)
 
 	// Get device information
-	info, err := c.GetInfo()
+	info, err := c.GetDeviceInfo()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,7 +82,7 @@ func ExampleClient_SetVolume() {
 	}
 
 	fmt.Printf("Volume: %d\n", volume.ActualVolume)
-	fmt.Printf("Muted: %t\n", volume.Muted)
+	fmt.Printf("Muted: %t\n", volume.MuteEnabled)
 
 	// Output:
 	// Volume: 75
@@ -171,11 +170,11 @@ func ExampleClient_SetZone() {
 	c := client.NewClient(config)
 
 	// Create a zone with multiple speakers
-	zone := &models.Zone{
+	zone := &models.ZoneRequest{
 		Master: "192.168.1.100",
-		Members: []models.ZoneMember{
-			{IPAddress: "192.168.1.101"},
-			{IPAddress: "192.168.1.102"},
+		Members: []models.MemberEntry{
+			{IP: "192.168.1.101"},
+			{IP: "192.168.1.102"},
 		},
 	}
 
@@ -200,8 +199,8 @@ func ExampleClient_GetPresets() {
 		log.Fatal(err)
 	}
 
-	for _, preset := range presets.Presets {
-		fmt.Printf("Preset %d: %s (%s)\n", preset.ID, preset.Name, preset.Source)
+	for _, preset := range presets.Preset {
+		fmt.Printf("Preset %d: %s (%s)\n", preset.ID, preset.GetDisplayName(), preset.GetSource())
 	}
 
 	// Output:
@@ -210,39 +209,25 @@ func ExampleClient_GetPresets() {
 	// Preset 3: NPR News (INTERNET_RADIO)
 }
 
-// ExampleClient_SubscribeToEvents demonstrates real-time event monitoring.
-func ExampleClient_SubscribeToEvents() {
+// ExampleClient_NewWebSocketClient demonstrates WebSocket client creation.
+func ExampleClient_NewWebSocketClient() {
 	config := &client.Config{Host: "192.168.1.100"}
 	c := client.NewClient(config)
 
-	ctx := context.Background()
-	events, err := c.SubscribeToEvents(ctx)
+	// Create WebSocket client for real-time events
+	wsClient := c.NewWebSocketClient(nil)
+
+	// Connect to device WebSocket
+	err := wsClient.Connect()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer wsClient.Disconnect()
 
-	// Monitor events for a short time
-	timeout := time.After(5 * time.Second)
-
-	for {
-		select {
-		case event := <-events:
-			switch e := event.(type) {
-			case *models.NowPlayingUpdated:
-				fmt.Printf("Track changed: %s by %s\n", e.Track, e.Artist)
-			case *models.VolumeUpdated:
-				fmt.Printf("Volume changed: %d\n", e.ActualVolume)
-			}
-		case <-timeout:
-			fmt.Println("Event monitoring completed")
-			return
-		}
-	}
+	fmt.Printf("WebSocket connected: %t\n", wsClient.IsConnected())
 
 	// Output:
-	// Track changed: Stairway to Heaven by Led Zeppelin
-	// Volume changed: 65
-	// Event monitoring completed
+	// WebSocket connected: true
 }
 
 // ExampleClient_SendKey demonstrates sending key commands.
@@ -254,7 +239,7 @@ func ExampleClient_SendKey() {
 	commands := []string{"PLAY", "PAUSE", "NEXT_TRACK", "PREV_TRACK", "MUTE"}
 
 	for _, cmd := range commands {
-		err := c.SendKey(cmd, "press")
+		err := c.SendKey(cmd)
 		if err != nil {
 			log.Printf("Failed to send %s: %v", cmd, err)
 			continue
@@ -280,16 +265,16 @@ func ExampleClient_GetCapabilities() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Device supports %d sources\n", len(capabilities.Sources))
-	for _, source := range capabilities.Sources {
-		fmt.Printf("- %s (%s)\n", source.Source, source.SourceAccount)
+	fmt.Printf("Device supports %d capabilities\n", len(capabilities.Capability))
+	for _, capability := range capabilities.Capability {
+		fmt.Printf("- %s (URL: %s)\n", capability.Name, capability.URL)
 	}
 
 	// Output:
-	// Device supports 5 sources
-	// - SPOTIFY (spotify_user123)
-	// - BLUETOOTH ()
-	// - AUX ()
-	// - AIRPLAY ()
-	// - INTERNET_RADIO ()
+	// Device supports 5 capabilities
+	// - VOLUME (/volume)
+	// - BASS (/bass)
+	// - SOURCES (/sources)
+	// - PRESETS (/presets)
+	// - ZONE (/getZone)
 }

@@ -56,7 +56,8 @@
 //	import "github.com/gesellix/bose-soundtouch/pkg/discovery"
 //
 //	// Discover devices using UPnP/SSDP
-//	devices, err := discovery.DiscoverDevices(ctx, 5*time.Second)
+//	service := discovery.NewService(5*time.Second)
+//	devices, err := service.DiscoverDevices(ctx)
 //	if err != nil {
 //		log.Fatal(err)
 //	}
