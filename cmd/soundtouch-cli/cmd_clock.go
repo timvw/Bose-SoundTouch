@@ -27,20 +27,51 @@ func getClockTime(c *cli.Context) error {
 		return err
 	}
 
+	fmt.Println("Clock Time Information:")
+
 	if timeObj, err := clockTime.GetTime(); err == nil {
-		fmt.Printf("Current time: %02d:%02d\n", timeObj.Hour(), timeObj.Minute())
-		fmt.Printf("UTC time: %s\n", timeObj.Format("2006-01-02 15:04:05 MST"))
+		fmt.Printf("  Current time: %s\n", timeObj.Format("2006-01-02 15:04:05"))
+		fmt.Printf("  Local time: %02d:%02d:%02d\n", timeObj.Hour(), timeObj.Minute(), timeObj.Second())
 	} else {
-		fmt.Printf("Time value: %s\n", clockTime.Value)
+		fmt.Printf("  Parse error: %v\n", err)
+
+		if clockTime.Value != "" {
+			fmt.Printf("  Raw value: %s\n", clockTime.Value)
+		}
+	}
+
+	if clockTime.GetLocalTime() != nil {
+		lt := clockTime.GetLocalTime()
+
+		fmt.Printf("  Local time details:\n")
+		fmt.Printf("    Date: %04d-%02d-%02d (day %d)\n", lt.Year, lt.Month+1, lt.DayOfMonth, lt.DayOfWeek)
+		fmt.Printf("    Time: %02d:%02d:%02d\n", lt.Hour, lt.Minute, lt.Second)
 	}
 
 	if clockTime.GetUTC() > 0 {
 		utcTime := time.Unix(clockTime.GetUTC(), 0)
-		fmt.Printf("UTC timestamp: %d (%s)\n", clockTime.GetUTC(), utcTime.Format("2006-01-02 15:04:05 MST"))
+		fmt.Printf("  UTC timestamp: %d (%s)\n", clockTime.GetUTC(), utcTime.Format("2006-01-02 15:04:05 MST"))
+	}
+
+	if clockTime.GetTimeFormat() != "" {
+		fmt.Printf("  Time format: %s\n", clockTime.GetTimeFormat())
+	}
+
+	if clockTime.GetBrightness() > 0 {
+		fmt.Printf("  Brightness: %d\n", clockTime.GetBrightness())
+	}
+
+	if clockTime.GetUTCSyncTime() > 0 {
+		syncTime := time.Unix(clockTime.GetUTCSyncTime(), 0)
+		fmt.Printf("  Last sync: %s\n", syncTime.Format("2006-01-02 15:04:05 MST"))
+	}
+
+	if clockTime.GetClockError() != 0 {
+		fmt.Printf("  Clock error: %d\n", clockTime.GetClockError())
 	}
 
 	if clockTime.GetZone() != "" {
-		fmt.Printf("Time zone: %s\n", clockTime.GetZone())
+		fmt.Printf("  Time zone: %s\n", clockTime.GetZone())
 	}
 
 	return nil

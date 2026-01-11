@@ -292,6 +292,23 @@ This is an independent project based on the official Bose SoundTouch Web API doc
 
 SoundTouch is a trademark of Bose Corporation.
 
+## SoundTouch End of Life Notice
+
+**Important:** Bose has announced that [SoundTouch cloud support will end on May 6, 2026](https://www.bose.com/soundtouch-end-of-life).
+
+**What will continue to work:**
+- ✅ Local API control (this library's primary functionality)
+- ✅ Bluetooth, AirPlay, Spotify Connect, and AUX streaming
+- ✅ Remote control features (Play, Pause, Skip, Volume)
+- ✅ Multiroom grouping
+
+**What will stop working:**
+- ❌ Presets (preset buttons and app presets)
+- ❌ Browsing music services directly from the SoundTouch app
+- ❌ Cloud-based features and updates
+
+This Go library will continue to work as it primarily uses the local Web API for direct device control, which is unaffected by the cloud service discontinuation.
+
 ## Support
 
 - 🐛 **Bug Reports**: [Create an issue](https://github.com/gesellix/bose-soundtouch/issues/new)

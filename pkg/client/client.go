@@ -1274,6 +1274,18 @@ func (c *Client) RemoveZoneSlaveByDeviceID(masterDeviceID, slaveDeviceID string)
 	return c.RemoveZoneSlave(masterDeviceID, slaveDeviceID, "")
 }
 
+// RequestToken generates a new bearer token from the device
+func (c *Client) RequestToken() (*models.BearerToken, error) {
+	var token models.BearerToken
+
+	err := c.get("/requestToken", &token)
+	if err != nil {
+		return nil, fmt.Errorf("failed to request token: %w", err)
+	}
+
+	return &token, nil
+}
+
 // hasCapability checks if a capability is present in the device capabilities
 func (c *Client) hasCapability(capabilities *models.Capabilities, capability string) bool {
 	// Convert capabilities to string and check if it contains the capability

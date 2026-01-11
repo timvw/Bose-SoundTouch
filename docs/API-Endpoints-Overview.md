@@ -58,12 +58,19 @@ Retrieves information about the currently playing music.
 ### POST /key ✅ **Implemented**
 Sends key commands to the device.
 
+**IMPORTANT - Key values, state, and sender attributes are CaSe-SeNsItIvE!**
+
 **Important**: Proper key simulation requires sending both press and release states:
 
 **Request XML (Press + Release):**
 ```xml
 <key state="press" sender="Gabbo">KEY_NAME</key>
 <key state="release" sender="Gabbo">KEY_NAME</key>
+```
+
+**Response XML:**
+```xml
+<status>/key</status>
 ```
 
 **Available Keys:**
@@ -74,11 +81,14 @@ Sends key commands to the device.
 - `STOP` - Stop current playback
 - `PREV_TRACK` - Go to previous track
 - `NEXT_TRACK` - Go to next track
+- `PLAY_PAUSE` - Toggles between play and pause for currently playing media
 
 **Rating and Bookmark Controls:**
-- `THUMBS_UP` - Rate current content positively (Pandora, etc.)
-- `THUMBS_DOWN` - Rate current content negatively
+- `THUMBS_UP` - Rate current content positively (Pandora, Spotify, etc.)
+- `THUMBS_DOWN` - Rate current content negatively (Pandora, Spotify, etc.)
 - `BOOKMARK` - Bookmark current content
+- `ADD_FAVORITE` - Adds currently playing media to device favorites (Pandora, Spotify, etc.)
+- `REMOVE_FAVORITE` - Removes currently playing media from device favorites (Pandora, Spotify, etc.)
 
 **Power and System Controls:**
 - `POWER` - Toggle device power state
@@ -102,6 +112,19 @@ Sends key commands to the device.
 - `REPEAT_OFF` - Turn repeat mode off
 - `REPEAT_ONE` - Repeat current track
 - `REPEAT_ALL` - Repeat all tracks in playlist
+
+**State Values:**
+- `press` - Indicates the key is pressed
+- `release` - Indicates the key is released
+- `repeat` - Indicates the key is repeated
+
+**Sender Values:**
+- `Gabbo` - Default value for standard SoundTouch remote control device
+- `IrRemote` - IR remote control device
+- `Console` - Console device
+- `LightswitchRemote` - Lightswitch remote device
+- `BoselinkRemote` - Boselink remote device
+- `Etap` - Etap device
 
 ## Volume Control
 
@@ -139,12 +162,14 @@ Retrieves the current bass settings.
 ```
 
 ### POST /bass ✅ **Implemented**
-Sets the bass settings (-9 to +9).
+Sets the bass settings. Range varies by device - check `/bassCapabilities` for supported range.
 
 **Request XML:**
 ```xml
 <bass>0</bass>
 ```
+
+**Note**: Value must be within the range specified by `bassMin` and `bassMax` from `/bassCapabilities` service.
 
 ## Source Management
 
@@ -221,19 +246,57 @@ Retrieves multiroom zone information.
 Configures multiroom zones.
 
 ### GET /balance ✅ **Implemented**
-Retrieves balance settings (stereo devices).
+Retrieves balance settings (stereo devices). Only works if device is configured as part of a stereo pair.
+
+**Response XML:**
+```xml
+<balance deviceID="...">
+  <balanceAvailable>true</balanceAvailable>
+  <balanceMin>-7</balanceMin>
+  <balanceMax>7</balanceMax>
+  <balanceDefault>0</balanceDefault>
+  <targetBalance>0</targetBalance>
+  <actualBalance>0</actualBalance>
+</balance>
+```
 
 ### POST /balance ✅ **Implemented**
-Sets balance settings.
+Sets balance settings. Value must be within the range specified by `balanceMin` and `balanceMax`.
+
+**Request XML:**
+```xml
+<balance>
+  <targetBalance>0</targetBalance>
+</balance>
+```
+
+**Range Examples:**
+- `-7` = left speaker
+- `0` = centered
+- `7` = right speaker
 
 ### GET /clockTime ✅ **Implemented**
 Retrieves the device time.
+
+**Response XML:**
+```xml
+<clockTime utcTime="1701824606" cueMusic="0" timeFormat="TIME_FORMAT_12HOUR_ID" brightness="70" clockError="0" utcSyncTime="1701820350">
+  <localTime year="2023" month="11" dayOfMonth="5" dayOfWeek="2" hour="19" minute="3" second="26" />
+</clockTime>
+```
 
 ### POST /clockTime ✅ **Implemented**
 Sets the device time.
 
 ### GET /clockDisplay ✅ **Implemented**
 Retrieves clock display settings.
+
+**Response XML:**
+```xml
+<clockDisplay>
+  <clockConfig timezoneInfo="America/Chicago" userEnable="false" timeFormat="TIME_FORMAT_12HOUR_ID" userOffsetMinute="0" brightnessLevel="70" userUtcTime="0" />
+</clockDisplay>
+```
 
 ### POST /clockDisplay ✅ **Implemented**
 Configures the clock display.
@@ -254,21 +317,38 @@ Establishes a persistent connection for live updates.
 ### GET /networkInfo ✅ **Implemented**
 Retrieves network information.
 
+**Response XML:**
+```xml
+<networkInfo wifiProfileCount="1">
+  <interfaces>
+    <interface type="WIFI_INTERFACE" name="wlan0" macAddress="..." ipAddress="192.168.1.131" ssid="network_name" frequencyKHz="2452000" state="NETWORK_WIFI_CONNECTED" signal="MARGINAL_SIGNAL" mode="STATION" />
+    <interface type="WIFI_INTERFACE" name="wlan1" macAddress="..." state="NETWORK_WIFI_DISCONNECTED" />
+  </interfaces>
+</networkInfo>
+```
+
 ### GET /capabilities ✅ **Implemented**
 Retrieves device capabilities.
 
-### GET /name 🔍 **Extra** 
+### GET /name 🔍 **Extra**
 Retrieves the device name.
+
+**Response XML:**
+```xml
+<name>SoundTouch 10</name>
+```
 
 **Note**: Official API only documents `POST /name` for setting device name. Our GET implementation appears to be an undocumented extension.
 
 ### POST /name ✅ **Implemented**
-Sets the device name via `SetName()` method.
+Sets the device name via `SetName()` method. If name is changed, the change will be detected immediately via ZeroConf services.
 
-**Official Request Format:**
+**Request XML:**
 ```xml
-<name>$STRING</name>
+<name>SoundTouch Living Room</name>
 ```
+
+**Response**: Returns same structure as `/info` endpoint with updated name.
 
 ### GET /bassCapabilities ✅ **Implemented**
 Checks if bass customization is supported on the device.
@@ -284,9 +364,18 @@ Checks if bass customization is supported on the device.
 ```
 
 ### GET /trackInfo ✅ **Implemented**
-Gets track information (duplicate of `/now_playing` per official API).
+Gets extended track information for currently playing music service media.
 
-**Status**: Fully implemented but times out on SoundTouch 10 & 20 test devices (AllegroWebserver timeout). May work on other SoundTouch models or firmware versions. Use `/now_playing` endpoint as reliable alternative.
+**Response XML:**
+```xml
+<trackInfo deviceID="...">Track Name;extended details;separated by semicolons;</trackInfo>
+```
+
+**Important Notes:**
+- Only returns information if currently playing content is from a music service (PANDORA, SPOTIFY, etc.)
+- If playing non-music-service content (AIRPLAY, STORED_MUSIC, etc.), service becomes unresponsive for ~30 seconds until timeout
+- Extended details are delimited by semicolons (e.g., "Who You Are To Me (feat. Lady A);vocal duets;upbeat lyrics;")
+- Times out on some SoundTouch models - use `/now_playing` as reliable alternative
 
 **Implementation**: Available via `GetTrackInfo()` method. Consider using `GetNowPlaying()` method for guaranteed compatibility.
 
@@ -342,6 +431,26 @@ These endpoints work with real hardware but are NOT in official API v1.0:
 
 **Note**: Not documented in official API v1.0 but works with real devices.
 
+### Token Management ✅ **Implemented**
+
+#### GET /requestToken ✅ **Implemented**
+Generates a new bearer token from the device for authentication purposes.
+
+**Response XML:**
+```xml
+<bearertoken value="Bearer vUApzBVT6Lh0nw1xVu/plr1UDRNdMYMEpe0cStm4wCH5mWSjrrtORnGGirMn3pspkJ8mNR1MFh/J4OcsbEikMplcDGJVeuZOnDPAskQALvDBCF0PW74qXRms2k1AfLJ/" />
+```
+
+**Usage:**
+- Tokens are generated per request and may have expiration times
+- Use for HTTP Authorization headers: `Authorization: Bearer <token>`
+- Store tokens securely and treat as passwords
+- Request new tokens when needed rather than reusing old ones
+
+**Implementation**: Available via `RequestToken()` method
+
+**Testing**: Integration tests available - run with `SOUNDTOUCH_TEST_HOST=<device-ip> go test ./pkg/client -run TestRequestToken_Integration` to validate real device token generation without exposing token values
+
 ## Coverage Summary
 
 ### Official API Coverage: 100%
@@ -351,6 +460,13 @@ These endpoints work with real hardware but are NOT in official API v1.0:
 - **Device-Dependent**: 1 (5%) - GET /trackInfo times out on some models
 - **Excluded**: 1 endpoint (POST /presets officially N/A)
 
+### Real Device Discovery: 103 Endpoints Found
+- **Total Discovered Endpoints**: 103 (from /supportedURLs)
+- **Currently Implemented**: ~35 (34%)
+- **Core Functionality**: 100% implemented
+- **Extended Features**: Many undocumented endpoints available
+- **Implementation Focus**: User-facing and essential system endpoints prioritized
+
 ### Feature Coverage: 100%
 - ✅ All available user functionality implemented
 - ✅ All functional device operations supported  
@@ -358,6 +474,7 @@ These endpoints work with real hardware but are NOT in official API v1.0:
 - ✅ Full multiroom capabilities
 - ✅ Complete advanced audio controls (where supported by device)
 - 🔍 Additional features beyond official specification
+- 🔍 68 additional undocumented endpoints discovered but not yet implemented
 
 
 ## Error Handling
@@ -406,6 +523,180 @@ func SendKey(deviceIP string, key string) error {
 3. **Timeouts**: Recommended timeout for HTTP requests: 10 seconds
 4. **Rate Limiting**: No explicit limits documented, but moderate usage recommended
 5. **Device Discovery**: Devices can be found via UPnP on the local network
+
+## Comprehensive Endpoint Discovery
+
+### GET /supportedURLs ✅ **Implemented**
+Retrieves all supported endpoints for the specific device.
+
+**Response XML Structure:**
+```xml
+<supportedURLs deviceID="...">
+  <URL location="/info" />
+  <URL location="/capabilities" />
+  <!-- ... additional endpoints ... -->
+</supportedURLs>
+```
+
+**Complete Endpoint List** (103 endpoints discovered from real devices):
+
+**Core Device Information:**
+- `/info` ✅ - Device information
+- `/capabilities` ✅ - Device capabilities 
+- `/supportedURLs` ✅ - This endpoint (self-reference)
+- `/networkInfo` ✅ - Network configuration
+- `/name` ✅ - Device name management
+- `/netStats` - Network statistics
+- `/powerManagement` - Power state and battery information
+- `/soundTouchConfigurationStatus` - Device configuration status
+
+**Playback and Media Control:**
+- `/nowPlaying` ✅ - Current playback status
+- `/now_playing` ✅ - Alternative current playback endpoint
+- `/nowSelection` - Current selection details
+- `/key` ✅ - Send key commands
+- `/select` ✅ - Select source/content
+- `/playbackRequest` - Advanced playback requests
+- `/userPlayControl` - User play control interface (PAUSE_CONTROL, PLAY_CONTROL, etc.)
+- `/userTrackControl` - User track control interface
+- `/userRating` - User rating interface (UP/DOWN for Pandora, etc.)
+
+**Volume and Audio:**
+- `/volume` ✅ - Volume control
+- `/bass` ✅ - Bass settings
+- `/bassCapabilities` ✅ - Bass capability info
+- `/balance` ✅ - Stereo balance
+- `/DSPMonoStereo` - DSP mono/stereo settings
+
+**Sources and Content:**
+- `/sources` ✅ - Available sources
+- `/sourceDiscoveryStatus` - Source discovery status
+- `/nameSource` - Name/rename sources
+- `/selectLastSource` - Select last used source
+- `/selectLastWiFiSource` - Select last WiFi source
+- `/selectLastSoundTouchSource` - Select last SoundTouch source
+- `/selectLocalSource` - Select local source
+
+**Presets and Favorites:**
+- `/presets` ✅ - Preset management
+- `/storePreset` - Store new preset (max 6 presets)
+- `/removePreset` - Remove existing preset  
+- `/selectPreset` - Select preset by ID
+- `/recents` ✅ - Recently played content
+- `/bookmark` - Bookmark current content
+
+**Music Services:**
+- `/setMusicServiceAccount` - Configure music service account (Pandora, Spotify, etc.)
+- `/setMusicServiceOAuthAccount` - OAuth account setup
+- `/removeMusicServiceAccount` - Remove music service account
+- `/serviceAvailability` - Check service availability
+- `/introspect` - Get introspect data for specific sources
+
+**Station Management (Radio/Streaming):**
+- `/searchStation` - Search for stations (tested with Pandora)
+- `/addStation` - Add station to favorites (tested with Pandora)
+- `/removeStation` - Remove station from favorites (tested with Pandora)
+- `/genreStations` - Browse stations by genre
+- `/stationInfo` - Station information
+- `/trackInfo` ✅ - Extended track information with semicolon-delimited details
+
+**Zone and Multiroom:**
+- `/getZone` ✅ - Get zone configuration
+- `/setZone` ✅ - Set zone configuration  
+- `/addZoneSlave` ✅ - Add device to zone
+- `/removeZoneSlave` ✅ - Remove device from zone
+- `/addGroup` - Add to speaker group
+- `/removeGroup` - Remove from speaker group
+- `/getGroup` - Get group configuration
+- `/updateGroup` - Update group settings
+
+**Clock and Display:**
+- `/clockDisplay` ✅ - Clock display settings
+- `/clockTime` ✅ - Device time management
+
+**System and Configuration:**
+- `/powerManagement` - Power management settings
+- `/standby` - Standby mode control
+- `/lowPowerStandby` - Low power standby mode
+- `/systemtimeout` - System timeout settings
+- `/powersaving` - Power saving configuration
+- `/userActivity` - User activity tracking
+- `/language` - Language settings
+- `/speaker` - Speaker configuration
+
+**Network and Connectivity:**
+- `/performWirelessSiteSurvey` - WiFi site survey (returns detected networks with signal strength)
+- `/addWirelessProfile` - Add WiFi profile (supports various security types)
+- `/getActiveWirelessProfile` - Get active WiFi profile
+- `/setWiFiRadio` - WiFi radio control
+
+**Bluetooth:**
+- `/bluetoothInfo` ✅ - Bluetooth information and pairing status
+- `/enterBluetoothPairing` - Enter Bluetooth pairing mode (switches to BLUETOOTH source)
+- `/clearBluetoothPaired` - Clear all Bluetooth pairings (emits descending tone)
+
+**Pairing and Setup:**
+- `/pairLightswitch` - Pair with lightswitch accessory
+- `/cancelPairLightswitch` - Cancel lightswitch pairing
+- `/clearPairedList` - Clear all pairings
+- `/enterPairingMode` - Enter general pairing mode
+- `/setPairedStatus` - Set pairing status
+- `/setPairingStatus` - Update pairing status
+- `/soundTouchConfigurationStatus` - Configuration status
+- `/setup` - Device setup interface
+
+**Software Updates:**
+- `/swUpdateStart` - Start software update
+- `/swUpdateAbort` - Abort software update
+- `/swUpdateQuery` - Query update status
+- `/swUpdateCheck` - Check for updates
+
+**Advanced Features:**
+- `/search` - Content search (music libraries with filter support)
+- `/navigate` - Content navigation (traverse music library containers)
+- `/listMediaServers` - List available UPnP/DLNA media servers
+- `/requestToken` ✅ - Bearer token generation
+- `/notification` - Notification management
+- `/playNotification` - Play notification beep (ST-10 series only)
+- `/speaker` - Play TTS messages or URL content (ST-10 series only)
+- `/test` - System test interface
+
+**Internal/System:**
+- `/pdo` - Internal PDO operations  
+- `/slaveMsg` - Slave device messaging
+- `/masterMsg` - Master device messaging
+- `/factoryDefault` - Factory reset
+- `/criticalError` - Critical error handling
+- `/netStats` - Network statistics and device interface details
+- `/rebroadcastlatencymode` - Rebroadcast latency mode configuration
+- `/systemtimeout` - System timeout settings
+- `/powersaving` - Power saving configuration
+
+**Product Information:**
+- `/setProductSerialNumber` - Set product serial number
+- `/setProductSoftwareVersion` - Set software version
+- `/setComponentSoftwareVersion` - Set component versions
+
+**Marge Integration (Bose Cloud Services):**
+- `/marge` - Marge service integration (Bose cloud services, EOL May 2026)
+- `/setMargeAccount` - Set Marge account (EOL May 2026)
+- `/pushCustomerSupportInfoToMarge` - Push support info to cloud (EOL May 2026)
+
+**Reset and Control:**
+- `/getBCOReset` - Get BCO reset status
+- `/setBCOReset` - Set BCO reset
+
+**Notes on Endpoint Discovery:**
+- Total discovered endpoints: **103**
+- Both test devices (192.168.178.28 and 192.168.178.35) support identical endpoint lists
+- Many endpoints are undocumented in official API v1.0 but functional on real hardware
+- Some endpoints may require specific device types or firmware versions
+- Endpoints marked ✅ are currently implemented in this Go library
+
+**Implementation Priority:**
+1. **High**: Core functionality endpoints already implemented
+2. **Medium**: Music service integration, advanced zone management  
+3. **Low**: Internal/diagnostic endpoints, factory operations
 
 ## Reference
 

@@ -962,6 +962,20 @@ func main() {
 					},
 				},
 			},
+			// Token commands
+			{
+				Name:    "token",
+				Aliases: []string{"t"},
+				Usage:   "Bearer token management commands",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "request",
+						Usage:  "Request a new bearer token from the device",
+						Action: requestToken,
+						Before: RequireHost,
+					},
+				},
+			},
 		},
 	}
 

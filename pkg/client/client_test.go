@@ -1069,3 +1069,94 @@ func createTestClient(serverURL string) *Client {
 func contains(s, substr string) bool {
 	return strings.Contains(s, substr)
 }
+
+func TestClient_RequestToken(t *testing.T) {
+	// Create mock server
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/requestToken" {
+			t.Errorf("Expected path '/requestToken', got '%s'", r.URL.Path)
+			w.WriteHeader(http.StatusNotFound)
+
+			return
+		}
+
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET method, got %s", r.Method)
+			w.WriteHeader(http.StatusMethodNotAllowed)
+
+			return
+		}
+
+		// Return mock bearer token response (generic example)
+		w.Header().Set("Content-Type", "application/xml")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8" ?><bearertoken value="Bearer vUApzBVT6Lh0nw1xVu/plr1UDRNdMYMEpe0cStm4wCH5mWSjrrtORnGGirMn3pspkJ8mNR1MFh/J4OcsbEikMplcDGJVeuZOnDPAskQALvDBCF0PW74qXRms2k1AfLJ/" />`))
+	}))
+	defer server.Close()
+
+	// Create test client
+	client := createTestClient(server.URL)
+
+	// Test RequestToken
+	token, err := client.RequestToken()
+	if err != nil {
+		t.Fatalf("RequestToken() failed: %v", err)
+	}
+
+	if token == nil {
+		t.Fatal("RequestToken() returned nil token")
+	}
+
+	// Verify token properties instead of exact values
+	if !token.IsValid() {
+		t.Error("Token should be valid")
+	}
+
+	// Verify token has proper Bearer prefix
+	tokenValue := token.GetToken()
+	if !strings.HasPrefix(tokenValue, "Bearer ") {
+		t.Errorf("Token should start with 'Bearer ', got: %s", tokenValue)
+	}
+
+	// Verify auth header matches full token
+	if token.GetAuthHeader() != tokenValue {
+		t.Errorf("Auth header should match token value")
+	}
+
+	// Verify raw token extraction
+	rawToken := token.GetTokenWithoutPrefix()
+	if rawToken == tokenValue {
+		t.Error("Raw token should not include Bearer prefix")
+	}
+
+	// Verify token is reasonably long (bearer tokens should be substantial)
+	if len(rawToken) < 50 {
+		t.Errorf("Token seems too short: %d characters", len(rawToken))
+	}
+}
+
+func TestClient_RequestToken_Error(t *testing.T) {
+	// Create mock server that returns error
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte("Internal Server Error"))
+	}))
+	defer server.Close()
+
+	// Create test client
+	client := createTestClient(server.URL)
+
+	// Test RequestToken with error
+	token, err := client.RequestToken()
+	if err == nil {
+		t.Fatal("RequestToken() should have failed")
+	}
+
+	if token != nil {
+		t.Error("RequestToken() should return nil token on error")
+	}
+
+	if !strings.Contains(err.Error(), "failed to request token") {
+		t.Errorf("Error should mention 'failed to request token', got: %v", err)
+	}
+}
