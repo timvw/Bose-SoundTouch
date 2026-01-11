@@ -288,7 +288,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Disclaimer
 
-This is an independent project created by reverse-engineering and documenting the Bose SoundTouch Web API. It is not affiliated with, endorsed by, or supported by Bose Corporation. Use at your own risk.
+This is an independent project based on the official Bose SoundTouch Web API documentation provided by Bose Corporation. It is not affiliated with, endorsed by, or supported by Bose Corporation. Use at your own risk.
 
 SoundTouch is a trademark of Bose Corporation.
 
