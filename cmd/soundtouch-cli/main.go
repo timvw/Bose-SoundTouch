@@ -25,11 +25,7 @@ func getBuildInfo() (version, commit, date string) {
 		for _, setting := range info.Settings {
 			switch setting.Key {
 			case "vcs.revision":
-				if len(setting.Value) >= 7 {
-					commit = setting.Value[:7]
-				} else {
-					commit = setting.Value
-				}
+				commit = setting.Value
 			case "vcs.time":
 				if t, err := time.Parse(time.RFC3339, setting.Value); err == nil {
 					date = t.Format("2006-01-02_15:04:05")
