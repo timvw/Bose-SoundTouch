@@ -22,7 +22,7 @@ A clear and concise description of what you expected to happen.
 
 **Environment (please complete the following information):**
 - OS: [e.g. macOS 14.0, Windows 11, Ubuntu 22.04]
-- Go version: [e.g. 1.21.5]
+- Go version: [e.g. 1.25.5]
 - Library version: [e.g. v1.0.0, commit hash if using main branch]
 - SoundTouch device model: [e.g. SoundTouch 10, SoundTouch 20]
 - Device firmware version: [if known]

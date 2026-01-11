@@ -76,7 +76,7 @@ soundtouch-cli --host 192.168.1.100 play start
 
 **Environment**
 - **OS**: [e.g. macOS 14.0, Windows 11, Ubuntu 22.04]
-- **Go version**: [e.g. 1.21.5]
+- **Go version**: [e.g. 1.25.5]
 - **Library version**: [e.g. v1.0.0, commit hash]
 - **Network setup**: [home WiFi, corporate, etc.]
 

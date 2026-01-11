@@ -6,7 +6,7 @@ This guide will get you up and running with the SoundTouch Go client in under 10
 
 ## 📋 **Prerequisites**
 
-- **Go 1.19 or later** installed on your system
+- **Go 1.25.5 or later** installed on your system
 - **Bose SoundTouch device** on your network (SoundTouch 10, 20, 30, etc.)
 - **Same network** - Your computer and SoundTouch device must be on the same network
 

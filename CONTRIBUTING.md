@@ -24,7 +24,7 @@ This project adheres to our [Code of Conduct](CODE_OF_CONDUCT.md). By participat
 
 ### Prerequisites
 
-- **Go 1.21 or later**: [Download Go](https://golang.org/dl/)
+- **Go 1.25.5 or later**: [Download Go](https://golang.org/dl/)
 - **Git**: For version control
 - **Make**: For build automation (optional but recommended)
 - **SoundTouch Device**: For testing (optional but valuable)
