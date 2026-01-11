@@ -150,6 +150,7 @@ func PrintWarning(message string) {
 
 // showVersionInfo displays detailed version information including build details
 func showVersionInfo(_ *cli.Context) error {
+	version, commit, date := getBuildInfo()
 	fmt.Printf("soundtouch-cli version %s\n", version)
 	fmt.Printf("Build commit: %s\n", commit)
 	fmt.Printf("Build date: %s\n", date)

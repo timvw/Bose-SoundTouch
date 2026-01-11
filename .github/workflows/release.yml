@@ -154,9 +154,9 @@ jobs:
           rm -f "$OUTPUT_NAME" "$OUTPUT_NAME.sha256" "$OUTPUT_NAME.sha512"
           go clean -cache
 
-          # Build with optimizations and version info
+          # Build with optimizations (using debug.BuildInfo for version info)
           if ! go build \
-            -ldflags="-s -w -X main.version=v${{ needs.validate.outputs.version }} -X main.commit=${{ github.sha }} -X main.date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            -ldflags="-s -w" \
             -o "$OUTPUT_NAME" \
             ./cmd/soundtouch-cli; then
             echo "❌ Build failed"

@@ -3,18 +3,47 @@ package main
 import (
 	"log"
 	"os"
+	"runtime/debug"
+	"time"
 
 	"github.com/urfave/cli/v2"
 )
 
-// Build-time variables injected via ldflags
-var (
+// getBuildInfo extracts version information from debug.BuildInfo
+func getBuildInfo() (version, commit, date string) {
 	version = "dev"
-	commit  = "unknown"
-	date    = "unknown"
-)
+	commit = "unknown"
+	date = "unknown"
+
+	if info, ok := debug.ReadBuildInfo(); ok {
+		// Get version from module info
+		if info.Main.Version != "" && info.Main.Version != "(devel)" {
+			version = info.Main.Version
+		}
+
+		// Extract build settings
+		for _, setting := range info.Settings {
+			switch setting.Key {
+			case "vcs.revision":
+				if len(setting.Value) >= 7 {
+					commit = setting.Value[:7]
+				} else {
+					commit = setting.Value
+				}
+			case "vcs.time":
+				if t, err := time.Parse(time.RFC3339, setting.Value); err == nil {
+					date = t.Format("2006-01-02_15:04:05")
+				}
+			}
+		}
+	}
+
+	return
+}
 
 func main() {
+	version, _, _ := getBuildInfo()
+
 	app := &cli.App{
 		Name:  "soundtouch-cli",
 		Usage: "Command-line interface for controlling Bose SoundTouch devices",

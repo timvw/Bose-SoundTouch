@@ -21,12 +21,7 @@ SCANNER_PATH=./cmd/$(SCANNER_NAME)
 BUILD_DIR=./build
 
 # Version info
-VERSION?=dev
-BUILD_TIME=$(shell date -u '+%Y-%m-%d_%H:%M:%S')
-COMMIT=$(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-
-# Linker flags
-LDFLAGS=-X main.version=$(VERSION) -X main.date=$(BUILD_TIME) -X main.commit=$(COMMIT)
+# No ldflags needed - using debug.BuildInfo since Go 1.18
 
 all: check build
 
@@ -35,50 +30,50 @@ build: build-cli build-examples
 build-cli:
 	@echo "Building $(BINARY_NAME)..."
 	@mkdir -p $(BUILD_DIR)
-	$(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME) $(BINARY_PATH)
+	$(GOBUILD) -o $(BUILD_DIR)/$(BINARY_NAME) $(BINARY_PATH)
 
 build-examples:
 	@echo "Building $(EXAMPLE_MDNS_NAME)..."
 	@mkdir -p $(BUILD_DIR)
-	$(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(EXAMPLE_MDNS_NAME) $(EXAMPLE_MDNS_PATH)
+	$(GOBUILD) -o $(BUILD_DIR)/$(EXAMPLE_MDNS_NAME) $(EXAMPLE_MDNS_PATH)
 	@echo "Building $(EXAMPLE_UPNP_NAME)..."
-	$(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(EXAMPLE_UPNP_NAME) $(EXAMPLE_UPNP_PATH)
+	$(GOBUILD) -o $(BUILD_DIR)/$(EXAMPLE_UPNP_NAME) $(EXAMPLE_UPNP_PATH)
 	@echo "Building $(SCANNER_NAME)..."
-	$(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(SCANNER_NAME) $(SCANNER_PATH)
+	$(GOBUILD) -o $(BUILD_DIR)/$(SCANNER_NAME) $(SCANNER_PATH)
 
 build-all: build-linux build-darwin build-windows build-examples-all
 
 build-linux:
 	@echo "Building for Linux..."
 	@mkdir -p $(BUILD_DIR)
-	GOOS=linux GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 $(BINARY_PATH)
+	GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 $(BINARY_PATH)
 
 build-darwin:
 	@echo "Building for macOS..."
 	@mkdir -p $(BUILD_DIR)
-	GOOS=darwin GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 $(BINARY_PATH)
-	GOOS=darwin GOARCH=arm64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64 $(BINARY_PATH)
+	GOOS=darwin GOARCH=amd64 $(GOBUILD) -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 $(BINARY_PATH)
+	GOOS=darwin GOARCH=arm64 $(GOBUILD) -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64 $(BINARY_PATH)
 
 build-windows:
 	@echo "Building for Windows..."
 	@mkdir -p $(BUILD_DIR)
-	GOOS=windows GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe $(BINARY_PATH)
+	GOOS=windows GOARCH=amd64 $(GOBUILD) -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe $(BINARY_PATH)
 
 build-examples-all:
 	@echo "Building examples for all platforms..."
 	@mkdir -p $(BUILD_DIR)
-	GOOS=linux GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(EXAMPLE_MDNS_NAME)-linux-amd64 $(EXAMPLE_MDNS_PATH)
-	GOOS=darwin GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(EXAMPLE_MDNS_NAME)-darwin-amd64 $(EXAMPLE_MDNS_PATH)
-	GOOS=darwin GOARCH=arm64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(EXAMPLE_MDNS_NAME)-darwin-arm64 $(EXAMPLE_MDNS_PATH)
-	GOOS=windows GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(EXAMPLE_MDNS_NAME)-windows-amd64.exe $(EXAMPLE_MDNS_PATH)
-	GOOS=linux GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(EXAMPLE_UPNP_NAME)-linux-amd64 $(EXAMPLE_UPNP_PATH)
-	GOOS=darwin GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(EXAMPLE_UPNP_NAME)-darwin-amd64 $(EXAMPLE_UPNP_PATH)
-	GOOS=darwin GOARCH=arm64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(EXAMPLE_UPNP_NAME)-darwin-arm64 $(EXAMPLE_UPNP_PATH)
-	GOOS=windows GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(EXAMPLE_UPNP_NAME)-windows-amd64.exe $(EXAMPLE_UPNP_PATH)
-	GOOS=linux GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(SCANNER_NAME)-linux-amd64 $(SCANNER_PATH)
-	GOOS=darwin GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(SCANNER_NAME)-darwin-amd64 $(SCANNER_PATH)
-	GOOS=darwin GOARCH=arm64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(SCANNER_NAME)-darwin-arm64 $(SCANNER_PATH)
-	GOOS=windows GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(SCANNER_NAME)-windows-amd64.exe $(SCANNER_PATH)
+	GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BUILD_DIR)/$(EXAMPLE_MDNS_NAME)-linux-amd64 $(EXAMPLE_MDNS_PATH)
+	GOOS=darwin GOARCH=amd64 $(GOBUILD) -o $(BUILD_DIR)/$(EXAMPLE_MDNS_NAME)-darwin-amd64 $(EXAMPLE_MDNS_PATH)
+	GOOS=darwin GOARCH=arm64 $(GOBUILD) -o $(BUILD_DIR)/$(EXAMPLE_MDNS_NAME)-darwin-arm64 $(EXAMPLE_MDNS_PATH)
+	GOOS=windows GOARCH=amd64 $(GOBUILD) -o $(BUILD_DIR)/$(EXAMPLE_MDNS_NAME)-windows-amd64.exe $(EXAMPLE_MDNS_PATH)
+	GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BUILD_DIR)/$(EXAMPLE_UPNP_NAME)-linux-amd64 $(EXAMPLE_UPNP_PATH)
+	GOOS=darwin GOARCH=amd64 $(GOBUILD) -o $(BUILD_DIR)/$(EXAMPLE_UPNP_NAME)-darwin-amd64 $(EXAMPLE_UPNP_PATH)
+	GOOS=darwin GOARCH=arm64 $(GOBUILD) -o $(BUILD_DIR)/$(EXAMPLE_UPNP_NAME)-darwin-arm64 $(EXAMPLE_UPNP_PATH)
+	GOOS=windows GOARCH=amd64 $(GOBUILD) -o $(BUILD_DIR)/$(EXAMPLE_UPNP_NAME)-windows-amd64.exe $(EXAMPLE_UPNP_PATH)
+	GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BUILD_DIR)/$(SCANNER_NAME)-linux-amd64 $(SCANNER_PATH)
+	GOOS=darwin GOARCH=amd64 $(GOBUILD) -o $(BUILD_DIR)/$(SCANNER_NAME)-darwin-amd64 $(SCANNER_PATH)
+	GOOS=darwin GOARCH=arm64 $(GOBUILD) -o $(BUILD_DIR)/$(SCANNER_NAME)-darwin-arm64 $(SCANNER_PATH)
+	GOOS=windows GOARCH=amd64 $(GOBUILD) -o $(BUILD_DIR)/$(SCANNER_NAME)-windows-amd64.exe $(SCANNER_PATH)
 
 test:
 	@echo "Running tests..."
