@@ -9,12 +9,15 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// getBuildInfo extracts version information from debug.BuildInfo
-func getBuildInfo() (version, commit, date string) {
+// Package-level variables for build information
+var (
 	version = "dev"
-	commit = "unknown"
-	date = "unknown"
+	commit  = "unknown"
+	date    = "unknown"
+)
 
+// updateBuildInfo extracts version information from debug.BuildInfo and updates package variables
+func updateBuildInfo() {
 	if info, ok := debug.ReadBuildInfo(); ok {
 		// Get version from module info
 		if info.Main.Version != "" && info.Main.Version != "(devel)" {
@@ -33,12 +36,10 @@ func getBuildInfo() (version, commit, date string) {
 			}
 		}
 	}
-
-	return
 }
 
 func main() {
-	version, _, _ := getBuildInfo()
+	updateBuildInfo()
 
 	app := &cli.App{
 		Name:  "soundtouch-cli",
