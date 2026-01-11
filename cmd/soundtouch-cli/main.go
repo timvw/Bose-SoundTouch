@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"runtime/debug"
+	"sort"
 	"time"
 
 	"github.com/urfave/cli/v2"
@@ -15,6 +17,58 @@ var (
 	commit  = "unknown"
 	date    = "unknown"
 )
+
+// sortCommands recursively sorts commands and their subcommands alphabetically
+func sortCommands(commands []*cli.Command) {
+	sort.Slice(commands, func(i, j int) bool {
+		return commands[i].Name < commands[j].Name
+	})
+
+	// Recursively sort subcommands and flags
+	for _, cmd := range commands {
+		// Sort flags for this command
+		if len(cmd.Flags) > 0 {
+			sortFlags(cmd.Flags)
+		}
+
+		// Recursively sort subcommands
+		if len(cmd.Subcommands) > 0 {
+			sortCommands(cmd.Subcommands)
+		}
+	}
+}
+
+// sortFlags sorts a slice of flags alphabetically by name
+func sortFlags(flags []cli.Flag) {
+	sort.Slice(flags, func(i, j int) bool {
+		// Get the flag names for comparison
+		name1 := getFlagName(flags[i])
+		name2 := getFlagName(flags[j])
+
+		return name1 < name2
+	})
+}
+
+// getFlagName extracts the primary name from a flag
+func getFlagName(flag cli.Flag) string {
+	switch f := flag.(type) {
+	case *cli.StringFlag:
+		return f.Name
+	case *cli.IntFlag:
+		return f.Name
+	case *cli.BoolFlag:
+		return f.Name
+	case *cli.DurationFlag:
+		return f.Name
+	case *cli.StringSliceFlag:
+		return f.Name
+	default:
+		// Fallback: try to get name using reflection or string representation
+		flagStr := fmt.Sprintf("%v", flag)
+		// This is a simple fallback - in practice, all flags should match the types above
+		return flagStr
+	}
+}
 
 // updateBuildInfo extracts version information from debug.BuildInfo and updates package variables
 func updateBuildInfo() {
@@ -909,6 +963,14 @@ func main() {
 				},
 			},
 		},
+	}
+
+	// Sort commands alphabetically (including subcommands and flags recursively)
+	sortCommands(app.Commands)
+
+	// Also sort global flags
+	if len(app.Flags) > 0 {
+		sortFlags(app.Flags)
 	}
 
 	if err := app.Run(os.Args); err != nil {
