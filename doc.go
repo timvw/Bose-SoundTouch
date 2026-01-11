@@ -1,4 +1,4 @@
-// Package bose-soundtouch provides a comprehensive Go library and CLI tool for controlling Bose SoundTouch devices.
+// Package soundtouch provides a comprehensive Go library and CLI tool for controlling Bose SoundTouch devices.
 //
 // This library implements the complete Bose SoundTouch Web API, enabling programmatic control
 // of SoundTouch speakers including playback control, volume management, source selection,
@@ -153,4 +153,4 @@
 //
 // For detailed API documentation, examples, and advanced usage patterns, visit:
 // https://pkg.go.dev/github.com/gesellix/bose-soundtouch
-package main
+package soundtouch

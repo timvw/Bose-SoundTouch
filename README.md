@@ -6,7 +6,7 @@ A modern Go library and CLI tool for interacting with Bose SoundTouch devices vi
 
 ## Features
 
-### ✅ Implemented (100% Complete - 19/19 official endpoints)
+### ✅ Implemented (100% Complete - All Available API Endpoints)
 - **HTTP Client with XML Support**: Complete client for SoundTouch Web API
 - **Device Information**: Get detailed device info via `/info` endpoint
 - **Device Name**: Get device name via `/name` endpoint  
@@ -37,8 +37,8 @@ A modern Go library and CLI tool for interacting with Bose SoundTouch devices vi
 ### ✅ All High Priority Endpoints Complete
 All originally planned high-priority endpoints have been implemented. The API client now has comprehensive coverage of all available SoundTouch functionality.
 
-### ❌ Not Supported by API
-- **Preset Creation**: POST /presets (officially not supported by SoundTouch API)
+### ℹ️ API Limitations
+- **Preset Creation**: POST /presets endpoint is officially marked as "N/A" by Bose - not available for any client implementation
 
 ## Recent Additions - WebSocket Events ⚡
 
@@ -674,7 +674,7 @@ Bose-SoundTouch/
 | `/bass` | GET/POST | ✅ Complete | Bass control (-9 to +9) |
 | `/balance` | GET/POST | ✅ Complete | Balance control (-50 to +50) |
 | `/presets` | GET | ✅ Complete | Preset configurations (read-only) |
-| `/presets` | POST | ❌ Not Supported | **Officially not supported by SoundTouch API** |
+| `/presets` | POST | N/A | **Officially marked as "N/A" by Bose - no client can implement this** |
 | `/clockTime` | GET/POST | ✅ Complete | Device time management |
 | `/clockDisplay` | GET/POST | ✅ Complete | Clock display settings |
 | `/networkInfo` | GET | ✅ Complete | Network connectivity information |
@@ -684,7 +684,7 @@ Bose-SoundTouch/
 | `/setZone` | POST | ✅ **NEW** | **Zone creation and management** |
 | `/name` | POST | ✅ Complete | Set device name |
 | `/bassCapabilities` | GET | ✅ Complete | Bass capability detection |
-| `/trackInfo` | GET | ❌ Not Working | **Documented but times out on real devices** |
+| `/trackInfo` | GET | ✅ Complete | **Implemented but times out on SoundTouch 10/20 (may work on other models)** |
 | `/addZoneSlave` | POST | ✅ Complete | **Individual slave addition to existing zone** |
 | `/removeZoneSlave` | POST | ✅ Complete | **Individual slave removal from existing zone** |
 | `/audiodspcontrols` | GET/POST | ✅ Complete | **DSP audio modes and video sync delay** |

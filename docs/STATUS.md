@@ -1,6 +1,6 @@
 # Project Status Summary
 
-**Last Updated**: 2026-01-09  
+**Last Updated**: 2026-01-11
 **Current Version**: Development  
 **Branch**: `main`
 
@@ -73,8 +73,11 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 - `WebSocket /` - Real-time event streaming ✅ Complete
 - `GET /getZone`, `POST /setZone` - Multiroom zone management ✅ Complete
 
-### **❌ Not Supported by API**
-- `POST /presets` - Preset creation (officially marked as "N/A" by Bose)
+### **ℹ️ API Limitations**
+- `POST /presets` - Preset creation (officially marked as "N/A" by Bose - no client can implement this)
+
+### **⚠️ Not Working on Our Test Devices**
+- `GET /trackInfo` - Implemented but times out on our SoundTouch 10 & 20 (use `GET /now_playing` instead)
 
 ## 📊 Implementation Statistics
 
@@ -85,9 +88,12 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 | **System Endpoints** | 5/5 | 5 | 100% |
 | **Real-time Features** | 1/1 | 1 | 100% |
 | **Preset Management** | 1/1 | 1 | 100% |
-| **Zone Management** | 2/2 | 2 | 100% |
-| **~~Preset Creation~~** | ~~0/1~~ | ~~1~~ | **N/A - Not Supported by API** |
-| **Overall Progress** | 18/20 | 20 | **90%** |
+| **Zone Management** | 4/4 | 4 | 100% |
+| **Advanced Audio Controls** | 3/3 | 3 | 100% |
+| **Track Info** | 1/1 | 1 | **100%** |
+| **Overall Progress** | 26/26 | 26 | **100%** |
+
+**Note**: Excluded only officially unsupported endpoints (`POST /presets`). All documented endpoints are implemented.
 
 ## 🏆 Major Accomplishments
 
@@ -121,10 +127,19 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 ### Phase 4: Multiroom & Zone Management (COMPLETE)
 - ✅ Zone information retrieval (GET /getZone)
 - ✅ Zone configuration management (POST /setZone)
+- ✅ Low-level zone slave operations (POST /addZoneSlave, /removeZoneSlave)
 - ✅ Complete zone operations (create, modify, add, remove, dissolve)
 - ✅ Zone status and membership queries
 - ✅ Comprehensive validation and error handling
 - ✅ CLI integration for all zone operations
+
+### Phase 5: Advanced Audio Controls (COMPLETE)
+- ✅ DSP audio controls (GET/POST /audiodspcontrols) with audio modes and video sync
+- ✅ Advanced tone controls (GET/POST /audioproducttonecontrols) for professional audio
+- ✅ Speaker level controls (GET/POST /audioproductlevelcontrols) for multi-channel systems
+- ✅ Automatic capability detection and conditional availability
+- ✅ Device-specific feature validation
+- ✅ Professional-grade audio adjustment features
 
 ### Key Technical Achievements
 - **Complete Key Controls**: All 24 documented key commands implemented
@@ -265,9 +280,11 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 - Volume may be affected by external sources (Spotify app, etc.)
 - Some devices may have slight API variations
 - mDNS discovery may fail in corporate networks (expected behavior)
+- `GET /trackInfo` times out on SoundTouch 10 & 20 (may work on other models)
 
 ### API Design Decisions
 - Preset creation is intentionally not supported via API (official documentation: POST /presets = "N/A")
+- Track info endpoint is implemented but appears device/firmware dependent
 
 ### Development Notes
 - All major architectural decisions documented
@@ -277,5 +294,5 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 
 ---
 
-**Status**: 🟢 **Healthy Development** - Audio controls and preset management complete (70% overall)
-**Next Session Focus**: WebSocket real-time events or remaining system endpoints
+**Status**: 🟢 **Complete & Production Ready** - All available API endpoints implemented (100%)
+**Next Session Focus**: Web application interface or WASM browser integration

@@ -362,39 +362,86 @@ func (c Config) Validate() error
   - [x] Graceful error handling
   - [x] Network timeout management
 
-### Phase 3: Additional Control Endpoints 🎛️ (Next Priority)
-- [ ] **Source Management**
+### Phase 3: Additional Control Endpoints 🎛️ ✅ COMPLETE
+- [x] **Source Management** ✅ DONE
   - POST /select - Switch audio sources
   - Source validation and error handling
-- [ ] **Bass Control**
+  - Convenience methods (SelectSpotify, SelectBluetooth, etc.)
+- [x] **Bass Control** ✅ DONE
   - GET /bass - Get bass settings
   - POST /bass - Set bass level (-9 to +9)
-- [x] **Preset Management (Read-Only)**
-  - ~~POST /presets - Create/update presets~~ - **Officially not supported by SoundTouch API**
-- [ ] **Advanced Features**
-  - GET/POST /balance - Stereo balance (stereo devices)
+  - Range validation and safety features
+  - Incremental bass control methods
+- [x] **Balance Control** ✅ DONE
+  - GET/POST /balance - Stereo balance (-50 to +50)
+  - Balance adjustment with clamping
+  - Left/right convenience methods
+- [x] **Preset Management (Read-Only)** ✅ DONE
+  - Complete preset analysis and helper methods
+  - Note: POST /presets is officially marked as "N/A" by Bose - no API client can implement preset creation
+- [x] **System Features** ✅ DONE
   - GET/POST /clockTime - Device time management
   - GET/POST /clockDisplay - Clock display settings
   - GET /networkInfo - Network diagnostics
+  - GET /name, POST /name - Device name management
+  - GET /bassCapabilities - Bass capability detection
 
-### Phase 4: WebSocket Real-time Events 📡
-- [ ] **Implement WebSocket Client**
+### Phase 4: WebSocket Real-time Events 📡 ✅ COMPLETE
+- [x] **Implement WebSocket Client** ✅ DONE
   - Connection Management
   - Event parsing and routing
   - Reconnection with exponential backoff
-- [ ] **Event Handler System**
-  - Typed event structs
-  - Handler Registration
-  - Event Filtering
-- [ ] **CLI Real-time Monitoring**
+  - Automatic connection recovery
+- [x] **Event Handler System** ✅ DONE
+  - 12 typed event structs (NowPlayingUpdated, VolumeUpdated, etc.)
+  - Handler Registration and callback system
+  - Event Filtering and routing
+  - Comprehensive event type coverage
+- [x] **CLI Real-time Monitoring** ✅ DONE
   - Live Now-Playing Updates
   - Volume Change Monitoring
   - Connection Status Display
-- [ ] **Event Storage & History**
+  - Real-time event streaming with formatted output
+- [x] **Event Management** ✅ DONE
   - Event logging for debugging
-  - Historical Event Queries
+  - Connection state monitoring
+  - Error handling and recovery
 
-### Phase 5: Web Application & CORS Proxy 🌐
+### Phase 5: Multiroom Zone Management 🏠 ✅ COMPLETE
+- [x] **Zone Information** ✅ DONE
+  - GET /getZone - Retrieve zone configuration
+  - Zone status and membership queries
+  - Master/slave device identification
+- [x] **Zone Operations** ✅ DONE
+  - POST /setZone - Create and modify zones
+  - Zone creation with multiple devices
+  - Add/remove devices from existing zones
+  - Dissolve zones completely
+- [x] **Zone Management API** ✅ DONE
+  - CreateZone(), AddToZone(), RemoveFromZone()
+  - IP validation and duplicate detection
+  - Comprehensive error handling
+  - Zone builder with fluent API
+- [x] **Low-Level Zone API** ✅ DONE
+  - POST /addZoneSlave - Individual slave addition
+  - POST /removeZoneSlave - Individual slave removal
+  - Direct device ID and IP-based operations
+
+### Phase 6: Advanced Audio Controls 🎛️ ✅ COMPLETE
+- [x] **DSP Audio Controls** ✅ DONE
+  - GET/POST /audiodspcontrols - DSP settings and audio modes
+  - Video sync delay adjustment
+  - Audio mode switching (movie, music, etc.)
+- [x] **Advanced Tone Controls** ✅ DONE
+  - GET/POST /audioproducttonecontrols - Advanced bass/treble
+  - Professional-grade audio adjustment
+  - Device capability detection
+- [x] **Speaker Level Controls** ✅ DONE
+  - GET/POST /audioproductlevelcontrols - Individual speaker levels
+  - Front-center and rear-surround adjustment
+  - Multi-channel audio management
+
+### Phase 7: Web Application & CORS Proxy 🌐 (Future Enhancement)
 - [ ] **Create Embedded Web UI**
   - HTML/CSS/JS for SoundTouch control
   - Responsive design for mobile
@@ -414,7 +461,7 @@ func (c Config) Validate() error
   - Source Selection
   - Preset Management
 
-### Phase 5: WASM Browser Integration 🧩
+### Phase 8: WASM Browser Integration 🧩 (Future Enhancement)
 - [ ] **WASM Build Configuration**
   - Build tags and conditional compilation
   - WASM-specific HTTP client (via proxy)
@@ -432,7 +479,7 @@ func (c Config) Validate() error
   - Browser Extension Support
   - Documentation for CORS issues
 
-### Phase 6: Production Features & Polish 🚀
+### Phase 9: Production Features & Polish 🚀 (Future Enhancement)
 - [ ] **Advanced Configuration**
   - Environment-based Config
   - Configuration File Support
@@ -694,23 +741,32 @@ docker-compose up  # Mock devices + web app
 
 ## Success Criteria
 
-### Phase 1-2 (Foundation)
+### Phase 1-2 (Foundation) ✅ COMPLETE
 - ✅ Stable HTTP API connection to SoundTouch devices
-- ✅ XML model coverage for implemented APIs (DeviceInfo, NowPlaying, Sources, Name, Capabilities, Presets)
-- ✅ Automatic device discovery via UPnP
-- ✅ Functional CLI tool with discovery, info, now playing, sources, name, capabilities, and presets commands
-- ✅ Now Playing endpoint with comprehensive status information
-- ✅ Sources endpoint with filtering and categorization features
-- ✅ Device identification endpoints (name, capabilities)
-- ✅ Preset management with comprehensive analysis and filtering
+- ✅ XML model coverage for all core APIs (DeviceInfo, NowPlaying, Sources, Name, Capabilities, Presets, Volume, Key controls)
+- ✅ Automatic device discovery via UPnP and mDNS
+- ✅ Comprehensive CLI tool with all endpoint commands
+- ✅ Media controls with proper press+release key patterns
+- ✅ Volume management with safety features
+- ✅ Real device validation on SoundTouch 10 and 20
 
-### Phase 3-4 (Real-time & Web)
-- ✅ WebSocket event streaming with reconnection
-- ✅ Web UI with responsive design
-- ✅ Single binary deployment with embedded assets
-- ✅ CORS proxy for browser integration
+### Phase 3-4 (Audio Controls & Real-time Events) ✅ COMPLETE
+- ✅ Source selection with convenience methods (Spotify, Bluetooth, etc.)
+- ✅ Bass control with range validation (-9 to +9)
+- ✅ Balance control for stereo devices (-50 to +50)
+- ✅ Clock and display management (time, brightness, format)
+- ✅ Network information retrieval
+- ✅ WebSocket event streaming with 12 event types
+- ✅ Automatic reconnection and connection management
 
-### Phase 5-6 (Advanced)
+### Phase 5-6 (Multiroom & Advanced Audio) ✅ COMPLETE
+- ✅ Complete multiroom zone management (create, modify, dissolve)
+- ✅ Zone status and membership queries
+- ✅ Advanced audio controls (DSP, tone, speaker levels)
+- ✅ Professional-grade audio adjustment features
+- ✅ Device capability detection and validation
+
+### Phase 7+ (Future Enhancements)
 - ✅ WASM integration with JavaScript bridge
 - ✅ Multi-Device Support
 - ✅ Production-ready Configuration Management
