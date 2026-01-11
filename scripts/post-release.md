@@ -27,10 +27,11 @@ After successfully releasing v1.0.0, follow this checklist to maximize visibilit
   Tested on real hardware! https://github.com/gesellix/bose-soundtouch"
   ```
 
-- [ ] **Hacker News** submission:
+- [x] **Hacker News** submission: ✅ **COMPLETED**
   ```
   Title: "Bose SoundTouch Go Library – Complete API with WebSocket Events"
   URL: https://github.com/gesellix/bose-soundtouch
+  HN Discussion: https://news.ycombinator.com/item?id=46577551
   ```
 
 ### Social Media
