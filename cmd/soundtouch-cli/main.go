@@ -195,6 +195,13 @@ func main() {
 						Usage:  "Get current playback status",
 						Action: getNowPlaying,
 						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.BoolFlag{
+								Name:    "verbose",
+								Aliases: []string{"v"},
+								Usage:   "Show detailed content information (including Spotify URIs)",
+							},
+						},
 					},
 					{
 						Name:   "start",

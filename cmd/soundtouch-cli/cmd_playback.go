@@ -33,6 +33,9 @@ func getNowPlaying(c *cli.Context) error {
 	}
 
 	fmt.Printf("  Source: %s\n", nowPlaying.Source)
+	if nowPlaying.SourceAccount != "" {
+		fmt.Printf("  Source Account: %s\n", nowPlaying.SourceAccount)
+	}
 	fmt.Printf("  Status: %s\n", nowPlaying.PlayStatus.String())
 
 	if nowPlaying.Track != "" {
@@ -59,8 +62,28 @@ func getNowPlaying(c *cli.Context) error {
 		fmt.Printf("  Stream Type: %s\n", nowPlaying.StreamType)
 	}
 
+	// Show ContentItem details if verbose flag is set or always show location if available
+	verbose := c.Bool("verbose")
+	showDetails := verbose || (nowPlaying.ContentItem != nil && nowPlaying.ContentItem.Location != "")
+
+	if showDetails && nowPlaying.ContentItem != nil {
+		fmt.Printf("\nContent Details:\n")
+		if nowPlaying.ContentItem.Location != "" {
+			fmt.Printf("  Location: %s\n", nowPlaying.ContentItem.Location)
+		}
+		if verbose && nowPlaying.ContentItem.Type != "" {
+			fmt.Printf("  Content Type: %s\n", nowPlaying.ContentItem.Type)
+		}
+		if verbose && nowPlaying.ContentItem.ItemName != "" && nowPlaying.ContentItem.ItemName != nowPlaying.Track {
+			fmt.Printf("  Item Name: %s\n", nowPlaying.ContentItem.ItemName)
+		}
+		if verbose {
+			fmt.Printf("  Presetable: %t\n", nowPlaying.ContentItem.IsPresetable)
+		}
+	}
+
 	if nowPlaying.PlayStatus == models.PlayStatusBuffering {
-		fmt.Printf("  Note: Content is buffering\n")
+		fmt.Printf("\nNote: Content is buffering\n")
 	}
 
 	return nil
