@@ -316,6 +316,69 @@ func (c *Client) IsCurrentContentPresetable() (bool, error) {
 	return nowPlaying.ContentItem.IsPresetable, nil
 }
 
+// StorePreset saves content as a preset on the SoundTouch device
+func (c *Client) StorePreset(id int, contentItem *models.ContentItem) error {
+	if id < 1 || id > 6 {
+		return fmt.Errorf("preset ID must be between 1 and 6, got %d", id)
+	}
+
+	if contentItem == nil {
+		return fmt.Errorf("content item cannot be nil")
+	}
+
+	now := time.Now().Unix()
+	preset := &models.Preset{
+		ID:          id,
+		CreatedOn:   &now,
+		UpdatedOn:   &now,
+		ContentItem: contentItem,
+	}
+
+	err := c.post("/storePreset", preset)
+	if err != nil {
+		return fmt.Errorf("failed to store preset %d: %w", id, err)
+	}
+
+	return nil
+}
+
+// StoreCurrentAsPreset saves currently playing content as preset
+func (c *Client) StoreCurrentAsPreset(id int) error {
+	if id < 1 || id > 6 {
+		return fmt.Errorf("preset ID must be between 1 and 6, got %d", id)
+	}
+
+	nowPlaying, err := c.GetNowPlaying()
+	if err != nil {
+		return fmt.Errorf("failed to get current content: %w", err)
+	}
+
+	if nowPlaying.IsEmpty() || nowPlaying.ContentItem == nil {
+		return fmt.Errorf("no content currently playing")
+	}
+
+	if !nowPlaying.ContentItem.IsPresetable {
+		return fmt.Errorf("current content cannot be saved as preset")
+	}
+
+	return c.StorePreset(id, nowPlaying.ContentItem)
+}
+
+// RemovePreset deletes a preset from the SoundTouch device
+func (c *Client) RemovePreset(id int) error {
+	if id < 1 || id > 6 {
+		return fmt.Errorf("preset ID must be between 1 and 6, got %d", id)
+	}
+
+	preset := &models.Preset{ID: id}
+	err := c.post("/removePreset", preset)
+	if err != nil {
+		return fmt.Errorf("failed to remove preset %d: %w", id, err)
+	}
+
+	return nil
+}
+
 // SendKey sends a key press command to the device (press followed by release)
 func (c *Client) SendKey(keyValue string) error {
 	if !models.IsValidKey(keyValue) {

@@ -237,17 +237,94 @@ func main() {
 			},
 			// Preset commands
 			{
-				Name:   "preset",
-				Usage:  "Select preset by number",
-				Action: selectPreset,
-				Flags: []cli.Flag{
-					&cli.IntFlag{
-						Name:     "preset",
-						Usage:    "Preset number (1-6)",
-						Required: true,
+				Name:  "preset",
+				Usage: "Preset management commands",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "store-current",
+						Usage:  "Store currently playing content as preset",
+						Action: storeCurrentPreset,
+						Flags: []cli.Flag{
+							&cli.IntFlag{
+								Name:     "slot",
+								Usage:    "Preset slot number (1-6)",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "store",
+						Usage:  "Store specific content as preset",
+						Action: storePreset,
+						Flags: []cli.Flag{
+							&cli.IntFlag{
+								Name:     "slot",
+								Usage:    "Preset slot number (1-6)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "source",
+								Usage:    "Content source (SPOTIFY, TUNEIN, LOCAL_INTERNET_RADIO, etc.)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "location",
+								Usage:    "Content location (URI, URL, or ID)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "source-account",
+								Usage: "Source account (username, device ID, etc.)",
+							},
+							&cli.StringFlag{
+								Name:  "name",
+								Usage: "Display name for the preset",
+							},
+							&cli.StringFlag{
+								Name:  "type",
+								Usage: "Content type (uri, stationurl, etc.)",
+							},
+							&cli.StringFlag{
+								Name:  "artwork",
+								Usage: "Artwork URL",
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "remove",
+						Usage:  "Remove a preset",
+						Action: removePreset,
+						Flags: []cli.Flag{
+							&cli.IntFlag{
+								Name:     "slot",
+								Usage:    "Preset slot number (1-6)",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "select",
+						Usage:  "Select and play a preset",
+						Action: selectPresetNew,
+						Flags: []cli.Flag{
+							&cli.IntFlag{
+								Name:     "slot",
+								Usage:    "Preset slot number (1-6)",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "list",
+						Usage:  "List all presets",
+						Action: listPresets,
+						Before: RequireHost,
 					},
 				},
-				Before: RequireHost,
 			},
 			// Key commands
 			{
