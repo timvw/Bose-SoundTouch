@@ -218,7 +218,9 @@ This library supports all Bose SoundTouch-compatible devices, including:
 | Media Control | ✅ Complete | Play/pause/stop, track navigation |
 | Volume & Audio | ✅ Complete | Volume, bass, balance control |
 | Source Selection | ✅ Complete | Spotify, Bluetooth, AUX, etc. |
-| Preset Management | ✅ Complete | Read preset configurations |
+| Content Navigation | ✅ Complete | Browse music libraries, radio stations |
+| Station Management | ✅ Complete | Search, add, remove stations |
+| Preset Management | ✅ Complete | Store, select, remove presets |
 | Real-time Events | ✅ Complete | WebSocket event streaming |
 | Multiroom Zones | ✅ Complete | Zone creation and management |
 | System Settings | ✅ Complete | Clock, display, network info |
@@ -232,6 +234,8 @@ This library supports all Bose SoundTouch-compatible devices, including:
 - 📚 [API Reference](docs/API-Endpoints-Overview.md) - Complete endpoint documentation
 - 🔧 [CLI Reference](docs/CLI-REFERENCE.md) - Command-line tool guide
 - 🎯 [Getting Started](docs/GETTING-STARTED.md) - Detailed setup and usage
+- 🧭 [Navigation Guide](docs/NAVIGATION-GUIDE.md) - Content browsing and station management
+- 📋 [Navigation API Reference](docs/API-NAVIGATION-REFERENCE.md) - Navigation API documentation
 - ⚙️ [Advanced Features](docs/SYSTEM-ENDPOINTS.md) - Advanced functionality
 - 🏠 [Multiroom Setup](docs/zone-management.md) - Zone configuration guide
 - ⚡ [WebSocket Events](docs/websocket-events.md) - Real-time event handling
