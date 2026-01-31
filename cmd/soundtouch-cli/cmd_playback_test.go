@@ -133,7 +133,6 @@ func TestShouldShowContentDetails(t *testing.T) {
 		})
 	}
 }
-
 func TestContentDetailsDisplayLogic(t *testing.T) {
 	// Test the specific conditions that determine when to show content details
 	tests := []struct {

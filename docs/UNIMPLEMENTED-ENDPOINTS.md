@@ -297,8 +297,10 @@ Returns detected UPnP/DLNA media servers.
 </ListMediaServersResponse>
 ```
 
-#### GET /serviceAvailability 🔥 **CRITICAL**
+#### GET /serviceAvailability ✅ **IMPLEMENTED**
 Returns source service availability status.
+
+**Implementation Status:** ✅ Complete - Available in `pkg/client/client.go` as `GetServiceAvailability()`
 
 **Response Example:**
 ```xml
@@ -1028,7 +1030,7 @@ func TestDeviceCompatibility(t *testing.T) {
 1. **Power Management**: `standby`, `powerManagement`, `lowPowerStandby`
 2. **Notifications**: `speaker`, `playNotification` 
 3. **Network Management**: `performWirelessSiteSurvey`, `addWirelessProfile`
-4. **System Info**: `serviceAvailability`, `listMediaServers`, `language`
+4. **System Info**: ~~`serviceAvailability`~~ (✅ implemented), `listMediaServers`, `language`
 
 ### Phase 3: Advanced Features (3 weeks)
 1. **Bluetooth**: `enterBluetoothPairing`, `clearBluetoothPaired`

@@ -118,7 +118,7 @@ func TestClient_Navigate(t *testing.T) {
 					w.WriteHeader(tt.serverStatus)
 				}
 				if tt.serverResponse != "" {
-					w.Write([]byte(tt.serverResponse))
+					_, _ = w.Write([]byte(tt.serverResponse))
 				}
 			}))
 			defer server.Close()
@@ -190,7 +190,7 @@ func TestClient_NavigateWithMenu(t *testing.T) {
 			t.Errorf("Expected sort 'dateCreated', got %s", request.Sort)
 		}
 
-		w.Write([]byte(serverResponse))
+		_, _ = w.Write([]byte(serverResponse))
 	}))
 	defer server.Close()
 
@@ -242,7 +242,7 @@ func TestClient_NavigateContainer(t *testing.T) {
 </navigateResponse>`
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(serverResponse))
+		_, _ = w.Write([]byte(serverResponse))
 	}))
 	defer server.Close()
 
@@ -522,7 +522,7 @@ func TestClient_GetPandoraStations(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Verify it's calling navigate with the right parameters
 		var request models.NavigateRequest
-		xml.NewDecoder(r.Body).Decode(&request)
+		_ = xml.NewDecoder(r.Body).Decode(&request)
 
 		if request.Source != "PANDORA" {
 			t.Errorf("Expected source PANDORA, got %s", request.Source)
@@ -811,7 +811,7 @@ func TestClient_SearchPandoraStations(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Verify it's calling searchStation with the right parameters
 		var request models.SearchStationRequest
-		xml.NewDecoder(r.Body).Decode(&request)
+		_ = xml.NewDecoder(r.Body).Decode(&request)
 
 		if request.Source != "PANDORA" {
 			t.Errorf("Expected source PANDORA, got %s", request.Source)

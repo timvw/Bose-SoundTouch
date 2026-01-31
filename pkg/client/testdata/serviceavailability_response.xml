@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<serviceAvailability>
+  <services>
+    <service type="AIRPLAY" isAvailable="true" />
+    <service type="ALEXA" isAvailable="false" />
+    <service type="AMAZON" isAvailable="true" />
+    <service type="BLUETOOTH" isAvailable="false" reason="INVALID_SOURCE_TYPE" />
+    <service type="BMX" isAvailable="false" />
+    <service type="DEEZER" isAvailable="true" />
+    <service type="IHEART" isAvailable="true" />
+    <service type="LOCAL_INTERNET_RADIO" isAvailable="true" />
+    <service type="LOCAL_MUSIC" isAvailable="true" />
+    <service type="NOTIFICATION" isAvailable="false" />
+    <service type="PANDORA" isAvailable="true" />
+    <service type="SPOTIFY" isAvailable="true" />
+    <service type="TUNEIN" isAvailable="true" />
+  </services>
+</serviceAvailability>

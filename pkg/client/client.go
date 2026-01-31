@@ -250,6 +250,18 @@ func (c *Client) GetSources() (*models.Sources, error) {
 	return &sources, nil
 }
 
+// GetServiceAvailability retrieves service availability status from the /serviceAvailability endpoint
+func (c *Client) GetServiceAvailability() (*models.ServiceAvailability, error) {
+	var serviceAvailability models.ServiceAvailability
+
+	err := c.get("/serviceAvailability", &serviceAvailability)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get service availability: %w", err)
+	}
+
+	return &serviceAvailability, nil
+}
+
 // GetName retrieves the device name from the /name endpoint
 func (c *Client) GetName() (*models.Name, error) {
 	var name models.Name
@@ -272,6 +284,18 @@ func (c *Client) GetCapabilities() (*models.Capabilities, error) {
 	}
 
 	return &capabilities, nil
+}
+
+// GetSupportedURLs retrieves all supported endpoints from the /supportedURLs endpoint
+func (c *Client) GetSupportedURLs() (*models.SupportedURLsResponse, error) {
+	var supportedURLs models.SupportedURLsResponse
+
+	err := c.get("/supportedURLs", &supportedURLs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get supported URLs: %w", err)
+	}
+
+	return &supportedURLs, nil
 }
 
 // GetPresets retrieves configured presets from the /presets endpoint
@@ -974,7 +998,7 @@ func (c *Client) post(endpoint string, payload interface{}) error {
 }
 
 // postWithResponse performs a POST request with XML body and parses the response
-func (c *Client) postWithResponse(endpoint string, payload interface{}, result interface{}) error {
+func (c *Client) postWithResponse(endpoint string, payload, result interface{}) error {
 	url := c.baseURL + endpoint
 
 	var body io.Reader

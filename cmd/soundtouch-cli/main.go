@@ -179,6 +179,32 @@ func main() {
 				Before: RequireHost,
 			},
 			{
+				Name:    "supported-urls",
+				Aliases: []string{"urls"},
+				Usage:   "Get supported device endpoints",
+				Action:  getSupportedURLs,
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:    "verbose",
+						Aliases: []string{"v"},
+						Usage:   "Show complete endpoint list",
+					},
+					&cli.BoolFlag{
+						Name:    "features",
+						Aliases: []string{"f"},
+						Usage:   "Show detailed feature mapping and CLI commands",
+					},
+				},
+				Before: RequireHost,
+			},
+			{
+				Name:    "analyze",
+				Aliases: []string{"analysis"},
+				Usage:   "Analyze device capabilities and provide recommendations",
+				Action:  getDeviceAnalysis,
+				Before:  RequireHost,
+			},
+			{
 				Name:   "presets",
 				Usage:  "Get configured presets",
 				Action: getPresets,
@@ -616,6 +642,23 @@ func main() {
 						},
 						Before: RequireHost,
 					},
+					{
+						Name:   "list",
+						Usage:  "List saved stations",
+						Action: listStations,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source",
+								Usage:    "Station source (TUNEIN, PANDORA)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "source-account",
+								Usage: "Source account (required for Pandora)",
+							},
+						},
+						Before: RequireHost,
+					},
 				},
 			},
 			// Key commands
@@ -786,6 +829,18 @@ func main() {
 						Name:   "aux",
 						Usage:  "Select AUX input source",
 						Action: selectAux,
+						Before: RequireHost,
+					},
+					{
+						Name:   "availability",
+						Usage:  "Show service availability",
+						Action: getServiceAvailability,
+						Before: RequireHost,
+					},
+					{
+						Name:   "compare",
+						Usage:  "Compare sources and service availability",
+						Action: compareSourcesAndAvailability,
 						Before: RequireHost,
 					},
 				},

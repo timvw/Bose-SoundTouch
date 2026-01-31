@@ -558,7 +558,12 @@ func SendKey(deviceIP string, key string) error {
 ## Comprehensive Endpoint Discovery
 
 ### GET /supportedURLs ✅ **Implemented**
-Retrieves all supported endpoints for the specific device.
+Retrieves all supported endpoints for the specific device with comprehensive feature mapping.
+
+**Client Method**: `GetSupportedURLs() (*models.SupportedURLsResponse, error)`
+**CLI Commands**: 
+- `soundtouch-cli supported-urls [--features] [--verbose]` - Show endpoint-to-feature mapping
+- `soundtouch-cli analyze` - Comprehensive device capability analysis with recommendations
 
 **Response XML Structure:**
 ```xml
@@ -569,12 +574,21 @@ Retrieves all supported endpoints for the specific device.
 </supportedURLs>
 ```
 
+**Feature Mapping System**: The implementation includes a comprehensive endpoint-to-feature mapping system that:
+- Maps 103+ discovered endpoints to 15+ functional features
+- Categorizes features by type (Core, Audio, Playback, Sources, Content, etc.)
+- Identifies essential vs. optional features for device classification
+- Provides feature completeness scoring (0-100%)
+- Shows CLI command mappings for each supported feature
+- Detects partial implementations and missing capabilities
+- Offers personalized usage recommendations
+
 **Complete Endpoint List** (103 endpoints discovered from real devices):
 
 **Core Device Information:**
 - `/info` ✅ - Device information
 - `/capabilities` ✅ - Device capabilities 
-- `/supportedURLs` ✅ - This endpoint (self-reference)
+- `/supportedURLs` ✅ - This endpoint (self-reference) - **FULLY IMPLEMENTED with Feature Mapping**
 - `/networkInfo` ✅ - Network configuration
 - `/name` ✅ - Device name management
 - `/netStats` - Network statistics
@@ -620,7 +634,7 @@ Retrieves all supported endpoints for the specific device.
 - `/setMusicServiceAccount` - Configure music service account (Pandora, Spotify, etc.)
 - `/setMusicServiceOAuthAccount` - OAuth account setup
 - `/removeMusicServiceAccount` - Remove music service account
-- `/serviceAvailability` - Check service availability
+- `/serviceAvailability` ✅ **Implemented** - Check service availability
 - `/introspect` - Get introspect data for specific sources
 
 **Station Management (Radio/Streaming):**

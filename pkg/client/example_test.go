@@ -284,3 +284,33 @@ func ExampleClient_GetCapabilities() {
 	// - PRESETS (/presets)
 	// - ZONE (/getZone)
 }
+
+func ExampleClient_GetSupportedURLs_concept() {
+	// Example of how to use GetSupportedURLs() method
+	// Note: This example shows the concept but doesn't execute to avoid requiring a real device
+
+	config := &client.Config{Host: "192.168.1.100"}
+	c := client.NewClient(config)
+
+	supportedURLs, err := c.GetSupportedURLs()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("Device %s supports %d endpoints\n", supportedURLs.DeviceID, supportedURLs.GetURLCount())
+	fmt.Printf("Core functionality: %v\n", supportedURLs.HasCorePlaybackSupport())
+	fmt.Printf("Multiroom support: %v\n", supportedURLs.HasMultiroomSupport())
+	fmt.Printf("Streaming support: %v\n", supportedURLs.HasStreamingSupport())
+
+	// Check specific endpoints
+	if supportedURLs.HasURL("/audiodspcontrols") {
+		fmt.Println("Device supports advanced audio controls")
+	}
+
+	// Expected output with a real device:
+	// Device 08DF1F0BA325 supports 103 endpoints
+	// Core functionality: true
+	// Multiroom support: true
+	// Streaming support: true
+	// Device supports advanced audio controls
+}

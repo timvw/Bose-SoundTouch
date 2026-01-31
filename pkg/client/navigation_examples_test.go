@@ -170,7 +170,7 @@ func ExampleClient_NavigateContainer() {
 		len(tracks), len(subdirs))
 
 	// Show first few tracks
-	for i, track := range tracks[:min(3, len(tracks))] {
+	for i, track := range tracks[:minInt(3, len(tracks))] {
 		fmt.Printf("%d. %s", i+1, track.GetDisplayName())
 		if track.ArtistName != "" {
 			fmt.Printf(" - %s", track.ArtistName)
@@ -201,7 +201,7 @@ func Example_searchAndPlayWorkflow() {
 
 	// 2. Show available stations
 	fmt.Printf("Found %d stations:\n", len(stations))
-	for i, station := range stations[:min(5, len(stations))] {
+	for i, station := range stations[:minInt(5, len(stations))] {
 		fmt.Printf("%d. %s", i+1, station.GetDisplayName())
 		if station.Description != "" {
 			fmt.Printf(" - %s", station.Description)
@@ -224,7 +224,7 @@ func Example_searchAndPlayWorkflow() {
 }
 
 // Helper function for min calculation
-func min(a, b int) int {
+func minInt(a, b int) int {
 	if a < b {
 		return a
 	}

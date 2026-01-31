@@ -28,6 +28,13 @@ func searchStations(c *cli.Context) error {
 		return err
 	}
 
+	// Check service availability for the source
+	checker := NewServiceAvailabilityChecker(client)
+	actionDescription := fmt.Sprintf("search %s stations", source)
+	if !checker.CheckSourceAvailable(source, actionDescription) {
+		return fmt.Errorf("source '%s' is not available for station search", source)
+	}
+
 	response, err := client.SearchStation(source, sourceAccount, searchTerm)
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to search stations: %v", err))
@@ -54,6 +61,12 @@ func searchTuneIn(c *cli.Context) error {
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to create client: %v", err))
 		return err
+	}
+
+	// Check TuneIn availability
+	checker := NewServiceAvailabilityChecker(client)
+	if !checker.ValidateTuneInAvailable("search TuneIn stations") {
+		return fmt.Errorf("TuneIn is not available on this device")
 	}
 
 	response, err := client.SearchTuneInStations(searchTerm)
@@ -90,6 +103,12 @@ func searchPandora(c *cli.Context) error {
 		return err
 	}
 
+	// Check Pandora availability
+	checker := NewServiceAvailabilityChecker(client)
+	if !checker.ValidatePandoraAvailable("search Pandora stations") {
+		return fmt.Errorf("pandora is not available on this device")
+	}
+
 	response, err := client.SearchPandoraStations(sourceAccount, searchTerm)
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to search Pandora: %v", err))
@@ -122,6 +141,12 @@ func searchSpotify(c *cli.Context) error {
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to create client: %v", err))
 		return err
+	}
+
+	// Check Spotify availability
+	checker := NewServiceAvailabilityChecker(client)
+	if !checker.ValidateSpotifyAvailable("search Spotify content") {
+		return fmt.Errorf("Spotify is not available on this device")
 	}
 
 	response, err := client.SearchSpotifyContent(sourceAccount, searchTerm)
@@ -163,6 +188,13 @@ func addStation(c *cli.Context) error {
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to create client: %v", err))
 		return err
+	}
+
+	// Check service availability for the source
+	checker := NewServiceAvailabilityChecker(client)
+	actionDescription := fmt.Sprintf("add %s station", source)
+	if !checker.CheckSourceAvailable(source, actionDescription) {
+		return fmt.Errorf("source '%s' is not available for adding stations", source)
 	}
 
 	err = client.AddStation(source, sourceAccount, token, name)
@@ -237,7 +269,8 @@ func printSearchResults(response *models.SearchStationResponse, searchTerm strin
 
 	if len(songs) > 0 {
 		fmt.Printf("\n  🎵 Songs (%d):\n", len(songs))
-		for i, song := range songs {
+		for i := range songs {
+			song := &songs[i]
 			fmt.Printf("    %d. %s\n", i+1, song.GetDisplayName())
 			if song.Artist != "" {
 				fmt.Printf("       Artist: %s\n", song.Artist)
@@ -255,7 +288,8 @@ func printSearchResults(response *models.SearchStationResponse, searchTerm strin
 
 	if len(artists) > 0 {
 		fmt.Printf("  🎤 Artists (%d):\n", len(artists))
-		for i, artist := range artists {
+		for i := range artists {
+			artist := &artists[i]
 			fmt.Printf("    %d. %s\n", i+1, artist.GetDisplayName())
 			if artist.SourceAccount != "" {
 				fmt.Printf("       Account: %s\n", artist.SourceAccount)
@@ -267,7 +301,8 @@ func printSearchResults(response *models.SearchStationResponse, searchTerm strin
 
 	if len(stations) > 0 {
 		fmt.Printf("  📻 Stations (%d):\n", len(stations))
-		for i, station := range stations {
+		for i := range stations {
+			station := &stations[i]
 			fmt.Printf("    %d. %s\n", i+1, station.GetDisplayName())
 			if station.SourceAccount != "" {
 				fmt.Printf("       Account: %s\n", station.SourceAccount)
@@ -294,43 +329,96 @@ func printSearchResults(response *models.SearchStationResponse, searchTerm strin
 // hasAccountResults checks if any results have source accounts
 func hasAccountResults(response *models.SearchStationResponse) bool {
 	allResults := response.GetAllResults()
-	for _, result := range allResults {
-		if result.SourceAccount != "" {
+	for i := range allResults {
+		if allResults[i].SourceAccount != "" {
 			return true
 		}
 	}
 	return false
 }
 
-// validateStationSource validates that the source is supported for station operations
-func validateStationSource(source string) error {
-	if source == "" {
-		return fmt.Errorf("source is required")
+// listStations handles listing saved stations
+func listStations(c *cli.Context) error {
+	source := c.String("source")
+	sourceAccount := c.String("source-account")
+
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader(fmt.Sprintf("Getting %s stations", source), clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
 	}
 
-	validSources := []string{"TUNEIN", "PANDORA", "SPOTIFY"}
-	for _, validSource := range validSources {
-		if strings.EqualFold(source, validSource) {
-			return nil
+	// Check service availability for the source
+	checker := NewServiceAvailabilityChecker(client)
+
+	actionDescription := fmt.Sprintf("list %s stations", source)
+	if !checker.CheckSourceAvailable(source, actionDescription) {
+		return fmt.Errorf("source '%s' is not available for listing stations", source)
+	}
+
+	var response *models.NavigateResponse
+
+	switch strings.ToUpper(source) {
+	case "TUNEIN":
+		response, err = client.GetTuneInStations(sourceAccount)
+	case "PANDORA":
+		if sourceAccount == "" {
+			PrintError("Pandora source account is required")
+			return fmt.Errorf("source account required for Pandora")
 		}
+		response, err = client.GetPandoraStations(sourceAccount)
+	default:
+		return fmt.Errorf("listing stations is not supported for source: %s", source)
 	}
 
-	return fmt.Errorf("invalid source: %s (valid sources: %v)", source, validSources)
-}
-
-// formatStationToken formats a station token for display (truncate if too long)
-func formatStationToken(token string) string {
-	if len(token) <= 50 {
-		return token
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to get stations: %v", err))
+		return err
 	}
-	return token[:47] + "..."
+
+	printStationList(response, source)
+	return nil
 }
 
-// extractStationInfo extracts key information from a search result for display
-func extractStationInfo(result *models.SearchResult) (string, string, string) {
-	name := result.GetDisplayName()
-	token := result.Token
-	description := result.Description
+// printStationList formats and displays saved station results
+func printStationList(response *models.NavigateResponse, source string) {
+	fmt.Printf("Saved %s Stations:\n", source)
 
-	return name, token, description
+	if response.TotalItems == 0 {
+		fmt.Printf("  No stations found\n")
+		return
+	}
+
+	stations := response.GetStations()
+	fmt.Printf("  Total stations: %d\n", response.TotalItems)
+	fmt.Printf("  Showing: %d\n\n", len(stations))
+
+	for i, station := range stations {
+		fmt.Printf("  %d. %s\n", i+1, station.Name)
+
+		if station.ContentItem != nil {
+			if station.ContentItem.Location != "" {
+				fmt.Printf("     Location: %s\n", station.ContentItem.Location)
+			}
+			if station.ContentItem.SourceAccount != "" {
+				fmt.Printf("     Account: %s\n", station.ContentItem.SourceAccount)
+			}
+			if station.ContentItem.IsPresetable {
+				fmt.Printf("     Can be saved as preset: Yes\n")
+			}
+		}
+
+		if station.Type != "" {
+			fmt.Printf("     Type: %s\n", station.Type)
+		}
+		fmt.Println()
+	}
+
+	// Show usage hints
+	fmt.Printf("💡 Usage hints:\n")
+	fmt.Printf("   • To play a station: Use the location value with 'play content' command\n")
+	fmt.Printf("   • To save as preset: Use 'preset set' command with the location\n")
 }
