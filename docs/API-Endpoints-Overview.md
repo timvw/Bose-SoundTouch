@@ -2,6 +2,8 @@
 
 This document provides a comprehensive overview of the available API endpoints verified against the official Bose SoundTouch Web API v1.0 specification (January 7, 2026).
 
+**Acknowledgment**: Additional endpoints beyond the official API were discovered through the comprehensive [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API) maintained by the SoundTouch Plus community. Special thanks to @thlucas1 and contributors for documenting these working endpoints that enable full preset management and content navigation functionality.
+
 ## Implementation Status Legend
 - ✅ **Implemented** - Fully implemented with tests and real device validation
 - 🔍 **Extra** - Implemented but not in official API v1.0 (may be newer version or undocumented)
@@ -227,10 +229,39 @@ Retrieves the configured presets.
 </presets>
 ```
 
-### POST /presets ℹ️ **N/A**
+### POST /storePreset ✅ **IMPLEMENTED**
 Creates or updates a preset.
 
-**Status**: According to the official Bose SoundTouch API documentation, POST operations on `/presets` are marked as "N/A" - this endpoint officially does not support preset creation or modification via any API client.
+**Status**: While the official Bose SoundTouch API documentation marks POST `/presets` as "N/A", we discovered and implemented the actual working endpoint `/storePreset` through the comprehensive [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API). This enables full preset management functionality.
+
+**Implementation**: 
+- Client method: `StorePreset(id, contentItem)`, `StoreCurrentAsPreset(id)`  
+- CLI: `preset store`, `preset store-current`
+- Supports all content sources: Spotify, TuneIn, local music, etc.
+
+**XML Request**:
+```xml
+<preset id="1" createdOn="1640995200" updatedOn="1640995200">
+  <ContentItem source="SPOTIFY" type="uri" location="spotify:playlist:123" isPresetable="true">
+    <itemName>My Playlist</itemName>
+  </ContentItem>
+</preset>
+```
+
+**Response**: Updated preset configuration
+
+### POST /removePreset ✅ **IMPLEMENTED**
+Removes/clears a preset slot.
+
+**Implementation**:
+- Client method: `RemovePreset(id)`
+- CLI: `preset remove --slot <1-6>`
+- WebSocket events: Triggers `presetsUpdated` notifications
+
+**XML Request**:
+```xml
+<preset id="3"/>
+```
 
 **Alternative Methods**:
 - Use the official Bose SoundTouch mobile app

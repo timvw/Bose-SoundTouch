@@ -74,7 +74,7 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 - `GET /getZone`, `POST /setZone` - Multiroom zone management ✅ Complete
 
 ### **ℹ️ API Limitations**
-- `POST /presets` - Preset creation (officially marked as "N/A" by Bose - no client can implement this)
+- None! All functional endpoints are now implemented including preset management endpoints discovered via the [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API)
 
 ### **⚠️ Not Working on Our Test Devices**
 - `GET /trackInfo` - Implemented but times out on our SoundTouch 10 & 20 (use `GET /now_playing` instead)
@@ -93,7 +93,7 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 | **Track Info** | 1/1 | 1 | **100%** |
 | **Overall Progress** | 26/26 | 26 | **100%** |
 
-**Note**: Excluded only officially unsupported endpoints (`POST /presets`). All documented endpoints are implemented.
+**Note**: All functional endpoints implemented including preset management (`/storePreset`, `/removePreset`) discovered via the [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API). Official API marked preset creation as "N/A" but working endpoints were documented by the SoundTouch Plus community.
 
 ## 🏆 Major Accomplishments
 
@@ -283,7 +283,7 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 - `GET /trackInfo` times out on SoundTouch 10 & 20 (may work on other models)
 
 ### API Design Decisions
-- Preset creation is intentionally not supported via API (official documentation: POST /presets = "N/A")
+- Preset creation now fully supported via `/storePreset` endpoint discovered through [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API) (despite official docs marking POST /presets as "N/A")
 - Track info endpoint is implemented but appears device/firmware dependent
 
 ### Development Notes

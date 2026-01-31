@@ -41,7 +41,9 @@ This document provides a comprehensive analysis of the `/supportedURLs` endpoint
 - `/select` - Select source/content
 
 **Preset Management (1/2):**
-- `/presets` - Get presets (POST officially N/A)
+- `/presets` - Get presets ✅ Complete
+- `/storePreset` - Store/update presets ✅ Complete (reverse-engineered)
+- `/removePreset` - Remove presets ✅ Complete (reverse-engineered)
 
 **Zone/Multiroom (4/4):**
 - `/getZone` - Get zone configuration

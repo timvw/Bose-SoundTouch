@@ -15,6 +15,8 @@ A comprehensive Go library and CLI tool for controlling Bose SoundTouch devices 
 - 🏠 **Multiroom Support**: Create and manage zones across multiple speakers
 - ⚡ **Real-time Events**: WebSocket connection for live device state monitoring
 - 🔍 **Device Discovery**: Automatic discovery via UPnP/SSDP and mDNS
+- 📻 **Content Navigation**: Browse and search TuneIn, Pandora, Spotify, local music
+- 🎙️ **Station Management**: Add and play radio stations without presets
 - 🖥️ **CLI Tool**: Comprehensive command-line interface
 - 🔒 **Production Ready**: Extensive testing with real SoundTouch hardware
 - 🌐 **Cross-Platform**: Windows, macOS, Linux support
@@ -41,7 +43,7 @@ go get github.com/gesellix/bose-soundtouch
 soundtouch-cli discover devices
 ```
 
-#### Control a Device
+# Control a Device
 ```bash
 # Basic device information
 soundtouch-cli --host 192.168.1.100 info get
@@ -50,6 +52,16 @@ soundtouch-cli --host 192.168.1.100 info get
 soundtouch-cli --host 192.168.1.100 play start
 soundtouch-cli --host 192.168.1.100 volume set --level 50
 soundtouch-cli --host 192.168.1.100 source select --source SPOTIFY
+
+# Preset management
+soundtouch-cli --host 192.168.1.100 preset list
+soundtouch-cli --host 192.168.1.100 preset store-current --slot 1
+soundtouch-cli --host 192.168.1.100 preset select --slot 1
+
+# Browse and discover content
+soundtouch-cli --host 192.168.1.100 browse tunein
+soundtouch-cli --host 192.168.1.100 station search-tunein --query "jazz"
+soundtouch-cli --host 192.168.1.100 station add --source TUNEIN --token <token> --name "Jazz Radio"
 
 # Real-time monitoring
 soundtouch-cli --host 192.168.1.100 events subscribe
@@ -162,6 +174,75 @@ func main() {
 }
 ```
 
+#### Preset Management
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+    
+    "github.com/gesellix/bose-soundtouch/pkg/client"
+    "github.com/gesellix/bose-soundtouch/pkg/models"
+)
+
+func main() {
+    c := client.NewClient(&client.Config{
+        Host: "192.168.1.100",
+        Port: 8090,
+    })
+    
+    // Get current presets
+    presets, err := c.GetPresets()
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    fmt.Printf("Found %d presets\n", len(presets.Preset))
+    
+    // Store currently playing content as preset 1
+    err = c.StoreCurrentAsPreset(1)
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    // Store Spotify playlist as preset 2
+    spotifyContent := &models.ContentItem{
+        Source:        "SPOTIFY",
+        Type:          "uri",
+        Location:      "spotify:playlist:37i9dQZF1DXcBWIGoYBM5M",
+        SourceAccount: "your_username",
+        IsPresetable:  true,
+        ItemName:      "Today's Top Hits",
+    }
+    err = c.StorePreset(2, spotifyContent)
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    // Store radio station as preset 3
+    radioContent := &models.ContentItem{
+        Source:       "TUNEIN",
+        Type:         "stationurl",
+        Location:     "/v1/playbook/station/s33828",
+        IsPresetable: true,
+        ItemName:     "K-LOVE Radio",
+    }
+    err = c.StorePreset(3, radioContent)
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    // Select preset 1
+    err = c.SelectPreset(1)
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    fmt.Println("Preset management complete!")
+}
+```
+
 #### Multiroom Zones
 ```go
 package main
@@ -226,7 +307,7 @@ This library supports all Bose SoundTouch-compatible devices, including:
 | System Settings | ✅ Complete | Clock, display, network info |
 | Advanced Audio | ✅ Complete | DSP controls, tone controls |
 
-**API Limitations**: Preset creation is not supported by the SoundTouch API itself.
+**API Limitations**: None - all documented SoundTouch Web API functionality is implemented, including endpoints discovered via the comprehensive [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API).
 
 ## Documentation
 
@@ -234,6 +315,7 @@ This library supports all Bose SoundTouch-compatible devices, including:
 - 📚 [API Reference](docs/API-Endpoints-Overview.md) - Complete endpoint documentation
 - 🔧 [CLI Reference](docs/CLI-REFERENCE.md) - Command-line tool guide
 - 🎯 [Getting Started](docs/GETTING-STARTED.md) - Detailed setup and usage
+- 📻 [Preset Quick Start](docs/PRESET-QUICKSTART.md) - Favorite content management
 - 🧭 [Navigation Guide](docs/NAVIGATION-GUIDE.md) - Content browsing and station management
 - 📋 [Navigation API Reference](docs/API-NAVIGATION-REFERENCE.md) - Navigation API documentation
 - ⚙️ [Advanced Features](docs/SYSTEM-ENDPOINTS.md) - Advanced functionality
@@ -281,6 +363,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 Check out the [examples/](examples/) directory for more usage patterns:
 
 - **Basic HTTP Client**: Simple device control
+- **Preset Management**: Store and manage favorite content
+- **Navigation & Stations**: Browse content and manage radio stations
 - **WebSocket Events**: Real-time monitoring
 - **Device Discovery**: Finding devices on your network
 - **Multiroom Management**: Zone operations
@@ -307,11 +391,33 @@ SoundTouch is a trademark of Bose Corporation.
 - ✅ Multiroom grouping
 
 **What will stop working:**
-- ❌ Presets (preset buttons and app presets)
+- ❌ Cloud-based preset sync between devices and SoundTouch app
 - ❌ Browsing music services directly from the SoundTouch app
 - ❌ Cloud-based features and updates
 
-This Go library will continue to work as it primarily uses the local Web API for direct device control, which is unaffected by the cloud service discontinuation.
+**What continues to work:**
+- ✅ Local preset management via this API client (store, select, remove)
+- ✅ Direct content playback (stations, playlists, etc.)
+
+This Go library will continue to work as it uses the local Web API for direct device control, which is unaffected by the cloud service discontinuation. The local preset management functionality implemented in this library (discovered through the [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API)) provides an alternative to the cloud-based preset features that will be discontinued.
+
+**Community Alternatives**: See the [Related Projects](#related-projects) section below for additional tools like SoundCork that provide cloud service alternatives and the SoundTouch Plus project that offers comprehensive Home Assistant integration.
+
+## Related Projects
+
+### SoundTouch Plus
+- **Project**: [SoundTouch Plus Home Assistant Component](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus)
+- **Wiki**: [SoundTouch WebServices API Documentation](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API)
+- **Description**: Comprehensive Home Assistant integration with extensive API documentation
+- **Contribution**: The SoundTouch Plus Wiki provided invaluable documentation of working endpoints beyond the official API, enabling the preset management and content navigation features in this library
+
+### SoundCork
+- **Project**: [SoundCork - SoundTouch API Intercept](https://github.com/deborahgu/soundcork)
+- **Description**: Intercept API for Bose SoundTouch devices after cloud service discontinuation
+- **Purpose**: Provides a local alternative to cloud-based SoundTouch services post-sunset
+- **Compatibility**: Complements this Go library by extending functionality beyond the local device API
+
+These projects form a comprehensive ecosystem for SoundTouch device management and provide alternatives to Bose's discontinued cloud services.
 
 ## Support
 

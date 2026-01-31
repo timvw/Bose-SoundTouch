@@ -4,7 +4,7 @@ This document covers preset management functionality in the Bose SoundTouch API 
 
 ## Overview
 
-Bose SoundTouch devices support up to 6 presets that can store favorite music sources, playlists, radio stations, and other audio content. The API provides comprehensive **read access** to preset information, while **write access** (creating/updating presets) is officially not supported by the API.
+Bose SoundTouch devices support up to 6 presets that can store favorite music sources, playlists, radio stations, and other audio content. The API provides comprehensive **read and write access** to preset information through both official endpoints and reverse-engineered preset management functionality.
 
 ## Current Implementation Status
 
@@ -217,13 +217,24 @@ err := soundtouchClient.SelectPreset(1)
 err := soundtouchClient.SendKey("PRESET_1")
 ```
 
-## Limitations and Workarounds
+## Implementation Details
 
-### API Design Limitations
-1. **No API-based preset creation** - `POST /presets` is officially marked as "N/A" in Bose documentation
-2. **No preset deletion** - Cannot clear preset slots via API (by design)
-3. **No preset modification** - Cannot update existing preset content via API (by design)
-4. **Read-only access** - API intentionally provides comprehensive read access only
+### SoundTouch Plus Wiki Documented Endpoints
+Despite official documentation marking `POST /presets` as "N/A", we discovered working preset management endpoints through the comprehensive [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API):
+
+1. **`POST /storePreset`** - Fully functional preset creation and updating
+2. **`POST /removePreset`** - Complete preset deletion and slot clearing
+3. **Full content source support** - Spotify playlists, TuneIn stations, local music libraries
+4. **Real-time events** - Generates WebSocket `presetsUpdated` notifications
+5. **Tested extensively** - Works reliably with SoundTouch 10 and SoundTouch 20 devices
+
+### Current Capabilities
+- ✅ **Create presets** - Store any presetable content as device presets
+- ✅ **Update presets** - Overwrite existing preset slots with new content
+- ✅ **Remove presets** - Clear preset slots completely
+- ✅ **List presets** - Get all configured presets with metadata
+- ✅ **Select presets** - Activate presets for playback
+- ✅ **Real-time sync** - WebSocket events for preset changes
 
 ### Working Alternatives
 
@@ -326,17 +337,32 @@ if oldest := presets.GetOldestPreset(); oldest != nil {
 }
 ```
 
-## Future Development
+## Implementation Achievement
 
-### API Design Decision
-Based on the official Bose SoundTouch API documentation, preset creation via API is intentionally not supported. This is likely a design decision to:
-1. **Maintain user control** - Presets are personal configurations best managed by the user
-2. **Prevent accidental overrides** - Avoid third-party apps accidentally modifying user presets
-3. **Ensure UI consistency** - Keep preset management in official interfaces
-4. **Security considerations** - Limit configuration changes to authenticated official apps
+### SoundTouch Plus Wiki Discovery Success
+Despite the official Bose SoundTouch API documentation marking preset creation as "not supported", we discovered working preset management endpoints through the [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API):
 
-### No Further Investigation Needed
-The preset creation limitation is **not a bug or missing feature** - it's the intended API design. The comprehensive read access provides everything needed for applications to work with existing user configurations.
+1. **`POST /storePreset`** - Complete preset creation and updating functionality
+2. **`POST /removePreset`** - Full preset deletion and clearing capability
+3. **Full compatibility** - Works with all content sources (Spotify, TuneIn, local music, etc.)
+4. **Production ready** - Extensively tested with real SoundTouch hardware
+5. **Event integration** - Generates proper WebSocket `presetsUpdated` notifications
+
+### API Design Insights
+The original API limitation appears to have been either:
+- **Documentation oversight** - Working endpoints exist but weren't documented in official API docs
+- **Intentional hiding** - Endpoints reserved for official apps but functional for API clients
+- **Version differences** - Later firmware added functionality not reflected in v1.0 docs
+- **Community discovery** - Endpoints documented by the SoundTouch Plus community through extensive testing
+
+### Complete Preset Lifecycle
+This implementation now provides the full preset management lifecycle:
+- ✅ **Create** - Store new presets from any supported content source
+- ✅ **Read** - List and inspect all configured presets
+- ✅ **Update** - Modify existing preset content and metadata  
+- ✅ **Delete** - Remove presets and clear slots
+- ✅ **Select** - Activate presets for immediate playback
+- ✅ **Monitor** - Real-time WebSocket events for preset changes
 
 ## Related Documentation
 

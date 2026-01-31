@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document analyzes the feasibility and implementation approach for adding `/storePreset` functionality to the Bose SoundTouch API client, based on [GitHub Issue #14](https://github.com/gesellix/Bose-SoundTouch/issues/14).
+This document analyzes the feasibility and implementation approach for adding `/storePreset` functionality to the Bose SoundTouch API client, based on [GitHub Issue #14](https://github.com/gesellix/Bose-SoundTouch/issues/14) and endpoints discovered through the comprehensive [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API).
 
 ## Current Implementation Status
 
@@ -20,7 +20,7 @@ This document analyzes the feasibility and implementation approach for adding `/
 
 ## API Capabilities
 
-According to the [SoundTouch WebServices API Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API#preset-store), `/storePreset` supports:
+According to the comprehensive [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API#preset-store), `/storePreset` supports:
 
 1. **Radio Stations** (TUNEIN, LOCAL_INTERNET_RADIO)
 2. **Spotify Content** (Playlists, Albums, Artists, Tracks)
@@ -369,9 +369,9 @@ The `/storePreset` feature is **highly feasible** and would add significant valu
 Key benefits:
 - ✅ **User-friendly**: Simple CLI commands for preset management with automatic location detection
 - ✅ **Universal**: Supports ALL content sources (Spotify, TUNEIN, Internet Radio, NAS Music, Pandora, Local Music)
-- ✅ **Well-documented**: Complete API specification available
+- ✅ **Well-documented**: Complete API specification available via [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API)
 - ✅ **Event-driven**: WebSocket integration for real-time updates
 - ✅ **Low complexity**: Leverages existing code patterns and infrastructure
 - ✅ **Enhanced CLI**: Automatic location display makes it easy to capture preset data
 
-This feature would enable SoundTouch users to fully utilize their device's preset capabilities programmatically, making it easier to manage and access their favorite content from any supported source.
+This feature would enable SoundTouch users to fully utilize their device's preset capabilities programmatically, making it easier to manage and access their favorite content from any supported source. **Special thanks to the SoundTouch Plus community for documenting these working endpoints that weren't included in the official API documentation.**

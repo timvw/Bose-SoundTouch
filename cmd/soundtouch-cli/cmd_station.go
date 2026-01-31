@@ -1,0 +1,336 @@
+package main
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/gesellix/bose-soundtouch/pkg/models"
+	"github.com/urfave/cli/v2"
+)
+
+// searchStations handles searching for stations across different sources
+func searchStations(c *cli.Context) error {
+	source := c.String("source")
+	sourceAccount := c.String("source-account")
+	searchTerm := c.String("query")
+
+	if searchTerm == "" {
+		PrintError("Search query is required")
+		return fmt.Errorf("search query cannot be empty")
+	}
+
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader(fmt.Sprintf("Searching %s for: %s", source, searchTerm), clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	response, err := client.SearchStation(source, sourceAccount, searchTerm)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to search stations: %v", err))
+		return err
+	}
+
+	printSearchResults(response, searchTerm)
+	return nil
+}
+
+// searchTuneIn handles searching TuneIn specifically
+func searchTuneIn(c *cli.Context) error {
+	searchTerm := c.String("query")
+
+	if searchTerm == "" {
+		PrintError("Search query is required")
+		return fmt.Errorf("search query cannot be empty")
+	}
+
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader(fmt.Sprintf("Searching TuneIn for: %s", searchTerm), clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	response, err := client.SearchTuneInStations(searchTerm)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to search TuneIn: %v", err))
+		return err
+	}
+
+	printSearchResults(response, searchTerm)
+	return nil
+}
+
+// searchPandora handles searching Pandora specifically
+func searchPandora(c *cli.Context) error {
+	sourceAccount := c.String("source-account")
+	searchTerm := c.String("query")
+
+	if sourceAccount == "" {
+		PrintError("Pandora source account is required")
+		return fmt.Errorf("source account required for Pandora")
+	}
+
+	if searchTerm == "" {
+		PrintError("Search query is required")
+		return fmt.Errorf("search query cannot be empty")
+	}
+
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader(fmt.Sprintf("Searching Pandora for: %s", searchTerm), clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	response, err := client.SearchPandoraStations(sourceAccount, searchTerm)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to search Pandora: %v", err))
+		return err
+	}
+
+	printSearchResults(response, searchTerm)
+	return nil
+}
+
+// searchSpotify handles searching Spotify specifically
+func searchSpotify(c *cli.Context) error {
+	sourceAccount := c.String("source-account")
+	searchTerm := c.String("query")
+
+	if sourceAccount == "" {
+		PrintError("Spotify source account is required")
+		return fmt.Errorf("source account required for Spotify")
+	}
+
+	if searchTerm == "" {
+		PrintError("Search query is required")
+		return fmt.Errorf("search query cannot be empty")
+	}
+
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader(fmt.Sprintf("Searching Spotify for: %s", searchTerm), clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	response, err := client.SearchSpotifyContent(sourceAccount, searchTerm)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to search Spotify: %v", err))
+		return err
+	}
+
+	printSearchResults(response, searchTerm)
+	return nil
+}
+
+// addStation handles adding a station and playing it immediately
+func addStation(c *cli.Context) error {
+	source := c.String("source")
+	sourceAccount := c.String("source-account")
+	token := c.String("token")
+	name := c.String("name")
+
+	if source == "" {
+		PrintError("Source is required")
+		return fmt.Errorf("source cannot be empty")
+	}
+
+	if token == "" {
+		PrintError("Station token is required")
+		return fmt.Errorf("token cannot be empty")
+	}
+
+	if name == "" {
+		PrintError("Station name is required")
+		return fmt.Errorf("name cannot be empty")
+	}
+
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader(fmt.Sprintf("Adding %s station: %s", source, name), clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	err = client.AddStation(source, sourceAccount, token, name)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to add station: %v", err))
+		return err
+	}
+
+	PrintSuccess(fmt.Sprintf("Added and started playing station: %s", name))
+	return nil
+}
+
+// removeStation handles removing a station from collections
+func removeStation(c *cli.Context) error {
+	source := c.String("source")
+	location := c.String("location")
+	itemType := c.String("type")
+	sourceAccount := c.String("source-account")
+
+	if source == "" {
+		PrintError("Source is required")
+		return fmt.Errorf("source cannot be empty")
+	}
+
+	if location == "" {
+		PrintError("Station location is required")
+		return fmt.Errorf("location cannot be empty")
+	}
+
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader(fmt.Sprintf("Removing %s station", source), clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	// Create content item for the station to remove
+	contentItem := &models.ContentItem{
+		Source:        source,
+		Location:      location,
+		Type:          itemType,
+		SourceAccount: sourceAccount,
+	}
+
+	err = client.RemoveStation(contentItem)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to remove station: %v", err))
+		return err
+	}
+
+	PrintSuccess("Station removed successfully")
+	return nil
+}
+
+// printSearchResults formats and displays search results
+func printSearchResults(response *models.SearchStationResponse, searchTerm string) {
+	fmt.Printf("Search Results for '%s':\n", searchTerm)
+
+	if response.IsEmpty() {
+		fmt.Printf("  No results found\n")
+		return
+	}
+
+	fmt.Printf("  Total results: %d\n", response.GetResultCount())
+
+	// Group results by type for better display
+	songs := response.GetSongs()
+	artists := response.GetArtists()
+	stations := response.GetStations()
+
+	if len(songs) > 0 {
+		fmt.Printf("\n  🎵 Songs (%d):\n", len(songs))
+		for i, song := range songs {
+			fmt.Printf("    %d. %s\n", i+1, song.GetDisplayName())
+			if song.Artist != "" {
+				fmt.Printf("       Artist: %s\n", song.Artist)
+			}
+			if song.Album != "" {
+				fmt.Printf("       Album: %s\n", song.Album)
+			}
+			if song.SourceAccount != "" {
+				fmt.Printf("       Account: %s\n", song.SourceAccount)
+			}
+			fmt.Printf("       Token: %s\n", song.Token)
+			fmt.Println()
+		}
+	}
+
+	if len(artists) > 0 {
+		fmt.Printf("  🎤 Artists (%d):\n", len(artists))
+		for i, artist := range artists {
+			fmt.Printf("    %d. %s\n", i+1, artist.GetDisplayName())
+			if artist.SourceAccount != "" {
+				fmt.Printf("       Account: %s\n", artist.SourceAccount)
+			}
+			fmt.Printf("       Token: %s\n", artist.Token)
+			fmt.Println()
+		}
+	}
+
+	if len(stations) > 0 {
+		fmt.Printf("  📻 Stations (%d):\n", len(stations))
+		for i, station := range stations {
+			fmt.Printf("    %d. %s\n", i+1, station.GetDisplayName())
+			if station.SourceAccount != "" {
+				fmt.Printf("       Account: %s\n", station.SourceAccount)
+			}
+			fmt.Printf("       Token: %s\n", station.Token)
+			if station.Description != "" {
+				fmt.Printf("       Description: %s\n", station.Description)
+			}
+			fmt.Println()
+		}
+	}
+
+	// Show usage hints
+	fmt.Printf("💡 Usage hints:\n")
+	fmt.Printf("   • To add a station and play it: station add --source %s --token <token> --name <name>\n", response.Source)
+	if hasAccountResults(response) {
+		fmt.Printf("   • Include --source-account <account> when adding stations that require it\n")
+	}
+	if len(songs) > 0 || len(artists) > 0 || len(stations) > 0 {
+		fmt.Printf("   • Copy the token from results above to use with 'station add'\n")
+	}
+}
+
+// hasAccountResults checks if any results have source accounts
+func hasAccountResults(response *models.SearchStationResponse) bool {
+	allResults := response.GetAllResults()
+	for _, result := range allResults {
+		if result.SourceAccount != "" {
+			return true
+		}
+	}
+	return false
+}
+
+// validateStationSource validates that the source is supported for station operations
+func validateStationSource(source string) error {
+	if source == "" {
+		return fmt.Errorf("source is required")
+	}
+
+	validSources := []string{"TUNEIN", "PANDORA", "SPOTIFY"}
+	for _, validSource := range validSources {
+		if strings.EqualFold(source, validSource) {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("invalid source: %s (valid sources: %v)", source, validSources)
+}
+
+// formatStationToken formats a station token for display (truncate if too long)
+func formatStationToken(token string) string {
+	if len(token) <= 50 {
+		return token
+	}
+	return token[:47] + "..."
+}
+
+// extractStationInfo extracts key information from a search result for display
+func extractStationInfo(result *models.SearchResult) (string, string, string) {
+	name := result.GetDisplayName()
+	token := result.Token
+	description := result.Description
+
+	return name, token, description
+}
