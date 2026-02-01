@@ -248,37 +248,3 @@ func printNavigationResults(response *models.NavigateResponse, title string) {
 		fmt.Printf("  💡 Found %d playable items\n", len(playableItems))
 	}
 }
-
-// Helper function to parse pagination parameters
-func parsePaginationParams(c *cli.Context) (int, int) {
-	start := c.Int("start")
-	limit := c.Int("limit")
-
-	if start < 1 {
-		start = 1
-	}
-	if limit < 1 {
-		limit = 20 // Reasonable default
-	}
-	if limit > 1000 {
-		limit = 1000 // Prevent excessive requests
-	}
-
-	return start, limit
-}
-
-// Helper function to validate required source parameter
-func validateSource(source string) error {
-	if source == "" {
-		return fmt.Errorf("source is required")
-	}
-
-	validSources := []string{"TUNEIN", "PANDORA", "SPOTIFY", "STORED_MUSIC", "LOCAL_MUSIC"}
-	for _, validSource := range validSources {
-		if source == validSource {
-			return nil
-		}
-	}
-
-	return fmt.Errorf("invalid source: %s (valid sources: %v)", source, validSources)
-}
