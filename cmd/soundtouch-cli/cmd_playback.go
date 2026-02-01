@@ -102,6 +102,10 @@ func printContentDetails(nowPlaying *models.NowPlaying, verbose bool) {
 	fmt.Printf("\nContent Details:\n")
 	printContentLocation(nowPlaying.ContentItem)
 	printVerboseContentInfo(nowPlaying, verbose)
+
+	if verbose {
+		printVerbosePlaybackDetails(nowPlaying)
+	}
 }
 
 // printContentLocation prints the content location
@@ -125,7 +129,45 @@ func printVerboseContentInfo(nowPlaying *models.NowPlaying, verbose bool) {
 		fmt.Printf("  Item Name: %s\n", nowPlaying.ContentItem.ItemName)
 	}
 
+	if nowPlaying.ContentItem.ContainerArt != "" {
+		fmt.Printf("  Container Art: %s\n", nowPlaying.ContentItem.ContainerArt)
+	}
+
 	fmt.Printf("  Presetable: %t\n", nowPlaying.ContentItem.IsPresetable)
+}
+
+// printVerbosePlaybackDetails prints detailed playback information in verbose mode
+func printVerbosePlaybackDetails(nowPlaying *models.NowPlaying) {
+	fmt.Printf("\nPlayback Details:\n")
+
+	// Shuffle and repeat settings
+	if nowPlaying.ShuffleSetting != "" {
+		fmt.Printf("  Shuffle: %s\n", nowPlaying.ShuffleSetting.String())
+	}
+
+	if nowPlaying.RepeatSetting != "" {
+		fmt.Printf("  Repeat: %s\n", nowPlaying.RepeatSetting.String())
+	}
+
+	// Track ID
+	if nowPlaying.TrackID != "" {
+		fmt.Printf("  Track ID: %s\n", nowPlaying.TrackID)
+	}
+
+	// Art details
+	if nowPlaying.Art != nil {
+		fmt.Printf("  Art Image Status: %s\n", nowPlaying.Art.ArtImageStatus)
+		if nowPlaying.Art.URL != "" {
+			fmt.Printf("  Art URL: %s\n", nowPlaying.Art.URL)
+		}
+	}
+
+	// Capabilities
+	fmt.Printf("\nCapabilities:\n")
+	fmt.Printf("  Skip Enabled: %t\n", nowPlaying.CanSkip())
+	fmt.Printf("  Skip Previous Enabled: %t\n", nowPlaying.CanSkipPrevious())
+	fmt.Printf("  Favorite Enabled: %t\n", nowPlaying.CanFavorite())
+	fmt.Printf("  Seek Supported: %t\n", nowPlaying.IsSeekSupported())
 }
 
 // printPlaybackStatus prints special status messages
