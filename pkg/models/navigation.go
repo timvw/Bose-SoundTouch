@@ -160,22 +160,26 @@ func NewSearchStationRequest(source, sourceAccount, searchTerm string) *SearchSt
 // GetPlayableItems returns only the playable items from the navigate response
 func (nr *NavigateResponse) GetPlayableItems() []NavigateItem {
 	var playable []NavigateItem
+
 	for _, item := range nr.Items {
 		if item.Playable == 1 {
 			playable = append(playable, item)
 		}
 	}
+
 	return playable
 }
 
 // GetDirectories returns only the directory items from the navigate response
 func (nr *NavigateResponse) GetDirectories() []NavigateItem {
 	var directories []NavigateItem
+
 	for _, item := range nr.Items {
 		if item.Type == "dir" {
 			directories = append(directories, item)
 		}
 	}
+
 	return directories
 }
 
@@ -193,11 +197,13 @@ func (nr *NavigateResponse) GetTracks() []NavigateItem {
 // GetStations returns only the station items from the navigate response
 func (nr *NavigateResponse) GetStations() []NavigateItem {
 	var stations []NavigateItem
+
 	for _, item := range nr.Items {
 		if item.Type == "stationurl" || (item.ContentItem != nil && item.ContentItem.Type == "stationurl") {
 			stations = append(stations, item)
 		}
 	}
+
 	return stations
 }
 
@@ -211,6 +217,7 @@ func (ni *NavigateItem) GetDisplayName() string {
 	if ni.Name != "" {
 		return ni.Name
 	}
+
 	if ni.ContentItem != nil && ni.ContentItem.ItemName != "" {
 		return ni.ContentItem.ItemName
 	}
@@ -253,6 +260,7 @@ func (ni *NavigateItem) GetArtwork() string {
 // GetAllResults returns all search results regardless of type
 func (sr *SearchStationResponse) GetAllResults() []SearchResult {
 	var allResults []SearchResult
+
 	allResults = append(allResults, sr.Songs...)
 	allResults = append(allResults, sr.Artists...)
 	allResults = append(allResults, sr.Stations...)

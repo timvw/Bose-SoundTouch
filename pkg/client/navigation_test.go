@@ -202,7 +202,6 @@ func TestClient_NavigateWithMenu(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-
 	response, err := client.NavigateWithMenu("PANDORA", "user123", "radioStations", "dateCreated", 1, 100)
 
 	if err != nil {
@@ -591,8 +590,7 @@ func TestClient_GetTuneInStations(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-
-	response, err := client.GetTuneInStations("")
+	response, err := client.GetTuneInStations("Rock")
 
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)

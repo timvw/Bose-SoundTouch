@@ -379,6 +379,7 @@ func (s *SupportedURLsResponse) GetSupportedFeatures() []EndpointFeature {
 // GetUnsupportedFeatures returns features not supported by this device
 func (s *SupportedURLsResponse) GetUnsupportedFeatures() []EndpointFeature {
 	features := GetEndpointFeatureMap()
+
 	var unsupported []EndpointFeature
 
 	for _, feature := range features {
@@ -402,6 +403,7 @@ func (s *SupportedURLsResponse) GetUnsupportedFeatures() []EndpointFeature {
 // GetPartiallyImplementedFeatures returns features where only some endpoints are supported
 func (s *SupportedURLsResponse) GetPartiallyImplementedFeatures() []EndpointFeature {
 	features := GetEndpointFeatureMap()
+
 	var partial []EndpointFeature
 
 	for _, feature := range features {
@@ -428,6 +430,7 @@ func (s *SupportedURLsResponse) GetPartiallyImplementedFeatures() []EndpointFeat
 // GetMissingEssentialFeatures returns essential features that are not supported
 func (s *SupportedURLsResponse) GetMissingEssentialFeatures() []EndpointFeature {
 	features := GetEndpointFeatureMap()
+
 	var missing []EndpointFeature
 
 	for _, feature := range features {
