@@ -1392,6 +1392,100 @@ func main() {
 					},
 				},
 			},
+			// Speaker commands (TTS and URL playback)
+			{
+				Name:    "speaker",
+				Aliases: []string{"sp"},
+				Usage:   "Speaker notification and content playback commands",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "tts",
+						Usage:  "Play a Text-To-Speech message",
+						Action: playTTS,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "text",
+								Aliases:  []string{"t"},
+								Usage:    "Text message to speak",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "app-key",
+								Aliases:  []string{"k"},
+								Usage:    "Application key for the request",
+								Required: true,
+							},
+							&cli.IntFlag{
+								Name:    "volume",
+								Aliases: []string{"v"},
+								Usage:   "Volume level (0-100, 0 = current volume)",
+								Value:   0,
+							},
+							&cli.StringFlag{
+								Name:    "language",
+								Aliases: []string{"l"},
+								Usage:   "Language code (EN, DE, ES, FR, etc.)",
+								Value:   "EN",
+							},
+						},
+					},
+					{
+						Name:   "url",
+						Usage:  "Play audio content from a URL",
+						Action: playURL,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "url",
+								Aliases:  []string{"u"},
+								Usage:    "URL of the audio content to play",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "app-key",
+								Aliases:  []string{"k"},
+								Usage:    "Application key for the request",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:    "service",
+								Aliases: []string{"s"},
+								Usage:   "Service name (appears in NowPlaying artist field)",
+								Value:   "URL Playback",
+							},
+							&cli.StringFlag{
+								Name:    "message",
+								Aliases: []string{"m"},
+								Usage:   "Message description (appears in NowPlaying album field)",
+								Value:   "Audio Content",
+							},
+							&cli.StringFlag{
+								Name:    "reason",
+								Aliases: []string{"r"},
+								Usage:   "Reason or filename (appears in NowPlaying track field)",
+							},
+							&cli.IntFlag{
+								Name:    "volume",
+								Aliases: []string{"v"},
+								Usage:   "Volume level (0-100, 0 = current volume)",
+								Value:   0,
+							},
+						},
+					},
+					{
+						Name:   "beep",
+						Usage:  "Play a notification beep sound",
+						Action: playNotificationBeep,
+						Before: RequireHost,
+					},
+					{
+						Name:   "help",
+						Usage:  "Show detailed help about speaker functionality",
+						Action: showSpeakerHelp,
+					},
+				},
+			},
 			// Token commands
 			{
 				Name:    "token",

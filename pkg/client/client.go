@@ -1643,3 +1643,44 @@ func (c *Client) hasCapability(capabilities *models.Capabilities, capability str
 	capStr := fmt.Sprintf("%+v", capabilities)
 	return strings.Contains(capStr, capability)
 }
+
+// PlayTTS plays a Text-To-Speech message using Google TTS on the speaker
+func (c *Client) PlayTTS(text, appKey string, volume ...int) error {
+	playInfo := models.NewTTSPlayInfo(text, appKey, volume...)
+
+	if err := playInfo.Validate(); err != nil {
+		return fmt.Errorf("invalid TTS request: %w", err)
+	}
+
+	return c.postPlayInfo(playInfo)
+}
+
+// PlayURL plays audio content from a URL on the speaker
+func (c *Client) PlayURL(url, appKey, service, message, reason string, volume ...int) error {
+	playInfo := models.NewURLPlayInfo(url, appKey, service, message, reason, volume...)
+
+	if err := playInfo.Validate(); err != nil {
+		return fmt.Errorf("invalid URL play request: %w", err)
+	}
+
+	return c.postPlayInfo(playInfo)
+}
+
+// PlayCustom plays custom content using a PlayInfo configuration
+func (c *Client) PlayCustom(playInfo *models.PlayInfo) error {
+	if err := playInfo.Validate(); err != nil {
+		return fmt.Errorf("invalid play request: %w", err)
+	}
+
+	return c.postPlayInfo(playInfo)
+}
+
+// PlayNotificationBeep plays a notification beep on the device
+func (c *Client) PlayNotificationBeep() error {
+	return c.post("/playNotification", nil)
+}
+
+// postPlayInfo sends a PlayInfo request to the /speaker endpoint
+func (c *Client) postPlayInfo(playInfo *models.PlayInfo) error {
+	return c.post("/speaker", playInfo)
+}
