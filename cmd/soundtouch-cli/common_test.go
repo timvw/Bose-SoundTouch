@@ -18,6 +18,7 @@ func TestFetchTuneInMetadata(t *testing.T) {
 <body></body>
 </html>
 `
+
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(html))
 	}))
@@ -26,6 +27,7 @@ func TestFetchTuneInMetadata(t *testing.T) {
 	// Temporarily override httpClient to use test server
 	oldClient := httpClient
 	httpClient = ts.Client()
+
 	defer func() { httpClient = oldClient }()
 
 	metadata, err := fetchTuneInMetadata("https://tunein.com/radio/WDR-2-Rheinland-1004-s213886/")

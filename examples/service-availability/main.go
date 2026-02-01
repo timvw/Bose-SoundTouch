@@ -67,6 +67,7 @@ func displayServiceReport(sa *models.ServiceAvailability) {
 
 	// Available services
 	fmt.Println("\n📱 AVAILABLE SERVICES:")
+
 	availableServices := sa.GetAvailableServices()
 	if len(availableServices) == 0 {
 		fmt.Println("  None")
@@ -78,6 +79,7 @@ func displayServiceReport(sa *models.ServiceAvailability) {
 
 	// Unavailable services
 	fmt.Println("\n❌ UNAVAILABLE SERVICES:")
+
 	unavailableServices := sa.GetUnavailableServices()
 	if len(unavailableServices) == 0 {
 		fmt.Println("  None")
@@ -102,6 +104,7 @@ func displayServiceCategories(sa *models.ServiceAvailability) {
 	fmt.Println("\n🎵 STREAMING SERVICES:")
 	streamingServices := sa.GetStreamingServices()
 	availableCount := 0
+
 	for _, service := range streamingServices {
 		status := "❌"
 		if service.IsAvailable {
@@ -115,6 +118,7 @@ func displayServiceCategories(sa *models.ServiceAvailability) {
 	fmt.Println("\n🔗 LOCAL INPUT SERVICES:")
 	localServices := sa.GetLocalServices()
 	localAvailableCount := 0
+
 	for _, service := range localServices {
 		status := "❌"
 		if service.IsAvailable {
@@ -123,6 +127,7 @@ func displayServiceCategories(sa *models.ServiceAvailability) {
 		}
 		fmt.Printf("  %s %s\n", status, formatServiceName(service.Type))
 	}
+
 	fmt.Printf("  Summary: %d/%d local services available\n", localAvailableCount, len(localServices))
 }
 
@@ -215,6 +220,7 @@ func getTroubleshootingTip(serviceType, reason string) string {
 		if reason == "INVALID_SOURCE_TYPE" {
 			return "This device may not support Bluetooth audio input"
 		}
+
 		return "Check if Bluetooth is enabled and try restarting the device"
 	case "SPOTIFY":
 		return "Ensure you have a Spotify Premium account and are logged in"
@@ -226,6 +232,7 @@ func getTroubleshootingTip(serviceType, reason string) string {
 		if reason != "" {
 			return fmt.Sprintf("Reason: %s", reason)
 		}
+
 		return "Service is currently unavailable"
 	}
 }

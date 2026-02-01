@@ -254,7 +254,6 @@ func TestClient_NavigateContainer(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-
 	response, err := client.NavigateContainer("STORED_MUSIC", "device123/0", 1, 1000, containerItem)
 
 	if err != nil {
@@ -546,7 +545,6 @@ func TestClient_GetPandoraStations(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-
 	response, err := client.GetPandoraStations("user123")
 
 	if err != nil {
@@ -835,7 +833,6 @@ func TestClient_SearchPandoraStations(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-
 	response, err := client.SearchPandoraStations("user123", "Taylor Swift")
 
 	if err != nil {
@@ -922,7 +919,6 @@ func TestClient_SearchSpotifyContent(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-
 	response, err := client.SearchSpotifyContent("user@example.com", "Queen")
 
 	if err != nil {

@@ -226,6 +226,7 @@ func getSupportedURLs(c *cli.Context) error {
 	}
 
 	printSupportedURLs(supportedURLs, c)
+
 	return nil
 }
 
@@ -310,6 +311,7 @@ func printFeatureStatus(feature models.EndpointFeature, supportedURLs *models.Su
 	}
 
 	fmt.Printf("    %s %s", status, feature.Name)
+
 	if feature.Essential {
 		fmt.Printf(" ⭐")
 	}
@@ -322,11 +324,13 @@ func printFeatureStatus(feature models.EndpointFeature, supportedURLs *models.Su
 
 func countSupportedEndpoints(feature models.EndpointFeature, supportedURLs *models.SupportedURLsResponse) int {
 	supportedEndpoints := 0
+
 	for _, endpoint := range feature.Endpoints {
 		if supportedURLs.HasURL(endpoint) {
 			supportedEndpoints++
 		}
 	}
+
 	return supportedEndpoints
 }
 
@@ -334,6 +338,7 @@ func printVerboseFeatureDetails(feature models.EndpointFeature, supportedEndpoin
 	fmt.Printf("        %s\n", feature.Description)
 	fmt.Printf("        CLI: %s\n", feature.CLICommand)
 	fmt.Printf("        Endpoints: %d/%d supported", supportedEndpoints, len(feature.Endpoints))
+
 	if supportedEndpoints < len(feature.Endpoints) {
 		fmt.Printf(" (partial)")
 	}
@@ -377,7 +382,8 @@ func printDetailedEndpoints(supportedURLs *models.SupportedURLsResponse) {
 	// Show core functionality
 	coreURLs := supportedURLs.GetCoreURLs()
 	if len(coreURLs) > 0 {
-		fmt.Printf("⚡ Core Functionality (%d endpoints):\n", len(coreURLs))
+		fmt.Printf("🎮 Core Functionality (%d endpoints):\n", len(coreURLs))
+
 		for _, url := range coreURLs {
 			fmt.Printf("    • %s\n", url)
 		}
@@ -410,6 +416,7 @@ func printDetailedEndpoints(supportedURLs *models.SupportedURLsResponse) {
 	networkURLs := supportedURLs.GetNetworkURLs()
 	if len(networkURLs) > 0 {
 		fmt.Printf("🌐 Network & Connectivity (%d endpoints):\n", len(networkURLs))
+
 		for _, url := range networkURLs {
 			fmt.Printf("    • %s\n", url)
 		}
@@ -487,7 +494,8 @@ func printDeviceAnalysis(supportedURLs *models.SupportedURLsResponse) {
 	// Show what's missing
 	unsupportedFeatures := supportedURLs.GetUnsupportedFeatures()
 	if len(unsupportedFeatures) > 0 {
-		fmt.Printf("❌ Unavailable Features (%d):\n", len(unsupportedFeatures))
+		fmt.Printf("❌ Unsupported Features (%d):\n", len(unsupportedFeatures))
+
 		for _, feature := range unsupportedFeatures {
 			fmt.Printf("    • %s - %s\n", feature.Name, feature.Description)
 		}
@@ -497,9 +505,11 @@ func printDeviceAnalysis(supportedURLs *models.SupportedURLsResponse) {
 	// Partial implementations
 	partial := supportedURLs.GetPartiallyImplementedFeatures()
 	if len(partial) > 0 {
-		fmt.Printf("⚠️  Partially Supported Features (%d):\n", len(partial))
+		fmt.Printf("⚠️ Partially Supported Features (%d):\n", len(partial))
+
 		for _, feature := range partial {
 			supportedCount := 0
+
 			for _, endpoint := range feature.Endpoints {
 				if supportedURLs.HasURL(endpoint) {
 					supportedCount++
@@ -522,6 +532,7 @@ func classifyDevice(supportedURLs *models.SupportedURLsResponse) string {
 	if supportedURLs.HasMultiroomSupport() && supportedURLs.HasAdvancedAudioSupport() {
 		return "Premium SoundTouch Speaker (Full Feature Set)"
 	}
+
 	if supportedURLs.HasMultiroomSupport() {
 		return "Standard SoundTouch Speaker (Multiroom Capable)"
 	}
@@ -529,6 +540,7 @@ func classifyDevice(supportedURLs *models.SupportedURLsResponse) string {
 	if supportedURLs.HasStreamingSupport() && supportedURLs.HasPresetSupport() {
 		return "Basic SoundTouch Speaker"
 	}
+
 	if supportedURLs.HasCorePlaybackSupport() {
 		return "Essential SoundTouch Device"
 	}
@@ -622,6 +634,7 @@ func getCategoryEmoji(category string) string {
 	if emoji, exists := emojis[category]; exists {
 		return emoji
 	}
+
 	return "📋"
 }
 

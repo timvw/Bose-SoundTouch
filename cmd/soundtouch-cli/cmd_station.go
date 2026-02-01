@@ -30,6 +30,7 @@ func searchStations(c *cli.Context) error {
 
 	// Check service availability for the source
 	checker := NewServiceAvailabilityChecker(client)
+
 	actionDescription := fmt.Sprintf("search %s stations", source)
 	if !checker.CheckSourceAvailable(source, actionDescription) {
 		return fmt.Errorf("source '%s' is not available for station search", source)
@@ -192,6 +193,7 @@ func addStation(c *cli.Context) error {
 
 	// Check service availability for the source
 	checker := NewServiceAvailabilityChecker(client)
+
 	actionDescription := fmt.Sprintf("add %s station", source)
 	if !checker.CheckSourceAvailable(source, actionDescription) {
 		return fmt.Errorf("source '%s' is not available for adding stations", source)

@@ -536,6 +536,7 @@ func BenchmarkServiceAvailability_GetAvailableServices(b *testing.B) {
 	}
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		_ = sa.GetAvailableServices()
 	}
@@ -555,6 +556,7 @@ func BenchmarkServiceAvailability_IsServiceAvailable(b *testing.B) {
 	}
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		_ = sa.IsServiceAvailable(ServiceTypeSpotify)
 	}

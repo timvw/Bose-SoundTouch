@@ -288,7 +288,6 @@ func ExampleClient_GetCapabilities() {
 func ExampleClient_GetSupportedURLs_concept() {
 	// Example of how to use GetSupportedURLs() method
 	// Note: This example shows the concept but doesn't execute to avoid requiring a real device
-
 	config := &client.Config{Host: "192.168.1.100"}
 	c := client.NewClient(config)
 

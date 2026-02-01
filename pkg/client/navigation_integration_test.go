@@ -21,6 +21,7 @@ func TestClient_Navigation_Integration(t *testing.T) {
 
 	// Parse host:port if provided
 	var finalHost string
+
 	var finalPort int
 	if strings.Contains(host, ":") {
 		parts := strings.Split(host, ":")
@@ -153,6 +154,7 @@ func TestClient_StationManagement_Integration(t *testing.T) {
 
 	// Parse host:port if provided
 	var finalHost string
+
 	var finalPort int
 	if strings.Contains(host, ":") {
 		parts := strings.Split(host, ":")
@@ -185,6 +187,7 @@ func TestClient_StationManagement_Integration(t *testing.T) {
 		for _, source := range sources.SourceItem {
 			if source.Source == "PANDORA" && source.Status.IsReady() {
 				pandoraAccount = source.SourceAccount
+
 				break
 			}
 		}
@@ -207,6 +210,7 @@ func TestClient_StationManagement_Integration(t *testing.T) {
 
 		// Try to find an artist or station result to add
 		var tokenToAdd string
+
 		var nameToAdd string
 
 		artists := searchResponse.GetArtists()
@@ -241,13 +245,16 @@ func TestClient_StationManagement_Integration(t *testing.T) {
 		}
 
 		var testSource string
+
 		var testAccount string
 
 		// Look for STORED_MUSIC as it typically has containers
+
 		for _, source := range sources.SourceItem {
 			if source.Source == "STORED_MUSIC" && source.Status.IsReady() {
 				testSource = source.Source
 				testAccount = source.SourceAccount
+
 				break
 			}
 		}

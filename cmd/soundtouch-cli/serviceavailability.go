@@ -58,7 +58,6 @@ func (sac *ServiceAvailabilityChecker) loadServiceAvailability() {
 
 	sac.serviceAvailability = serviceAvailability
 	sac.cached = true
-
 }
 
 // CheckServiceAvailable validates if a service is available and provides user feedback

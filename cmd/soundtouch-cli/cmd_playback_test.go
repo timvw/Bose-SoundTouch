@@ -221,7 +221,6 @@ func shouldShowContentDetails(verbose bool, contentItem *models.ContentItem) boo
 	// This mirrors the exact logic from cmd_playback.go:
 	// showDetails := verbose || (nowPlaying.ContentItem != nil && nowPlaying.ContentItem.Location != "")
 	// if showDetails && nowPlaying.ContentItem != nil { ... }
-
 	hasLocationData := contentItem != nil && contentItem.Location != ""
 	showDetails := verbose || hasLocationData
 

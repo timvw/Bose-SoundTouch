@@ -343,19 +343,23 @@ func handleConnection(event *models.ConnectionStateUpdatedEvent) {
 
 func handlePreset(event *models.PresetUpdatedEvent, verbose bool) {
 	presets := &event.Presets
+
 	deviceHeader := "\n📻 Presets Update"
 	if event.DeviceID != "" {
 		deviceHeader += fmt.Sprintf(" [%s]", event.DeviceID)
 	}
+
 	fmt.Printf("%s:\n", deviceHeader)
 	fmt.Printf("  📻 Total presets: %d\n", len(presets.Preset))
 
 	for _, preset := range presets.Preset {
 		fmt.Printf("  📻 Preset %d:", preset.ID)
+
 		if preset.ContentItem != nil {
 			fmt.Printf(" %s", preset.ContentItem.ItemName)
 			fmt.Printf(" (%s)", preset.ContentItem.Source)
 		}
+
 		fmt.Println()
 	}
 
