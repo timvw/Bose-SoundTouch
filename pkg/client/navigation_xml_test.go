@@ -57,11 +57,11 @@ func TestClient_NavigateXMLValidation(t *testing.T) {
 				capturedEndpoint = r.URL.Path
 
 				body := make([]byte, r.ContentLength)
-				r.Body.Read(body)
+				_, _ = r.Body.Read(body)
 				capturedXML = string(body)
 
 				// Return valid navigate response
-				w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>
+				_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>
 <navigateResponse source="` + tt.source + `">
 	<totalItems>0</totalItems>
 	<items></items>
@@ -99,11 +99,11 @@ func TestClient_NavigateWithMenuXMLValidation(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body := make([]byte, r.ContentLength)
-		r.Body.Read(body)
+		_, _ = r.Body.Read(body)
 		capturedXML = string(body)
 
-		w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>
-<navigateResponse source="PANDORA">
+		_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>
+<navigateResponse source="SPOTIFY">
 	<totalItems>0</totalItems>
 	<items></items>
 </navigateResponse>`))
@@ -174,10 +174,10 @@ func TestClient_SearchStationXMLValidation(t *testing.T) {
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				body := make([]byte, r.ContentLength)
-				r.Body.Read(body)
+				_, _ = r.Body.Read(body)
 				capturedXML = string(body)
 
-				w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>
+				_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>
 <results source="` + tt.source + `">
 	<songs></songs>
 	<artists></artists>
@@ -212,10 +212,10 @@ func TestClient_AddStationXMLValidation(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body := make([]byte, r.ContentLength)
-		r.Body.Read(body)
+		_, _ = r.Body.Read(body)
 		capturedXML = string(body)
 
-		w.Write([]byte(`<status>/addStation</status>`))
+		_, _ = w.Write([]byte(`<status>/addStation</status>`))
 	}))
 	defer server.Close()
 
@@ -252,10 +252,10 @@ func TestClient_RemoveStationXMLValidation(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body := make([]byte, r.ContentLength)
-		r.Body.Read(body)
+		_, _ = r.Body.Read(body)
 		capturedXML = string(body)
 
-		w.Write([]byte(`<status>/removeStation</status>`))
+		_, _ = w.Write([]byte(`<status>/removeStation</status>`))
 	}))
 	defer server.Close()
 
@@ -353,8 +353,8 @@ func TestClient_NavigationResponseParsing(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte(tt.responseXML))
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				_, _ = w.Write([]byte(tt.responseXML))
 			}))
 			defer server.Close()
 
@@ -465,8 +465,8 @@ func TestClient_SearchStationResponseParsing(t *testing.T) {
 	</stations>
 </results>`
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(responseXML))
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte(responseXML))
 	}))
 	defer server.Close()
 
@@ -559,7 +559,7 @@ func TestClient_NavigationHTTPHeaders(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		capturedHeaders = r.Header
 
-		w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>
+		_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>
 <navigateResponse source="TUNEIN">
 	<totalItems>0</totalItems>
 	<items></items>

@@ -113,7 +113,7 @@ func TestClient_Navigate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				if tt.serverStatus != 0 {
 					w.WriteHeader(tt.serverStatus)
 				}
@@ -241,7 +241,7 @@ func TestClient_NavigateContainer(t *testing.T) {
 	</items>
 </navigateResponse>`
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = w.Write([]byte(serverResponse))
 	}))
 	defer server.Close()
@@ -344,7 +344,7 @@ func TestClient_AddStation(t *testing.T) {
 					w.WriteHeader(tt.serverStatus)
 				}
 				if tt.serverResponse != "" {
-					w.Write([]byte(tt.serverResponse))
+					_, _ = w.Write([]byte(tt.serverResponse))
 				}
 
 				// Verify request format
@@ -457,7 +457,7 @@ func TestClient_RemoveStation(t *testing.T) {
 					w.WriteHeader(tt.serverStatus)
 				}
 				if tt.serverResponse != "" {
-					w.Write([]byte(tt.serverResponse))
+					_, _ = w.Write([]byte(tt.serverResponse))
 				}
 
 				// Verify request format
@@ -534,7 +534,7 @@ func TestClient_GetPandoraStations(t *testing.T) {
 			t.Errorf("Expected sort dateCreated, got %s", request.Sort)
 		}
 
-		w.Write([]byte(serverResponse))
+		_, _ = w.Write([]byte(serverResponse))
 	}))
 	defer server.Close()
 
@@ -560,7 +560,7 @@ func TestClient_GetPandoraStations(t *testing.T) {
 
 	// Test error case
 	_, err = client.GetPandoraStations("")
-	if err == nil || !contains(err.Error(), "Pandora source account cannot be empty") {
+	if err == nil || !contains(err.Error(), "pandora source account cannot be empty") {
 		t.Error("Expected error for empty source account")
 	}
 }
@@ -580,8 +580,8 @@ func TestClient_GetTuneInStations(t *testing.T) {
 	</items>
 </navigateResponse>`
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(serverResponse))
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte(serverResponse))
 	}))
 	defer server.Close()
 
@@ -621,8 +621,8 @@ func TestClient_GetStoredMusicLibrary(t *testing.T) {
 	</items>
 </navigateResponse>`
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(serverResponse))
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte(serverResponse))
 	}))
 	defer server.Close()
 
@@ -739,7 +739,7 @@ func TestClient_SearchStation(t *testing.T) {
 					w.WriteHeader(tt.serverStatus)
 				}
 				if tt.serverResponse != "" {
-					w.Write([]byte(tt.serverResponse))
+					_, _ = w.Write([]byte(tt.serverResponse))
 				}
 
 				// Verify request format for valid requests
@@ -823,7 +823,7 @@ func TestClient_SearchPandoraStations(t *testing.T) {
 			t.Errorf("Expected searchTerm 'Taylor Swift', got %s", request.SearchTerm)
 		}
 
-		w.Write([]byte(serverResponse))
+		_, _ = w.Write([]byte(serverResponse))
 	}))
 	defer server.Close()
 
@@ -849,7 +849,7 @@ func TestClient_SearchPandoraStations(t *testing.T) {
 
 	// Test error case
 	_, err = client.SearchPandoraStations("", "test")
-	if err == nil || !contains(err.Error(), "Pandora source account cannot be empty") {
+	if err == nil || !contains(err.Error(), "pandora source account cannot be empty") {
 		t.Error("Expected error for empty source account")
 	}
 }
@@ -866,8 +866,8 @@ func TestClient_SearchTuneInStations(t *testing.T) {
 	</stations>
 </results>`
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(serverResponse))
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte(serverResponse))
 	}))
 	defer server.Close()
 
@@ -909,8 +909,8 @@ func TestClient_SearchSpotifyContent(t *testing.T) {
 	</songs>
 </results>`
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(serverResponse))
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte(serverResponse))
 	}))
 	defer server.Close()
 
@@ -936,7 +936,7 @@ func TestClient_SearchSpotifyContent(t *testing.T) {
 
 	// Test error case
 	_, err = client.SearchSpotifyContent("", "test")
-	if err == nil || !contains(err.Error(), "Spotify source account cannot be empty") {
+	if err == nil || !contains(err.Error(), "spotify source account cannot be empty") {
 		t.Error("Expected error for empty source account")
 	}
 }

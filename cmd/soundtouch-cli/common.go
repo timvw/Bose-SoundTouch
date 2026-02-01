@@ -175,7 +175,7 @@ var httpClient = &http.Client{
 
 func fetchTuneInMetadata(url string) (*TuneInMetadata, error) {
 	if !strings.Contains(url, "tunein.com/radio/") {
-		return nil, nil
+		return nil, fmt.Errorf("url is not a TuneIn radio URL")
 	}
 
 	resp, err := httpClient.Get(url)

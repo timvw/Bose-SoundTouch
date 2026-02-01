@@ -32,6 +32,7 @@ func TestServiceAvailability_UnmarshalXML(t *testing.T) {
   </services>
 </serviceAvailability>`,
 			validate: func(t *testing.T, sa *ServiceAvailability) {
+				t.Helper()
 				if sa.Services == nil {
 					t.Fatal("services should not be nil")
 				}
@@ -71,6 +72,7 @@ func TestServiceAvailability_UnmarshalXML(t *testing.T) {
   </services>
 </serviceAvailability>`,
 			validate: func(t *testing.T, sa *ServiceAvailability) {
+				t.Helper()
 				if sa.Services == nil {
 					t.Fatal("services should not be nil")
 				}
@@ -87,6 +89,7 @@ func TestServiceAvailability_UnmarshalXML(t *testing.T) {
   </services>
 </serviceAvailability>`,
 			validate: func(t *testing.T, sa *ServiceAvailability) {
+				t.Helper()
 				if sa.Services == nil {
 					t.Fatal("services should not be nil")
 				}

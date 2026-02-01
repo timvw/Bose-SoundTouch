@@ -117,7 +117,7 @@ func TestClient_StorePreset(t *testing.T) {
 					w.WriteHeader(tt.serverStatus)
 				}
 				if tt.serverResponse != "" {
-					w.Write([]byte(tt.serverResponse))
+					_, _ = w.Write([]byte(tt.serverResponse))
 				}
 			}))
 			defer server.Close()
@@ -200,7 +200,7 @@ func TestClient_RemovePreset(t *testing.T) {
 					w.WriteHeader(tt.serverStatus)
 				}
 				if tt.serverResponse != "" {
-					w.Write([]byte(tt.serverResponse))
+					_, _ = w.Write([]byte(tt.serverResponse))
 				}
 			}))
 			defer server.Close()
@@ -343,7 +343,7 @@ func TestClient_StoreCurrentAsPreset(t *testing.T) {
 						w.WriteHeader(http.StatusOK)
 					}
 					if tt.nowPlayingResponse != "" {
-						w.Write([]byte(tt.nowPlayingResponse))
+						_, _ = w.Write([]byte(tt.nowPlayingResponse))
 					}
 				case "/storePreset":
 					if tt.storePresetStatus != 0 {
@@ -351,7 +351,7 @@ func TestClient_StoreCurrentAsPreset(t *testing.T) {
 					} else {
 						w.WriteHeader(http.StatusOK)
 					}
-					w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><presets></presets>`))
+					_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><presets></presets>`))
 				default:
 					w.WriteHeader(http.StatusNotFound)
 				}
@@ -386,9 +386,9 @@ func TestClient_StorePreset_XMLGeneration(t *testing.T) {
 	var capturedXML string
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body := make([]byte, r.ContentLength)
-		r.Body.Read(body)
+		_, _ = r.Body.Read(body)
 		capturedXML = string(body)
-		w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><presets></presets>`))
+		_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><presets></presets>`))
 	}))
 	defer server.Close()
 
@@ -437,9 +437,9 @@ func TestClient_RemovePreset_XMLGeneration(t *testing.T) {
 	var capturedXML string
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body := make([]byte, r.ContentLength)
-		r.Body.Read(body)
+		_, _ = r.Body.Read(body)
 		capturedXML = string(body)
-		w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><presets></presets>`))
+		_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><presets></presets>`))
 	}))
 	defer server.Close()
 
@@ -536,9 +536,9 @@ func TestClient_StorePreset_RealWorldScenarios(t *testing.T) {
 
 	for _, scenario := range scenarios {
 		t.Run(scenario.name, func(t *testing.T) {
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				// Just return success for these scenario tests
-				w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><presets></presets>`))
+				_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><presets></presets>`))
 			}))
 			defer server.Close()
 
@@ -556,8 +556,8 @@ func TestClient_StorePreset_RealWorldScenarios(t *testing.T) {
 }
 
 func TestClient_PresetTimestamps(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><presets></presets>`))
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><presets></presets>`))
 	}))
 	defer server.Close()
 

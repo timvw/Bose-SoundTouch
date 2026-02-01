@@ -25,19 +25,31 @@ type ServiceType string
 
 const (
 	// ServiceTypeAirPlay represents Apple AirPlay streaming service
-	ServiceTypeAirPlay            ServiceType = "AIRPLAY"
-	ServiceTypeAlexa              ServiceType = "ALEXA"
-	ServiceTypeAmazon             ServiceType = "AMAZON"
-	ServiceTypeBluetooth          ServiceType = "BLUETOOTH"
-	ServiceTypeBMX                ServiceType = "BMX"
-	ServiceTypeDeezer             ServiceType = "DEEZER"
-	ServiceTypeIHeart             ServiceType = "IHEART"
+	ServiceTypeAirPlay ServiceType = "AIRPLAY"
+	// ServiceTypeAlexa represents Amazon Alexa voice assistant integration
+	ServiceTypeAlexa ServiceType = "ALEXA"
+	// ServiceTypeAmazon represents Amazon Music streaming service
+	ServiceTypeAmazon ServiceType = "AMAZON"
+	// ServiceTypeBluetooth represents Bluetooth audio connectivity
+	ServiceTypeBluetooth ServiceType = "BLUETOOTH"
+	// ServiceTypeBMX represents BMX streaming service
+	ServiceTypeBMX ServiceType = "BMX"
+	// ServiceTypeDeezer represents Deezer music streaming service
+	ServiceTypeDeezer ServiceType = "DEEZER"
+	// ServiceTypeIHeart represents iHeartRadio streaming service
+	ServiceTypeIHeart ServiceType = "IHEART"
+	// ServiceTypeLocalInternetRadio represents local internet radio stations
 	ServiceTypeLocalInternetRadio ServiceType = "LOCAL_INTERNET_RADIO"
-	ServiceTypeLocalMusic         ServiceType = "LOCAL_MUSIC"
-	ServiceTypeNotification       ServiceType = "NOTIFICATION"
-	ServiceTypePandora            ServiceType = "PANDORA"
-	ServiceTypeSpotify            ServiceType = "SPOTIFY"
-	ServiceTypeTuneIn             ServiceType = "TUNEIN"
+	// ServiceTypeLocalMusic represents local music library
+	ServiceTypeLocalMusic ServiceType = "LOCAL_MUSIC"
+	// ServiceTypeNotification represents system notifications
+	ServiceTypeNotification ServiceType = "NOTIFICATION"
+	// ServiceTypePandora represents Pandora music streaming service
+	ServiceTypePandora ServiceType = "PANDORA"
+	// ServiceTypeSpotify represents Spotify music streaming service
+	ServiceTypeSpotify ServiceType = "SPOTIFY"
+	// ServiceTypeTuneIn represents TuneIn internet radio service
+	ServiceTypeTuneIn ServiceType = "TUNEIN"
 )
 
 // GetReason returns the reason why a service is unavailable (if any)

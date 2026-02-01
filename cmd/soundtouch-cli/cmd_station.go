@@ -146,7 +146,7 @@ func searchSpotify(c *cli.Context) error {
 	// Check Spotify availability
 	checker := NewServiceAvailabilityChecker(client)
 	if !checker.ValidateSpotifyAvailable("search Spotify content") {
-		return fmt.Errorf("Spotify is not available on this device")
+		return fmt.Errorf("spotify is not available on this device")
 	}
 
 	response, err := client.SearchSpotifyContent(sourceAccount, searchTerm)
