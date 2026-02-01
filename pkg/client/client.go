@@ -1554,7 +1554,7 @@ func (c *Client) RemoveStation(contentItem *models.ContentItem) error {
 // GetPandoraStations gets all Pandora radio stations for an account
 func (c *Client) GetPandoraStations(sourceAccount string) (*models.NavigateResponse, error) {
 	if sourceAccount == "" {
-		return nil, fmt.Errorf("Pandora source account cannot be empty")
+		return nil, fmt.Errorf("pandora source account cannot be empty")
 	}
 
 	return c.NavigateWithMenu("PANDORA", sourceAccount, "radioStations", "dateCreated", 1, 100)
@@ -1597,7 +1597,7 @@ func (c *Client) SearchStation(source, sourceAccount, searchTerm string) (*model
 // SearchPandoraStations searches for Pandora stations by artist/song name
 func (c *Client) SearchPandoraStations(sourceAccount, searchTerm string) (*models.SearchStationResponse, error) {
 	if sourceAccount == "" {
-		return nil, fmt.Errorf("Pandora source account cannot be empty")
+		return nil, fmt.Errorf("pandora source account cannot be empty")
 	}
 
 	return c.SearchStation("PANDORA", sourceAccount, searchTerm)
@@ -1611,7 +1611,7 @@ func (c *Client) SearchTuneInStations(searchTerm string) (*models.SearchStationR
 // SearchSpotifyContent searches for Spotify content (playlists, tracks, etc.)
 func (c *Client) SearchSpotifyContent(sourceAccount, searchTerm string) (*models.SearchStationResponse, error) {
 	if sourceAccount == "" {
-		return nil, fmt.Errorf("Spotify source account cannot be empty")
+		return nil, fmt.Errorf("spotify source account cannot be empty")
 	}
 
 	return c.SearchStation("SPOTIFY", sourceAccount, searchTerm)
