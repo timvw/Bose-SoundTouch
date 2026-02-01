@@ -245,7 +245,7 @@ BenchmarkGetServiceAvailability-8                         1000    1.2ms/op
 
 - **Standard library only** - No external dependencies beyond existing project requirements
 - **Backward compatible** - Works with existing client configurations
-- **Go version support** - Compatible with Go 1.25.5+
+- **Go version support** - Compatible with Go 1.25.6+
 
 ## Documentation
 

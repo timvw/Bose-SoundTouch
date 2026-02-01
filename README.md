@@ -327,7 +327,7 @@ This library supports all Bose SoundTouch-compatible devices, including:
 ## Development
 
 ### Prerequisites
-- Go 1.25.5 or later
+- Go 1.25.6 or later
 - Optional: SoundTouch device for testing
 
 ### Building from Source
