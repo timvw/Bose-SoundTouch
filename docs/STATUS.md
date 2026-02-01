@@ -36,6 +36,13 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
   - Incremental volume control
   - Safety features and validation
   - Volume level categorization
+- `POST /speaker` - TTS and URL playback ✅ Complete
+  - Text-to-Speech with multi-language support
+  - URL content playback with metadata
+  - Volume control with automatic restoration
+- `GET /playNotification` - Notification beep ✅ Complete
+  - Simple notification beep sound
+  - Pauses current media during playback
 
 #### CLI Tool ✅
 - Device discovery via UPnP ✅ Complete
@@ -72,6 +79,7 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 - `GET /networkInfo` - Network information ✅ Complete
 - `WebSocket /` - Real-time event streaming ✅ Complete
 - `GET /getZone`, `POST /setZone` - Multiroom zone management ✅ Complete
+- `POST /speaker`, `GET /playNotification` - Notification system ✅ Complete
 
 ### **ℹ️ API Limitations**
 - None! All functional endpoints are now implemented including preset management endpoints discovered via the [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API)
@@ -90,8 +98,9 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 | **Preset Management** | 1/1 | 1 | 100% |
 | **Zone Management** | 4/4 | 4 | 100% |
 | **Advanced Audio Controls** | 3/3 | 3 | 100% |
+| **Notification System** | 2/2 | 2 | 100% |
 | **Track Info** | 1/1 | 1 | **100%** |
-| **Overall Progress** | 26/26 | 26 | **100%** |
+| **Overall Progress** | 28/28 | 28 | **100%** |
 
 **Note**: All functional endpoints implemented including preset management (`/storePreset`, `/removePreset`) discovered via the [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API). Official API marked preset creation as "N/A" but working endpoints were documented by the SoundTouch Plus community.
 
@@ -141,6 +150,14 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 - ✅ Device-specific feature validation
 - ✅ Professional-grade audio adjustment features
 
+### Phase 6: Notification System (COMPLETE)
+- ✅ TTS (Text-to-Speech) playback (POST /speaker) with multi-language support
+- ✅ URL content playback (POST /speaker) with custom metadata
+- ✅ Notification beep (GET /playNotification) for simple alerts
+- ✅ Volume control with automatic restoration
+- ✅ Content interruption and resume functionality
+- ✅ ST-10 Series device compatibility
+
 ### Key Technical Achievements
 - **Complete Key Controls**: All 24 documented key commands implemented
 - **Source Selection**: Full source switching with convenience methods (-spotify, -bluetooth, -aux)
@@ -151,6 +168,7 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 - **Zone Management**: Complete multiroom zone operations with validation
 - **Zone Status**: Query zone membership, master/slave status, device counting
 - **System Management**: Clock time, display settings, and network information
+- **Notification System**: TTS and URL playback with multi-language support
 - **API Compliance**: Proper press+release key pattern implementation
 - **Safety First**: Volume warnings and limits for user protection
 - **User Experience**: Host:port parsing (e.g., `-host 192.168.1.100:8090`)
@@ -169,6 +187,7 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 - **WebSocket Events**: 50+ test cases for event parsing, handling, and connection management
 - **System Endpoints**: 20+ test cases for clock, display, and network functionality
 - **Balance Control**: 30+ test cases for stereo balance adjustment and clamping
+- **Notification System**: 30+ test cases for TTS, URL playback, and beep functionality
 - **Host Parsing**: 20+ test cases for various formats
 - **XML Models**: Comprehensive marshaling/unmarshaling tests
 - **HTTP Client**: Mock server tests with real response data
@@ -179,6 +198,7 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 - **Source Selection**: Tested with Spotify, TuneIn, and other available sources
 - **Bass Control**: Tested bass adjustment, validation, and device-specific behavior
 - **Balance Control**: Tested stereo balance (device-dependent feature)
+- **Notification System**: Tested TTS playback, URL content, and beep notifications on real devices
 - **Error Scenarios**: Network timeouts, invalid responses, invalid sources
 - **Safety Features**: Volume, bass, and balance limits tested on real devices
 
@@ -193,6 +213,7 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 - `docs/HOST-PORT-PARSING.md` - Enhanced CLI feature ✅
 - `docs/PLAN.md` - Development roadmap (updated) ✅
 - `docs/PROJECT-PATTERNS.md` - Development guidelines ✅
+- `SPEAKER_ENDPOINT.md` - Complete speaker notification documentation ✅
 
 ### 📝 Documentation Notes
 - All docs are synchronized with current implementation
@@ -234,6 +255,7 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 ### ✅ Production Ready Features
 - **Core Device Control**: Information, media controls, volume
 - **Audio Management**: Complete bass and balance control
+- **Notification System**: TTS, URL playback, and beep notifications
 - **Preset Management**: Complete preset analysis (API is read-only by design)
 - **Safety Features**: Volume warnings, input validation
 - **Error Handling**: Comprehensive error messages
@@ -263,6 +285,15 @@ This project implements a comprehensive Go client library and CLI tool for Bose 
 - [ ] Web application interface
 
 ### Recent Major Updates
+- **2026-02-01**: Speaker endpoint implementation - Complete notification system
+  - ✅ TTS (Text-to-Speech) with multi-language support (EN, DE, ES, FR, IT, NL, PT, RU, ZH, JA, etc.)
+  - ✅ URL content playback with custom metadata for NowPlaying display
+  - ✅ Notification beep functionality for simple alerts
+  - ✅ Volume control with automatic restoration
+  - ✅ Comprehensive CLI commands: `speaker tts`, `speaker url`, `speaker beep`
+  - ✅ Complete Go client methods: `PlayTTS()`, `PlayURL()`, `PlayCustom()`, `PlayNotificationBeep()`
+  - ✅ Full validation, error handling, and test coverage
+  - ✅ ST-10 Series device compatibility with proper device detection
 - **2026-02-01**: Code quality improvements - Resolved all golangci-lint issues (59→0)
   - ✅ Security: Updated Go 1.25.5→1.25.6 to fix TLS vulnerability GO-2026-4340
   - ✅ Complexity: Refactored 5 high-complexity functions for better maintainability

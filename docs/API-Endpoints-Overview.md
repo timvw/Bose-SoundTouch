@@ -332,6 +332,57 @@ Retrieves clock display settings.
 ### POST /clockDisplay ✅ **Implemented**
 Configures the clock display.
 
+### POST /speaker ✅ **Implemented**
+Plays TTS messages or URL content for notifications (ST-10 Series only).
+
+**TTS Request XML:**
+```xml
+<play_info>
+  <url>http://translate.google.com/translate_tts?ie=UTF-8&amp;tl=EN&amp;client=tw-ob&amp;q=Hello%20World</url>
+  <app_key>YOUR_APPLICATION_KEY</app_key>
+  <service>TTS Notification</service>
+  <message>Google TTS</message>
+  <reason>Hello World</reason>
+  <volume>70</volume>
+</play_info>
+```
+
+**URL Content Request XML:**
+```xml
+<play_info>
+  <url>https://example.com/audio.mp3</url>
+  <app_key>YOUR_APPLICATION_KEY</app_key>
+  <service>Music Service</service>
+  <message>Song Title</message>
+  <reason>Artist Name</reason>
+  <volume>60</volume>
+</play_info>
+```
+
+**Response XML:**
+```xml
+<status>/speaker</status>
+```
+
+**Implementation Features:**
+- Multi-language TTS support (EN, DE, ES, FR, IT, NL, PT, RU, ZH, JA, etc.)
+- Volume control with automatic restoration
+- Custom metadata for NowPlaying display
+- Pauses current content, plays notification, then resumes
+
+### GET /playNotification ✅ **Implemented**
+Plays a notification beep sound (ST-10 Series only).
+
+**Response XML:**
+```xml
+<status>/playNotification</status>
+```
+
+**Implementation:**
+- Simple double beep sound
+- Pauses current media during beep
+- Available via `PlayNotificationBeep()` method
+
 ## WebSocket Connection
 
 ### WebSocket / ✅ **Implemented**

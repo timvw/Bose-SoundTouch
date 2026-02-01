@@ -12,6 +12,7 @@ A comprehensive Go library and CLI tool for controlling Bose SoundTouch devices 
 
 - ✅ **Complete API Coverage**: All available SoundTouch Web API endpoints implemented
 - 🎵 **Media Control**: Play, pause, stop, volume, bass, balance, source selection
+- 🔔 **Smart Notifications**: TTS messages, URL audio content, notification beeps (ST-10)
 - 🏠 **Multiroom Support**: Create and manage zones across multiple speakers
 - ⚡ **Real-time Events**: WebSocket connection for live device state monitoring
 - 🔍 **Device Discovery**: Automatic discovery via UPnP/SSDP and mDNS
@@ -62,6 +63,11 @@ soundtouch-cli --host 192.168.1.100 preset select --slot 1
 soundtouch-cli --host 192.168.1.100 browse tunein
 soundtouch-cli --host 192.168.1.100 station search-tunein --query "jazz"
 soundtouch-cli --host 192.168.1.100 station add --source TUNEIN --token <token> --name "Jazz Radio"
+
+# Speaker notifications (ST-10 only)
+soundtouch-cli --host 192.168.1.100 speaker tts --text "Welcome home" --app-key YOUR_KEY
+soundtouch-cli --host 192.168.1.100 speaker url --url "https://example.com/doorbell.mp3" --app-key YOUR_KEY
+soundtouch-cli --host 192.168.1.100 speaker beep
 
 # Real-time monitoring
 soundtouch-cli --host 192.168.1.100 events subscribe
@@ -278,6 +284,51 @@ func main() {
 }
 ```
 
+#### Speaker Notifications (ST-10 only)
+```go
+package main
+
+import (
+    "log"
+    
+    "github.com/gesellix/bose-soundtouch/pkg/client"
+)
+
+func main() {
+    c := client.NewClient(&client.Config{
+        Host: "192.168.1.100",
+        Port: 8090,
+    })
+    
+    // Play Text-to-Speech message
+    err := c.PlayTTS("Welcome home!", "your-app-key", 70)
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    // Play audio content from URL
+    err = c.PlayURL(
+        "https://example.com/doorbell.mp3",
+        "your-app-key",
+        "Doorbell",
+        "Front Door",
+        "Visitor Alert",
+        80,
+    )
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    // Play notification beep
+    err = c.PlayNotificationBeep()
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    fmt.Println("Notifications sent!")
+}
+```
+
 ## Supported Devices
 
 This library supports all Bose SoundTouch-compatible devices, including:
@@ -304,6 +355,7 @@ This library supports all Bose SoundTouch-compatible devices, including:
 | Preset Management | ✅ Complete | Store, select, remove presets |
 | Real-time Events | ✅ Complete | WebSocket event streaming |
 | Multiroom Zones | ✅ Complete | Zone creation and management |
+| Speaker Notifications | ✅ Complete | TTS, URL audio, beep alerts (ST-10) |
 | System Settings | ✅ Complete | Clock, display, network info |
 | Advanced Audio | ✅ Complete | DSP controls, tone controls |
 
@@ -321,6 +373,7 @@ This library supports all Bose SoundTouch-compatible devices, including:
 - ⚙️ [Advanced Features](docs/SYSTEM-ENDPOINTS.md) - Advanced functionality
 - 🏠 [Multiroom Setup](docs/zone-management.md) - Zone configuration guide
 - ⚡ [WebSocket Events](docs/websocket-events.md) - Real-time event handling
+- 🔔 [Speaker Notifications](SPEAKER_ENDPOINT.md) - TTS and audio notifications guide
 - 🔍 [Device Discovery](docs/DISCOVERY.md) - Discovery configuration
 - 🛠️ [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues and solutions
 

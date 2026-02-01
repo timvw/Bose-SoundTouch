@@ -674,6 +674,104 @@ soundtouch-cli --host 192.168.1.10 station add \
 soundtouch-cli --host 192.168.1.10 browse tunein --limit 10
 ```
 
+### Speaker Notifications and Content
+
+Play notifications, TTS messages, and audio content (ST-10 Series only).
+
+#### `speaker <subcommand>`
+
+Speaker notification and content playback commands.
+
+```bash
+# Play Text-to-Speech message
+soundtouch-cli --host <device> speaker tts --text <MESSAGE> --app-key <KEY> [--volume <LEVEL>] [--language <CODE>]
+
+# Play audio content from URL
+soundtouch-cli --host <device> speaker url --url <URL> --app-key <KEY> [--volume <LEVEL>] [--service <NAME>] [--message <MSG>] [--reason <REASON>]
+
+# Play notification beep
+soundtouch-cli --host <device> speaker beep
+
+# Get detailed help about speaker functionality
+soundtouch-cli speaker help
+```
+
+**TTS Examples:**
+```bash
+# Basic TTS in English
+soundtouch-cli --host 192.168.1.10 speaker tts \
+  --text "Hello, welcome home" \
+  --app-key "your-app-key"
+
+# TTS with volume and language
+soundtouch-cli --host 192.168.1.10 speaker tts \
+  --text "Bonjour le monde" \
+  --app-key "your-app-key" \
+  --volume 70 \
+  --language FR
+
+# TTS for home automation alert
+soundtouch-cli --host 192.168.1.10 speaker tts \
+  --text "Motion detected at front door" \
+  --app-key "security-system-key" \
+  --volume 80
+```
+
+**URL Content Examples:**
+```bash
+# Play audio file from URL
+soundtouch-cli --host 192.168.1.10 speaker url \
+  --url "https://example.com/doorbell.mp3" \
+  --app-key "your-app-key" \
+  --volume 75
+
+# Play with custom metadata
+soundtouch-cli --host 192.168.1.10 speaker url \
+  --url "https://example.com/song.mp3" \
+  --app-key "your-app-key" \
+  --service "Music Service" \
+  --message "Beautiful Song" \
+  --reason "Artist Name" \
+  --volume 60
+
+# Emergency alert
+soundtouch-cli --host 192.168.1.10 speaker url \
+  --url "https://alerts.example.com/fire-alarm.wav" \
+  --app-key "emergency-system" \
+  --service "Emergency System" \
+  --message "Fire Alert" \
+  --volume 100
+```
+
+**Simple Notifications:**
+```bash
+# Quick beep notification
+soundtouch-cli --host 192.168.1.10 speaker beep
+
+# Test device connectivity with beep
+soundtouch-cli --host 192.168.1.10 speaker beep
+```
+
+**Supported Languages for TTS:**
+- `EN` - English (default)
+- `DE` - German  
+- `ES` - Spanish
+- `FR` - French
+- `IT` - Italian
+- `NL` - Dutch
+- `PT` - Portuguese
+- `RU` - Russian
+- `ZH` - Chinese
+- `JA` - Japanese
+
+**Important Notes:**
+- Only works with ST-10 (Series III) speakers
+- ST-300 and other models may not support speaker notifications
+- App key is required for TTS and URL playback (user-provided)
+- Volume is automatically restored after notification completes
+- Currently playing content is paused during notification and resumed after
+- If device is zone master, notification plays on all zone members
+
 ## Common Usage Patterns
 
 ### Quick Device Setup

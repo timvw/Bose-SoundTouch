@@ -12,10 +12,10 @@ This document provides comprehensive information about SoundTouch API endpoints 
 
 ## Implementation Priority Matrix
 
-### 🔥 Critical Priority (14 endpoints)
+### 🔥 Critical Priority (12 endpoints)
 Essential user functionality that significantly impacts user experience.
 
-### 🎯 High Priority (15 endpoints)  
+### 🎯 High Priority (13 endpoints)
 Smart home integration and advanced user features.
 
 ### 📊 Medium Priority (19 endpoints)
@@ -382,60 +382,50 @@ Places device into low-power mode.
 
 ## High Priority Implementation Candidates
 
-### Notification System (ST-10 Series Only)
+### ~~Notification System (ST-10 Series Only)~~ ✅ **IMPLEMENTED**
 
-#### POST /speaker 🎯 **HIGH**
+#### ~~POST /speaker~~ ✅ **IMPLEMENTED**
 Plays TTS messages or URL content for notifications.
 
-**TTS Message Example:**
-```xml
-<play_info>
-  <url>http://translate.google.com/translate_tts?ie=UTF-8&amp;tl=EN&amp;client=tw-ob&amp;q=There%20is%20activity%20at%20the%20front%20door.</url>
-  <app_key>Xp7YGBI9dh763Kj8sY8e86JPXtisddBa</app_key>
-  <service>TTS Notification</service>
-  <message>Google TTS</message>
-  <reason>There is activity at the front door.</reason>
-  <volume>70</volume>
-</play_info>
+**CLI Usage:**
+```bash
+# TTS with multiple languages
+soundtouch-cli speaker tts --text "Hello World" --app-key YOUR_KEY --language EN --volume 70
+
+# URL content playback
+soundtouch-cli speaker url --url "https://example.com/audio.mp3" --app-key YOUR_KEY --volume 60
+
+# Simple notification beep
+soundtouch-cli speaker beep
 ```
 
-**URL Playback Example:**
-```xml
-<play_info>
-  <url>https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_1MB_MP3.mp3</url>
-  <app_key>Xp7YGBI9dh763Kj8sY8e86JPXtisddBa</app_key>
-  <service>FreeTestData.com</service>
-  <message>MP3 Test Data</message>
-  <reason>Free_Test_Data_1MB_MP3</reason>
-  <volume>70</volume>
-</play_info>
+**Go Client Usage:**
+```go
+// Text-to-Speech
+client.PlayTTS("Hello World", "your-app-key", 70)
+
+// URL content
+client.PlayURL("https://example.com/audio.mp3", "your-app-key", "Service", "Message", "Reason", 60)
+
+// Notification beep
+client.PlayNotificationBeep()
 ```
 
-**Response:**
-```xml
-<status>/speaker</status>
-```
+**Implementation Features:**
+- ✅ Complete TTS support with multi-language (EN, DE, ES, FR, IT, NL, PT, RU, ZH, JA, etc.)
+- ✅ URL content playback with custom metadata
+- ✅ Volume control with automatic restoration
+- ✅ Comprehensive CLI commands with help system
+- ✅ Full validation and error handling
+- ✅ Complete test suite and documentation
 
-**Implementation Notes:**
-- Only works on ST-10 series devices
-- Requires app_key parameter (user-provided)
-- Volume automatically restored after playback
-- Currently playing content paused/resumed automatically
-- NowPlaying status shows notification details during playback
-
-#### GET /playNotification 🎯 **HIGH**
+#### ~~GET /playNotification~~ ✅ **IMPLEMENTED**
 Plays a notification beep sound.
 
-**Response:**
-```xml
-<status>/playNotification</status>
-```
-
-**Implementation Notes:**
-- Causes double beep sound
-- Pauses current media, plays beep, resumes media
-- ST-10 only feature
-- ST-300 does not support this despite documentation
+**Implementation:**
+- ✅ `PlayNotificationBeep()` method
+- ✅ CLI command: `soundtouch-cli speaker beep`
+- ✅ Proper error handling for unsupported devices
 
 ### WiFi Management
 
