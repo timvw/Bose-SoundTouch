@@ -32,61 +32,100 @@ func getNowPlaying(c *cli.Context) error {
 		return nil
 	}
 
+	printBasicPlaybackInfo(nowPlaying)
+	printTrackInfo(nowPlaying)
+	printTimeInfo(nowPlaying)
+	printStreamInfo(nowPlaying)
+	printContentDetails(nowPlaying, c.Bool("verbose"))
+	printPlaybackStatus(nowPlaying)
+
+	return nil
+}
+
+// printBasicPlaybackInfo prints basic source and status information
+func printBasicPlaybackInfo(nowPlaying *models.NowPlaying) {
 	fmt.Printf("  Source: %s\n", nowPlaying.Source)
 	if nowPlaying.SourceAccount != "" {
 		fmt.Printf("  Source Account: %s\n", nowPlaying.SourceAccount)
 	}
 	fmt.Printf("  Status: %s\n", nowPlaying.PlayStatus.String())
+}
 
+// printTrackInfo prints track, artist, and album information
+func printTrackInfo(nowPlaying *models.NowPlaying) {
 	if nowPlaying.Track != "" {
 		fmt.Printf("  Track: %s\n", nowPlaying.Track)
 	}
-
 	if nowPlaying.Artist != "" {
 		fmt.Printf("  Artist: %s\n", nowPlaying.Artist)
 	}
-
 	if nowPlaying.Album != "" {
 		fmt.Printf("  Album: %s\n", nowPlaying.Album)
 	}
+}
 
-	if nowPlaying.HasTimeInfo() {
-		fmt.Printf("  Duration: %s\n", nowPlaying.FormatDuration())
-
-		if nowPlaying.Position != nil {
-			fmt.Printf("  Position: %s\n", nowPlaying.FormatPosition())
-		}
+// printTimeInfo prints duration and position information
+func printTimeInfo(nowPlaying *models.NowPlaying) {
+	if !nowPlaying.HasTimeInfo() {
+		return
 	}
 
+	fmt.Printf("  Duration: %s\n", nowPlaying.FormatDuration())
+	if nowPlaying.Position != nil {
+		fmt.Printf("  Position: %s\n", nowPlaying.FormatPosition())
+	}
+}
+
+// printStreamInfo prints stream type information
+func printStreamInfo(nowPlaying *models.NowPlaying) {
 	if nowPlaying.StreamType != "" {
 		fmt.Printf("  Stream Type: %s\n", nowPlaying.StreamType)
 	}
+}
 
-	// Show ContentItem details if verbose flag is set or always show location if available
-	verbose := c.Bool("verbose")
-	showDetails := verbose || (nowPlaying.ContentItem != nil && nowPlaying.ContentItem.Location != "")
-
-	if showDetails && nowPlaying.ContentItem != nil {
-		fmt.Printf("\nContent Details:\n")
-		if nowPlaying.ContentItem.Location != "" {
-			fmt.Printf("  Location: %s\n", nowPlaying.ContentItem.Location)
-		}
-		if verbose && nowPlaying.ContentItem.Type != "" {
-			fmt.Printf("  Content Type: %s\n", nowPlaying.ContentItem.Type)
-		}
-		if verbose && nowPlaying.ContentItem.ItemName != "" && nowPlaying.ContentItem.ItemName != nowPlaying.Track {
-			fmt.Printf("  Item Name: %s\n", nowPlaying.ContentItem.ItemName)
-		}
-		if verbose {
-			fmt.Printf("  Presetable: %t\n", nowPlaying.ContentItem.IsPresetable)
-		}
+// printContentDetails prints detailed content information when verbose or location is available
+func printContentDetails(nowPlaying *models.NowPlaying, verbose bool) {
+	if nowPlaying.ContentItem == nil {
+		return
 	}
 
+	showDetails := verbose || nowPlaying.ContentItem.Location != ""
+	if !showDetails {
+		return
+	}
+
+	fmt.Printf("\nContent Details:\n")
+	printContentLocation(nowPlaying.ContentItem)
+	printVerboseContentInfo(nowPlaying, verbose)
+}
+
+// printContentLocation prints the content location
+func printContentLocation(contentItem *models.ContentItem) {
+	if contentItem.Location != "" {
+		fmt.Printf("  Location: %s\n", contentItem.Location)
+	}
+}
+
+// printVerboseContentInfo prints verbose content information
+func printVerboseContentInfo(nowPlaying *models.NowPlaying, verbose bool) {
+	if !verbose || nowPlaying.ContentItem == nil {
+		return
+	}
+
+	if nowPlaying.ContentItem.Type != "" {
+		fmt.Printf("  Content Type: %s\n", nowPlaying.ContentItem.Type)
+	}
+	if nowPlaying.ContentItem.ItemName != "" && nowPlaying.ContentItem.ItemName != nowPlaying.Track {
+		fmt.Printf("  Item Name: %s\n", nowPlaying.ContentItem.ItemName)
+	}
+	fmt.Printf("  Presetable: %t\n", nowPlaying.ContentItem.IsPresetable)
+}
+
+// printPlaybackStatus prints special status messages
+func printPlaybackStatus(nowPlaying *models.NowPlaying) {
 	if nowPlaying.PlayStatus == models.PlayStatusBuffering {
 		fmt.Printf("\nNote: Content is buffering\n")
 	}
-
-	return nil
 }
 
 // playCommand handles play command

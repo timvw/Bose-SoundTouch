@@ -70,67 +70,78 @@ func storeCurrentPreset(c *cli.Context) error {
 	return nil
 }
 
-// storePreset handles storing specific content as preset
-func storePreset(c *cli.Context) error {
-	slot := c.Int("slot")
-	source := c.String("source")
-	location := c.String("location")
-	sourceAccount := c.String("source-account")
-	name := c.String("name")
-	itemType := c.String("type")
-	artwork := c.String("artwork")
+// presetParams holds parameters for storing a preset
+type presetParams struct {
+	slot          int
+	source        string
+	location      string
+	sourceAccount string
+	name          string
+	itemType      string
+	artwork       string
+}
 
-	// Resolve location and source from potential URLs
-	resolvedSource, resolvedLocation := resolveLocation(source, location)
-	if resolvedLocation != location && (source == "" || source == "TUNEIN") {
+// extractPresetParams extracts parameters from CLI context
+func extractPresetParams(c *cli.Context) *presetParams {
+	return &presetParams{
+		slot:          c.Int("slot"),
+		source:        c.String("source"),
+		location:      c.String("location"),
+		sourceAccount: c.String("source-account"),
+		name:          c.String("name"),
+		itemType:      c.String("type"),
+		artwork:       c.String("artwork"),
+	}
+}
+
+// resolveLocationAndMetadata resolves location and fetches metadata if needed
+func resolveLocationAndMetadata(params *presetParams) error {
+	resolvedSource, resolvedLocation := resolveLocation(params.source, params.location)
+	if resolvedLocation != params.location && (params.source == "" || params.source == "TUNEIN") {
 		// If location was a TuneIn URL, fetch metadata if name or artwork is missing
-		if name == "" || artwork == "" {
-			metadata, err := fetchTuneInMetadata(location)
+		if params.name == "" || params.artwork == "" {
+			metadata, err := fetchTuneInMetadata(params.location)
 			if err == nil && metadata != nil {
-				if name == "" {
-					name = metadata.Name
+				if params.name == "" {
+					params.name = metadata.Name
 				}
-				if artwork == "" {
-					artwork = metadata.Artwork
+				if params.artwork == "" {
+					params.artwork = metadata.Artwork
 				}
 			}
 		}
 	}
-	source = resolvedSource
-	location = resolvedLocation
+	params.source = resolvedSource
+	params.location = resolvedLocation
+	return nil
+}
 
-	clientConfig := GetClientConfig(c)
-
-	if source == "" {
+// validatePresetParams validates required preset parameters
+func validatePresetParams(params *presetParams) error {
+	if params.source == "" {
 		return fmt.Errorf("source is required (use --source)")
 	}
-
-	if location == "" {
+	if params.location == "" {
 		return fmt.Errorf("location is required (use --location)")
 	}
+	return nil
+}
 
-	PrintDeviceHeader(fmt.Sprintf("Storing %s content as preset %d", source, slot), clientConfig.Host, clientConfig.Port)
-
-	client, err := CreateSoundTouchClient(clientConfig)
-	if err != nil {
-		PrintError(fmt.Sprintf("Failed to create client: %v", err))
-		return err
-	}
-
-	// Create content item
+// createContentItem creates a ContentItem from preset parameters
+func createContentItem(params *presetParams) *models.ContentItem {
 	contentItem := &models.ContentItem{
-		Source:        source,
-		Type:          itemType,
-		Location:      location,
-		SourceAccount: sourceAccount,
+		Source:        params.source,
+		Type:          params.itemType,
+		Location:      params.location,
+		SourceAccount: params.sourceAccount,
 		IsPresetable:  true,
-		ItemName:      name,
-		ContainerArt:  artwork,
+		ItemName:      params.name,
+		ContainerArt:  params.artwork,
 	}
 
 	// Set default type if not specified
-	if itemType == "" {
-		switch source {
+	if params.itemType == "" {
+		switch params.source {
 		case "SPOTIFY":
 			contentItem.Type = "uri"
 		case "TUNEIN", "LOCAL_INTERNET_RADIO":
@@ -140,26 +151,58 @@ func storePreset(c *cli.Context) error {
 		}
 	}
 
-	// Show what we're storing
+	return contentItem
+}
+
+// printPresetContent displays what content will be stored
+func printPresetContent(params *presetParams) {
 	fmt.Printf("Content to store:\n")
-	fmt.Printf("  Name: %s\n", name)
-	fmt.Printf("  Source: %s\n", source)
-	fmt.Printf("  Location: %s\n", location)
-	if sourceAccount != "" {
-		fmt.Printf("  Source Account: %s\n", sourceAccount)
+	fmt.Printf("  Name: %s\n", params.name)
+	fmt.Printf("  Source: %s\n", params.source)
+	fmt.Printf("  Location: %s\n", params.location)
+	if params.sourceAccount != "" {
+		fmt.Printf("  Source Account: %s\n", params.sourceAccount)
 	}
-	if itemType != "" {
-		fmt.Printf("  Type: %s\n", itemType)
+	if params.itemType != "" {
+		fmt.Printf("  Type: %s\n", params.itemType)
+	}
+}
+
+// storePreset handles storing specific content as preset
+func storePreset(c *cli.Context) error {
+	// Extract parameters
+	params := extractPresetParams(c)
+
+	// Resolve location and fetch metadata if needed
+	if err := resolveLocationAndMetadata(params); err != nil {
+		return err
 	}
 
+	// Validate required parameters
+	if err := validatePresetParams(params); err != nil {
+		return err
+	}
+
+	clientConfig := GetClientConfig(c)
+	PrintDeviceHeader(fmt.Sprintf("Storing %s content as preset %d", params.source, params.slot), clientConfig.Host, clientConfig.Port)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		PrintError(fmt.Sprintf("Failed to create client: %v", err))
+		return err
+	}
+
+	contentItem := createContentItem(params)
+	printPresetContent(params)
+
 	// Store preset
-	err = client.StorePreset(slot, contentItem)
+	err = client.StorePreset(params.slot, contentItem)
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to store preset: %v", err))
 		return err
 	}
 
-	PrintSuccess(fmt.Sprintf("Stored content as preset %d", slot))
+	PrintSuccess(fmt.Sprintf("Stored content as preset %d", params.slot))
 
 	return nil
 }

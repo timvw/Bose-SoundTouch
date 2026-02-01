@@ -204,40 +204,61 @@ func printNavigationResults(response *models.NavigateResponse, title string) {
 
 	fmt.Printf("  Items:\n")
 	for i, item := range response.Items {
-		fmt.Printf("    %d. %s\n", i+1, item.GetDisplayName())
-
-		// Show type and source for identification
-		if item.ContentItem != nil {
-			if item.ContentItem.Source != "" && item.ContentItem.Source != response.Source {
-				fmt.Printf("       Source: %s\n", item.ContentItem.Source)
-			}
-			if item.Type != "" {
-				fmt.Printf("       Type: %s\n", item.Type)
-			}
-			if item.ContentItem.Location != "" && len(item.ContentItem.Location) < 100 {
-				fmt.Printf("       Location: %s\n", item.ContentItem.Location)
-			}
-		}
-
-		// Show additional metadata
-		if item.ArtistName != "" {
-			fmt.Printf("       Artist: %s\n", item.ArtistName)
-		}
-		if item.AlbumName != "" {
-			fmt.Printf("       Album: %s\n", item.AlbumName)
-		}
-
-		// Show if it's a container that can be browsed further
-		if item.IsDirectory() {
-			fmt.Printf("       📁 Directory (can browse into)\n")
-		} else if item.IsPlayable() {
-			fmt.Printf("       ▶️  Playable content\n")
-		}
-
-		fmt.Println()
+		printNavigationItem(item, i+1, response.Source)
 	}
 
-	// Show navigation hints
+	printNavigationHints(response)
+}
+
+// printNavigationItem prints a single navigation item with its metadata
+func printNavigationItem(item models.NavigateItem, index int, responseSource string) {
+	fmt.Printf("    %d. %s\n", index, item.GetDisplayName())
+
+	printContentItemInfo(item, responseSource)
+	printItemMetadata(item)
+	printItemType(item)
+
+	fmt.Println()
+}
+
+// printContentItemInfo prints content item information (source, type, location)
+func printContentItemInfo(item models.NavigateItem, responseSource string) {
+	if item.ContentItem == nil {
+		return
+	}
+
+	if item.ContentItem.Source != "" && item.ContentItem.Source != responseSource {
+		fmt.Printf("       Source: %s\n", item.ContentItem.Source)
+	}
+	if item.Type != "" {
+		fmt.Printf("       Type: %s\n", item.Type)
+	}
+	if item.ContentItem.Location != "" && len(item.ContentItem.Location) < 100 {
+		fmt.Printf("       Location: %s\n", item.ContentItem.Location)
+	}
+}
+
+// printItemMetadata prints additional metadata (artist, album)
+func printItemMetadata(item models.NavigateItem) {
+	if item.ArtistName != "" {
+		fmt.Printf("       Artist: %s\n", item.ArtistName)
+	}
+	if item.AlbumName != "" {
+		fmt.Printf("       Album: %s\n", item.AlbumName)
+	}
+}
+
+// printItemType prints whether the item is a directory or playable
+func printItemType(item models.NavigateItem) {
+	if item.IsDirectory() {
+		fmt.Printf("       📁 Directory (can browse into)\n")
+	} else if item.IsPlayable() {
+		fmt.Printf("       ▶️  Playable content\n")
+	}
+}
+
+// printNavigationHints prints helpful navigation hints
+func printNavigationHints(response *models.NavigateResponse) {
 	directories := response.GetDirectories()
 	if len(directories) > 0 {
 		fmt.Printf("  💡 To browse into a directory, use: browse container --location <location> --type <type>\n")

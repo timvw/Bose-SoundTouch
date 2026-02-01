@@ -309,6 +309,14 @@ func compareSourcesAndAvailability(c *cli.Context) error {
 
 	fmt.Printf("Source vs Availability Comparison:\n\n")
 
+	performSourceComparisons(sources, serviceAvailability)
+	printSourceSummary(sources, serviceAvailability)
+
+	return nil
+}
+
+// performSourceComparisons compares configured sources with availability
+func performSourceComparisons(sources *models.Sources, serviceAvailability *models.ServiceAvailability) {
 	// Check key services
 	comparisons := []struct {
 		name                 string
@@ -331,40 +339,48 @@ func compareSourcesAndAvailability(c *cli.Context) error {
 	}
 
 	for _, comp := range comparisons {
-		configured := comp.configuredCheck()
-		available := comp.availableCheck()
+		compareServiceStatus(comp.name, comp.configuredCheck(), comp.availableCheck(), serviceAvailability)
+	}
+}
 
-		fmt.Printf("🔍 %s:\n", comp.name)
-		fmt.Printf("    Configured: %s\n", boolToStatus(configured))
-		fmt.Printf("    Available: %s\n", boolToStatus(available))
+// compareServiceStatus compares a single service's configuration vs availability
+func compareServiceStatus(serviceName string, configured, available bool, serviceAvailability *models.ServiceAvailability) {
+	fmt.Printf("🔍 %s:\n", serviceName)
+	fmt.Printf("    Configured: %s\n", boolToStatus(configured))
+	fmt.Printf("    Available: %s\n", boolToStatus(available))
 
-		switch {
-		case available && !configured:
-			fmt.Printf("    💡 %s is available but not configured - consider setting it up\n", comp.name)
-		case configured && !available:
-			fmt.Printf("    ⚠️  %s is configured but not available - check device status\n", comp.name)
+	switch {
+	case available && !configured:
+		fmt.Printf("    💡 %s is available but not configured - consider setting it up\n", serviceName)
+	case configured && !available:
+		fmt.Printf("    ⚠️  %s is configured but not available - check device status\n", serviceName)
+		printServiceUnavailableReason(serviceName, serviceAvailability)
+	case configured && available:
+		fmt.Printf("    ✅ %s is properly configured and available\n", serviceName)
+	default:
+		fmt.Printf("    ➖ %s is neither configured nor available\n", serviceName)
+	}
+	fmt.Println()
+}
 
-			// Show specific reason if available
-			switch comp.name {
-			case "Spotify":
-				service := serviceAvailability.GetServiceByType(models.ServiceTypeSpotify)
-				if service != nil && service.Reason != "" {
-					fmt.Printf("    📝 Reason: %s\n", service.Reason)
-				}
-			case "Bluetooth":
-				service := serviceAvailability.GetServiceByType(models.ServiceTypeBluetooth)
-				if service != nil && service.Reason != "" {
-					fmt.Printf("    📝 Reason: %s\n", service.Reason)
-				}
-			}
-		case configured && available:
-			fmt.Printf("    ✅ %s is properly configured and available\n", comp.name)
-		default:
-			fmt.Printf("    ➖ %s is neither configured nor available\n", comp.name)
-		}
-		fmt.Println()
+// printServiceUnavailableReason prints the reason why a service is unavailable
+func printServiceUnavailableReason(serviceName string, serviceAvailability *models.ServiceAvailability) {
+	var service *models.Service
+
+	switch serviceName {
+	case "Spotify":
+		service = serviceAvailability.GetServiceByType(models.ServiceTypeSpotify)
+	case "Bluetooth":
+		service = serviceAvailability.GetServiceByType(models.ServiceTypeBluetooth)
 	}
 
+	if service != nil && service.Reason != "" {
+		fmt.Printf("    📝 Reason: %s\n", service.Reason)
+	}
+}
+
+// printSourceSummary prints a summary of sources and services
+func printSourceSummary(sources *models.Sources, serviceAvailability *models.ServiceAvailability) {
 	// Summary
 	fmt.Printf("📊 Summary:\n")
 	fmt.Printf("    Total configured sources: %d\n", sources.GetSourceCount())
@@ -372,7 +388,6 @@ func compareSourcesAndAvailability(c *cli.Context) error {
 	fmt.Printf("    Total available services: %d\n", serviceAvailability.GetAvailableServiceCount())
 	fmt.Printf("    Total possible services: %d\n", serviceAvailability.GetServiceCount())
 
-	return nil
 }
 
 // boolToStatus converts boolean to user-friendly status

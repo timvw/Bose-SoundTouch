@@ -269,55 +269,77 @@ func printSearchResults(response *models.SearchStationResponse, searchTerm strin
 	artists := response.GetArtists()
 	stations := response.GetStations()
 
-	if len(songs) > 0 {
-		fmt.Printf("\n  🎵 Songs (%d):\n", len(songs))
-		for i := range songs {
-			song := &songs[i]
-			fmt.Printf("    %d. %s\n", i+1, song.GetDisplayName())
-			if song.Artist != "" {
-				fmt.Printf("       Artist: %s\n", song.Artist)
-			}
-			if song.Album != "" {
-				fmt.Printf("       Album: %s\n", song.Album)
-			}
-			if song.SourceAccount != "" {
-				fmt.Printf("       Account: %s\n", song.SourceAccount)
-			}
-			fmt.Printf("       Token: %s\n", song.Token)
-			fmt.Println()
-		}
+	printSongs(songs)
+	printArtists(artists)
+	printStations(stations)
+	printSearchHints(response, songs, artists, stations)
+}
+
+// printSongs prints song search results
+func printSongs(songs []models.SearchResult) {
+	if len(songs) == 0 {
+		return
 	}
 
-	if len(artists) > 0 {
-		fmt.Printf("  🎤 Artists (%d):\n", len(artists))
-		for i := range artists {
-			artist := &artists[i]
-			fmt.Printf("    %d. %s\n", i+1, artist.GetDisplayName())
-			if artist.SourceAccount != "" {
-				fmt.Printf("       Account: %s\n", artist.SourceAccount)
-			}
-			fmt.Printf("       Token: %s\n", artist.Token)
-			fmt.Println()
+	fmt.Printf("\n  🎵 Songs (%d):\n", len(songs))
+	for i := range songs {
+		song := &songs[i]
+		fmt.Printf("    %d. %s\n", i+1, song.GetDisplayName())
+		if song.Artist != "" {
+			fmt.Printf("       Artist: %s\n", song.Artist)
 		}
+		if song.Album != "" {
+			fmt.Printf("       Album: %s\n", song.Album)
+		}
+		if song.SourceAccount != "" {
+			fmt.Printf("       Account: %s\n", song.SourceAccount)
+		}
+		fmt.Printf("       Token: %s\n", song.Token)
+		fmt.Println()
+	}
+}
+
+// printArtists prints artist search results
+func printArtists(artists []models.SearchResult) {
+	if len(artists) == 0 {
+		return
 	}
 
-	if len(stations) > 0 {
-		fmt.Printf("  📻 Stations (%d):\n", len(stations))
-		for i := range stations {
-			station := &stations[i]
-			fmt.Printf("    %d. %s\n", i+1, station.GetDisplayName())
-			if station.SourceAccount != "" {
-				fmt.Printf("       Account: %s\n", station.SourceAccount)
-			}
-			fmt.Printf("       Token: %s\n", station.Token)
-			if station.Description != "" {
-				fmt.Printf("       Description: %s\n", station.Description)
-			}
-			fmt.Println()
+	fmt.Printf("  🎤 Artists (%d):\n", len(artists))
+	for i := range artists {
+		artist := &artists[i]
+		fmt.Printf("    %d. %s\n", i+1, artist.GetDisplayName())
+		if artist.SourceAccount != "" {
+			fmt.Printf("       Account: %s\n", artist.SourceAccount)
 		}
+		fmt.Printf("       Token: %s\n", artist.Token)
+		fmt.Println()
+	}
+}
+
+// printStations prints station search results
+func printStations(stations []models.SearchResult) {
+	if len(stations) == 0 {
+		return
 	}
 
-	// Show usage hints
+	fmt.Printf("  📻 Stations (%d):\n", len(stations))
+	for i := range stations {
+		station := &stations[i]
+		fmt.Printf("    %d. %s\n", i+1, station.GetDisplayName())
+		if station.SourceAccount != "" {
+			fmt.Printf("       Account: %s\n", station.SourceAccount)
+		}
+		fmt.Printf("       Token: %s\n", station.Token)
+		if station.Description != "" {
+			fmt.Printf("       Description: %s\n", station.Description)
+		}
+		fmt.Println()
+	}
+}
+
+// printSearchHints prints usage hints for search results
+func printSearchHints(response *models.SearchStationResponse, songs, artists, stations []models.SearchResult) {
 	fmt.Printf("💡 Usage hints:\n")
 	fmt.Printf("   • To add a station and play it: station add --source %s --token <token> --name <name>\n", response.Source)
 	if hasAccountResults(response) {
