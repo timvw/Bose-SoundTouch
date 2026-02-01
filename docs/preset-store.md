@@ -91,6 +91,11 @@ soundtouch-cli --host 192.168.1.100 preset store \
   --location "/v1/playback/station/s33828" \
   --name "K-LOVE Radio"
 
+# Store radio station using TuneIn URL (Name and Artwork are automatically fetched)
+soundtouch-cli --host 192.168.1.100 preset store \
+  --slot 6 \
+  --location "https://tunein.com/radio/WDR-2-Rheinland-1004-s213886/"
+
 # Remove preset
 soundtouch-cli --host 192.168.1.100 preset remove --slot 3
 

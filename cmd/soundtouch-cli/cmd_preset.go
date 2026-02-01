@@ -80,6 +80,25 @@ func storePreset(c *cli.Context) error {
 	itemType := c.String("type")
 	artwork := c.String("artwork")
 
+	// Resolve location and source from potential URLs
+	resolvedSource, resolvedLocation := resolveLocation(source, location)
+	if resolvedLocation != location && (source == "" || source == "TUNEIN") {
+		// If location was a TuneIn URL, fetch metadata if name or artwork is missing
+		if name == "" || artwork == "" {
+			metadata, err := fetchTuneInMetadata(location)
+			if err == nil && metadata != nil {
+				if name == "" {
+					name = metadata.Name
+				}
+				if artwork == "" {
+					artwork = metadata.Artwork
+				}
+			}
+		}
+	}
+	source = resolvedSource
+	location = resolvedLocation
+
 	clientConfig := GetClientConfig(c)
 
 	if source == "" {

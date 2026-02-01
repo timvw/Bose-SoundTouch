@@ -98,14 +98,13 @@ func main() {
 	app := &cli.App{
 		Name:  "soundtouch-cli",
 		Usage: "Command-line interface for controlling Bose SoundTouch devices",
-		Description: `A comprehensive CLI tool for interacting with Bose SoundTouch devices.
+		Description: `⠎⠕⠥⠝⠙⠤⠞⠕⠥⠉⠓ A comprehensive CLI tool for interacting with Bose SoundTouch devices.
    Supports device discovery, playback control, volume/bass/balance adjustment,
    source selection, zone management, and more.`,
 		Version: version,
 		Authors: []*cli.Author{
 			{
-				Name:  "SoundTouch CLI Contributors",
-				Email: "info@example.com",
+				Name: "Tobias Gesellchen, and the SoundTouch CLI Contributors",
 			},
 		},
 		Flags: CommonFlags,
