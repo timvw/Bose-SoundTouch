@@ -23,8 +23,10 @@ func TestClient_Navigation_Integration(t *testing.T) {
 	var finalHost string
 
 	var finalPort int
+
 	if strings.Contains(host, ":") {
 		parts := strings.Split(host, ":")
+
 		finalHost = parts[0]
 		if len(parts) > 1 {
 			// Use default port if parsing fails
@@ -156,8 +158,10 @@ func TestClient_StationManagement_Integration(t *testing.T) {
 	var finalHost string
 
 	var finalPort int
+
 	if strings.Contains(host, ":") {
 		parts := strings.Split(host, ":")
+
 		finalHost = parts[0]
 		if len(parts) > 1 {
 			finalPort = 8090
@@ -184,6 +188,7 @@ func TestClient_StationManagement_Integration(t *testing.T) {
 		}
 
 		var pandoraAccount string
+
 		for _, source := range sources.SourceItem {
 			if source.Source == "PANDORA" && source.Status.IsReady() {
 				pandoraAccount = source.SourceAccount
@@ -314,6 +319,7 @@ func TestClient_Navigation_ErrorHandling_Integration(t *testing.T) {
 
 	// Parse host:port if provided
 	var finalHost string
+
 	var finalPort int
 	if strings.Contains(host, ":") {
 		parts := strings.Split(host, ":")
@@ -390,6 +396,7 @@ func BenchmarkClient_Navigate_Integration(b *testing.B) {
 
 	// Parse host:port if provided
 	var finalHost string
+
 	var finalPort int
 	if strings.Contains(host, ":") {
 		parts := strings.Split(host, ":")

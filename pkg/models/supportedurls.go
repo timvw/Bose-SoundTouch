@@ -356,6 +356,7 @@ func (s *SupportedURLsResponse) GetFeaturesByCategory() map[string][]EndpointFea
 // GetSupportedFeatures returns all features supported by this device
 func (s *SupportedURLsResponse) GetSupportedFeatures() []EndpointFeature {
 	features := GetEndpointFeatureMap()
+
 	var supported []EndpointFeature
 
 	for _, feature := range features {
@@ -458,6 +459,7 @@ func (s *SupportedURLsResponse) GetMissingEssentialFeatures() []EndpointFeature 
 // GetFeatureCompleteness returns a completeness score (0-100) based on supported features
 func (s *SupportedURLsResponse) GetFeatureCompleteness() (int, int, int) {
 	features := GetEndpointFeatureMap()
+
 	var total, supported, essential int
 
 	for _, feature := range features {

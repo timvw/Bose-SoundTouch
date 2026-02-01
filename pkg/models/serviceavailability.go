@@ -69,6 +69,7 @@ func (sa *ServiceAvailability) GetAvailableServices() []Service {
 	}
 
 	var available []Service
+
 	for _, service := range sa.Services.Service {
 		if service.IsAvailable {
 			available = append(available, service)
@@ -172,6 +173,7 @@ func (sa *ServiceAvailability) GetStreamingServices() []Service {
 	}
 
 	var streaming []Service
+
 	for _, service := range sa.Services.Service {
 		for _, streamingType := range streamingTypes {
 			if service.Type == string(streamingType) {

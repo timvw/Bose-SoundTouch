@@ -630,7 +630,6 @@ func TestClient_GetStoredMusicLibrary(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-
 	response, err := client.GetStoredMusicLibrary("device123/0")
 
 	if err != nil {
@@ -764,7 +763,6 @@ func TestClient_SearchStation(t *testing.T) {
 			}
 			client := NewClient(config)
 			client.baseURL = server.URL
-
 			response, err := client.SearchStation(tt.source, tt.sourceAccount, tt.searchTerm)
 
 			if tt.expectError {
@@ -874,7 +872,6 @@ func TestClient_SearchTuneInStations(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-
 	response, err := client.SearchTuneInStations("Jazz")
 
 	if err != nil {

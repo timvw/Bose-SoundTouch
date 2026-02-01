@@ -11,6 +11,7 @@ func TestNavigateRequest_NewNavigateRequest(t *testing.T) {
 	if req.Source != "SPOTIFY" {
 		t.Errorf("Expected source SPOTIFY, got %s", req.Source)
 	}
+
 	if req.SourceAccount != "user@example.com" {
 		t.Errorf("Expected sourceAccount user@example.com, got %s", req.SourceAccount)
 	}
@@ -101,9 +102,11 @@ func TestNavigateRequest_XMLMarshalWithItem(t *testing.T) {
 	if !contains(xmlStr, `<startItem>1</startItem>`) {
 		t.Error("XML should contain startItem element")
 	}
+
 	if !contains(xmlStr, `<numItems>1000</numItems>`) {
 		t.Error("XML should contain numItems element")
 	}
+
 	if !contains(xmlStr, `<item`) {
 		t.Error("XML should contain item element")
 	}
@@ -137,6 +140,7 @@ func TestNavigateResponse_XMLUnmarshal(t *testing.T) {
 		</navigateResponse>`
 
 	var response NavigateResponse
+
 	err := xml.Unmarshal([]byte(xmlData), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -175,6 +179,7 @@ func TestNavigateResponse_XMLUnmarshal(t *testing.T) {
 	if secondItem.ArtistName != "Test Artist" {
 		t.Errorf("Expected artist name 'Test Artist', got %s", secondItem.ArtistName)
 	}
+
 	if !secondItem.IsTrack() {
 		t.Error("Expected second item to be a track")
 	}
@@ -346,6 +351,7 @@ func TestStationResponse_XMLUnmarshal(t *testing.T) {
 	xmlData := `<status>/addStation</status>`
 
 	var response StationResponse
+
 	err := xml.Unmarshal([]byte(xmlData), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)
@@ -468,6 +474,7 @@ func TestSearchStationResponse_XMLUnmarshal(t *testing.T) {
 		</results>`
 
 	var response SearchStationResponse
+
 	err := xml.Unmarshal([]byte(xmlData), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal XML: %v", err)

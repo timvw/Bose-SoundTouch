@@ -89,6 +89,7 @@ func displayServiceReport(sa *models.ServiceAvailability) {
 			if service.Reason != "" {
 				reason = fmt.Sprintf(" (%s)", service.Reason)
 			}
+
 			fmt.Printf("  ❌ %s%s\n", formatServiceName(service.Type), reason)
 		}
 	}
@@ -102,6 +103,7 @@ func displayServiceReport(sa *models.ServiceAvailability) {
 
 func displayServiceCategories(sa *models.ServiceAvailability) {
 	fmt.Println("\n🎵 STREAMING SERVICES:")
+
 	streamingServices := sa.GetStreamingServices()
 	availableCount := 0
 
@@ -116,6 +118,7 @@ func displayServiceCategories(sa *models.ServiceAvailability) {
 	fmt.Printf("  Summary: %d/%d streaming services available\n", availableCount, len(streamingServices))
 
 	fmt.Println("\n🔗 LOCAL INPUT SERVICES:")
+
 	localServices := sa.GetLocalServices()
 	localAvailableCount := 0
 
@@ -125,6 +128,7 @@ func displayServiceCategories(sa *models.ServiceAvailability) {
 			status = "✅"
 			localAvailableCount++
 		}
+
 		fmt.Printf("  %s %s\n", status, formatServiceName(service.Type))
 	}
 
@@ -153,6 +157,7 @@ func displayQuickStatusChecks(sa *models.ServiceAvailability) {
 		if check.check() {
 			status = "✅ Available"
 		}
+
 		fmt.Printf("  %s %s: %s\n", check.icon, check.name, status)
 	}
 }

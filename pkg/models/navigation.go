@@ -186,11 +186,13 @@ func (nr *NavigateResponse) GetDirectories() []NavigateItem {
 // GetTracks returns only the track items from the navigate response
 func (nr *NavigateResponse) GetTracks() []NavigateItem {
 	var tracks []NavigateItem
+
 	for _, item := range nr.Items {
 		if item.Type == "track" {
 			tracks = append(tracks, item)
 		}
 	}
+
 	return tracks
 }
 
@@ -221,6 +223,7 @@ func (ni *NavigateItem) GetDisplayName() string {
 	if ni.ContentItem != nil && ni.ContentItem.ItemName != "" {
 		return ni.ContentItem.ItemName
 	}
+
 	return "Unknown Item"
 }
 
@@ -254,6 +257,7 @@ func (ni *NavigateItem) GetArtwork() string {
 	if ni.ContentItem != nil && ni.ContentItem.ContainerArt != "" {
 		return ni.ContentItem.ContainerArt
 	}
+
 	return ""
 }
 

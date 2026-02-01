@@ -113,6 +113,7 @@ func TestServiceAvailability_UnmarshalXML(t *testing.T) {
 			if err != nil {
 				t.Fatalf("failed to unmarshal XML: %v", err)
 			}
+
 			tt.validate(t, &sa)
 		})
 	}

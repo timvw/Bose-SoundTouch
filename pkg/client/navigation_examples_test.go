@@ -17,6 +17,7 @@ func ExampleClient_Navigate() {
 	}
 
 	fmt.Printf("Found %d items in TuneIn\n", response.TotalItems)
+
 	for _, item := range response.Items {
 		fmt.Printf("- %s (%s)\n", item.GetDisplayName(), item.Type)
 	}
@@ -200,7 +201,8 @@ func Example_searchAndPlayWorkflow() {
 	}
 
 	// 2. Show available stations
-	fmt.Printf("Found %d stations:\n", len(stations))
+	fmt.Printf("Found %d stations\n", len(stations))
+
 	for i, station := range stations[:minInt(5, len(stations))] {
 		fmt.Printf("%d. %s", i+1, station.GetDisplayName())
 		if station.Description != "" {

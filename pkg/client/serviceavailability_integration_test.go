@@ -72,6 +72,7 @@ func TestGetServiceAvailability_Integration(t *testing.T) {
 
 		localServices := serviceAvailability.GetLocalServices()
 		t.Logf("Local services count: %d", len(localServices))
+
 		for _, service := range localServices {
 			t.Logf("  - Local: %s (%v)", service.Type, service.IsAvailable)
 		}

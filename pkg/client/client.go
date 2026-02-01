@@ -395,6 +395,7 @@ func (c *Client) RemovePreset(id int) error {
 	}
 
 	preset := &models.Preset{ID: id}
+
 	err := c.post("/removePreset", preset)
 	if err != nil {
 		return fmt.Errorf("failed to remove preset %d: %w", id, err)
