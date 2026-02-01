@@ -96,6 +96,12 @@ soundtouch-cli --host 192.168.1.100 preset store \
   --slot 6 \
   --location "https://tunein.com/radio/WDR-2-Rheinland-1004-s213886/"
 
+# Store Spotify album using URL (Name and Artwork are automatically fetched)
+soundtouch-cli --host 192.168.1.100 preset store \
+  --slot 1 \
+  --location "https://open.spotify.com/album/6rT8yer84xoh0t17poLsmn?si=XqxdZazpTLC1ceoC8EeCuA" \
+  --source-account "yourusername"
+
 # Remove preset
 soundtouch-cli --host 192.168.1.100 preset remove --slot 3
 

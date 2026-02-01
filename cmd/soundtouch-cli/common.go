@@ -1,10 +1,13 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
+	"html"
 	"io"
 	"net"
 	"net/http"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -163,10 +166,26 @@ func resolveLocation(source, location string) (string, string) {
 		}
 	}
 
+	// Spotify URL conversion
+	// Example: https://open.spotify.com/album/7F50uh7oGitmAEScRKV6pD?si=YhDPWL9LRGO5whz1wLsteA
+	if strings.Contains(location, "open.spotify.com/") {
+		re := regexp.MustCompile(`https://open\.spotify\.com/([^/]+)/([^?]+)`)
+
+		matches := re.FindStringSubmatch(location)
+		if len(matches) >= 3 {
+			contentType := matches[1]
+			contentID := matches[2]
+			uri := fmt.Sprintf("spotify:%s:%s", contentType, contentID)
+			encodedURI := base64.StdEncoding.EncodeToString([]byte(uri))
+
+			return "SPOTIFY", "/playback/container/" + encodedURI
+		}
+	}
+
 	return source, location
 }
 
-type TuneInMetadata struct {
+type Metadata struct {
 	Name    string
 	Artwork string
 }
@@ -175,7 +194,7 @@ var httpClient = &http.Client{
 	Timeout: 5 * time.Second,
 }
 
-func fetchTuneInMetadata(url string) (*TuneInMetadata, error) {
+func fetchTuneInMetadata(url string) (*Metadata, error) {
 	if !strings.Contains(url, "tunein.com/radio/") {
 		return nil, fmt.Errorf("url is not a TuneIn radio URL")
 	}
@@ -195,20 +214,20 @@ func fetchTuneInMetadata(url string) (*TuneInMetadata, error) {
 		return nil, err
 	}
 
-	html := string(body)
-	metadata := &TuneInMetadata{}
+	rawHTML := string(body)
+	metadata := &Metadata{}
 
 	// Simple extraction of og:title and og:image
 	// Example: <meta data-react-helmet="true" property="og:title" content="WDR 2 Rheinland, 100.4 FM, Köln | Free Internet Radio | TuneIn"/>
 	// Example: <meta data-react-helmet="true" property="og:image" content="https://cdn-radiotime-logos.tunein.com/s213886g.png"/>
 
 	titlePrefix := `property="og:title" content="`
-	if idx := strings.Index(html, titlePrefix); idx != -1 {
+	if idx := strings.Index(rawHTML, titlePrefix); idx != -1 {
 		start := idx + len(titlePrefix)
 
-		end := strings.Index(html[start:], `"`)
+		end := strings.Index(rawHTML[start:], `"`)
 		if end != -1 {
-			title := html[start : start+end]
+			title := html.UnescapeString(rawHTML[start : start+end])
 			// Clean up title (remove ", 100.4 FM, Köln | Free Internet Radio | TuneIn")
 			if pipeIdx := strings.Index(title, " | "); pipeIdx != -1 {
 				title = title[:pipeIdx]
@@ -223,12 +242,72 @@ func fetchTuneInMetadata(url string) (*TuneInMetadata, error) {
 	}
 
 	imagePrefix := `property="og:image" content="`
-	if idx := strings.Index(html, imagePrefix); idx != -1 {
+	if idx := strings.Index(rawHTML, imagePrefix); idx != -1 {
 		start := idx + len(imagePrefix)
 
-		end := strings.Index(html[start:], `"`)
+		end := strings.Index(rawHTML[start:], `"`)
 		if end != -1 {
-			metadata.Artwork = html[start : start+end]
+			metadata.Artwork = rawHTML[start : start+end]
+		}
+	}
+
+	return metadata, nil
+}
+
+func fetchSpotifyMetadata(url string) (*Metadata, error) {
+	if !strings.Contains(url, "open.spotify.com/") {
+		return nil, fmt.Errorf("url is not a Spotify URL")
+	}
+
+	resp, err := httpClient.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 1024*200)) // Spotify pages can be larger
+	if err != nil {
+		return nil, err
+	}
+
+	rawHTML := string(body)
+	metadata := &Metadata{}
+
+	// Simple extraction of og:title and og:image
+	// Example: <meta property="og:title" content="Terminal Caribe - Album by Santi &amp; Tuğçe | Spotify"
+
+	titlePrefix := `property="og:title" content="`
+	if idx := strings.Index(rawHTML, titlePrefix); idx != -1 {
+		start := idx + len(titlePrefix)
+
+		end := strings.Index(rawHTML[start:], `"`)
+		if end != -1 {
+			title := html.UnescapeString(rawHTML[start : start+end])
+			// Clean up title (remove " | Spotify")
+			if pipeIdx := strings.Index(title, " | "); pipeIdx != -1 {
+				title = title[:pipeIdx]
+			}
+
+			// Spotify often has "- Album by ..." or "- Playlist by ..."
+			// We might want to keep it or clean it up.
+			// User's TuneIn example cleaned it up.
+			// For now let's just keep what Spotify provides as title minus the " | Spotify" part.
+
+			metadata.Name = title
+		}
+	}
+
+	imagePrefix := `property="og:image" content="`
+	if idx := strings.Index(rawHTML, imagePrefix); idx != -1 {
+		start := idx + len(imagePrefix)
+
+		end := strings.Index(rawHTML[start:], `"`)
+		if end != -1 {
+			metadata.Artwork = rawHTML[start : start+end]
 		}
 	}
 

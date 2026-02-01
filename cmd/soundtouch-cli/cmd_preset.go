@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gesellix/bose-soundtouch/pkg/models"
 	"github.com/urfave/cli/v2"
@@ -101,25 +102,35 @@ func extractPresetParams(c *cli.Context) *presetParams {
 
 // resolveLocationAndMetadata resolves location and fetches metadata if needed
 func resolveLocationAndMetadata(params *presetParams) error {
+	originalLocation := params.location
 	resolvedSource, resolvedLocation := resolveLocation(params.source, params.location)
-	if resolvedLocation != params.location && (params.source == "" || params.source == "TUNEIN") {
-		// If location was a TuneIn URL, fetch metadata if name or artwork is missing
-		if params.name == "" || params.artwork == "" {
-			metadata, err := fetchTuneInMetadata(params.location)
-			if err == nil && metadata != nil {
-				if params.name == "" {
-					params.name = metadata.Name
-				}
-
-				if params.artwork == "" {
-					params.artwork = metadata.Artwork
-				}
-			}
-		}
-	}
 
 	params.source = resolvedSource
 	params.location = resolvedLocation
+
+	// If metadata (name or artwork) is missing, try to fetch it
+	if params.name == "" || params.artwork == "" {
+		var (
+			metadata *Metadata
+			err      error
+		)
+
+		if params.source == "TUNEIN" && strings.Contains(originalLocation, "tunein.com/radio/") {
+			metadata, err = fetchTuneInMetadata(originalLocation)
+		} else if params.source == "SPOTIFY" && strings.Contains(originalLocation, "open.spotify.com/") {
+			metadata, err = fetchSpotifyMetadata(originalLocation)
+		}
+
+		if err == nil && metadata != nil {
+			if params.name == "" {
+				params.name = metadata.Name
+			}
+
+			if params.artwork == "" {
+				params.artwork = metadata.Artwork
+			}
+		}
+	}
 
 	return nil
 }

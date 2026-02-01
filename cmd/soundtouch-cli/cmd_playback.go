@@ -157,6 +157,7 @@ func printVerbosePlaybackDetails(nowPlaying *models.NowPlaying) {
 	// Art details
 	if nowPlaying.Art != nil {
 		fmt.Printf("  Art Image Status: %s\n", nowPlaying.Art.ArtImageStatus)
+
 		if nowPlaying.Art.URL != "" {
 			fmt.Printf("  Art URL: %s\n", nowPlaying.Art.URL)
 		}
