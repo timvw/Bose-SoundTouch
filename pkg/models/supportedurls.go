@@ -20,6 +20,7 @@ func (s *SupportedURLsResponse) GetURLs() []string {
 	for i, url := range s.URLs {
 		urls[i] = url.Location
 	}
+
 	return urls
 }
 
@@ -30,6 +31,7 @@ func (s *SupportedURLsResponse) HasURL(location string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -47,11 +49,13 @@ func (s *SupportedURLsResponse) GetCoreURLs() []string {
 	}
 
 	var available []string
+
 	for _, endpoint := range coreEndpoints {
 		if s.HasURL(endpoint) {
 			available = append(available, endpoint)
 		}
 	}
+
 	return available
 }
 
@@ -63,11 +67,13 @@ func (s *SupportedURLsResponse) GetStreamingURLs() []string {
 	}
 
 	var available []string
+
 	for _, endpoint := range streamingEndpoints {
 		if s.HasURL(endpoint) {
 			available = append(available, endpoint)
 		}
 	}
+
 	return available
 }
 
@@ -81,11 +87,13 @@ func (s *SupportedURLsResponse) GetAdvancedURLs() []string {
 	}
 
 	var available []string
+
 	for _, endpoint := range advancedEndpoints {
 		if s.HasURL(endpoint) {
 			available = append(available, endpoint)
 		}
 	}
+
 	return available
 }
 
@@ -97,11 +105,13 @@ func (s *SupportedURLsResponse) GetNetworkURLs() []string {
 	}
 
 	var available []string
+
 	for _, endpoint := range networkEndpoints {
 		if s.HasURL(endpoint) {
 			available = append(available, endpoint)
 		}
 	}
+
 	return available
 }
 
@@ -113,6 +123,7 @@ func (s *SupportedURLsResponse) HasCorePlaybackSupport() bool {
 			return false
 		}
 	}
+
 	return true
 }
 
@@ -139,11 +150,13 @@ func (s *SupportedURLsResponse) HasStreamingSupport() bool {
 // GetUnsupportedURLs returns a list of common URLs that this device doesn't support
 func (s *SupportedURLsResponse) GetUnsupportedURLs(checkList []string) []string {
 	var unsupported []string
+
 	for _, endpoint := range checkList {
 		if !s.HasURL(endpoint) {
 			unsupported = append(unsupported, endpoint)
 		}
 	}
+
 	return unsupported
 }
 
@@ -338,6 +351,7 @@ func (s *SupportedURLsResponse) GetFeaturesByCategory() map[string][]EndpointFea
 	for _, feature := range features {
 		// Check if device supports this feature (any of its endpoints)
 		supported := false
+
 		for _, endpoint := range feature.Endpoints {
 			if s.HasURL(endpoint) {
 				supported = true
@@ -362,6 +376,7 @@ func (s *SupportedURLsResponse) GetSupportedFeatures() []EndpointFeature {
 	for _, feature := range features {
 		// Check if device supports this feature (any of its endpoints)
 		hasSupport := false
+
 		for _, endpoint := range feature.Endpoints {
 			if s.HasURL(endpoint) {
 				hasSupport = true
@@ -386,6 +401,7 @@ func (s *SupportedURLsResponse) GetUnsupportedFeatures() []EndpointFeature {
 	for _, feature := range features {
 		// Check if device supports this feature (any of its endpoints)
 		hasSupport := false
+
 		for _, endpoint := range feature.Endpoints {
 			if s.HasURL(endpoint) {
 				hasSupport = true
@@ -413,6 +429,7 @@ func (s *SupportedURLsResponse) GetPartiallyImplementedFeatures() []EndpointFeat
 		}
 
 		supportedCount := 0
+
 		for _, endpoint := range feature.Endpoints {
 			if s.HasURL(endpoint) {
 				supportedCount++
@@ -441,6 +458,7 @@ func (s *SupportedURLsResponse) GetMissingEssentialFeatures() []EndpointFeature 
 
 		// Check if device supports this essential feature
 		hasSupport := false
+
 		for _, endpoint := range feature.Endpoints {
 			if s.HasURL(endpoint) {
 				hasSupport = true
@@ -471,6 +489,7 @@ func (s *SupportedURLsResponse) GetFeatureCompleteness() (int, int, int) {
 
 		// Check if device supports this feature
 		hasSupport := false
+
 		for _, endpoint := range feature.Endpoints {
 			if s.HasURL(endpoint) {
 				hasSupport = true

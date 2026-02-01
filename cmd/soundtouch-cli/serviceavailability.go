@@ -39,6 +39,7 @@ func (sac *ServiceAvailabilityChecker) loadServiceAvailability() {
 		// Create a mock availability that allows everything
 		sac.serviceAvailability = &models.ServiceAvailability{}
 		sac.cached = true
+
 		return
 	}
 
@@ -46,6 +47,7 @@ func (sac *ServiceAvailabilityChecker) loadServiceAvailability() {
 	if err != nil {
 		// If availability check fails, warn but don't fail the command
 		PrintWarning(fmt.Sprintf("Could not check service availability: %v", err))
+
 		if !sac.skipAvailabilityCheck {
 			PrintWarning("Command will proceed without availability validation")
 			PrintWarning("Set SOUNDTOUCH_SKIP_AVAILABILITY_CHECK=true to disable these checks")
@@ -53,6 +55,7 @@ func (sac *ServiceAvailabilityChecker) loadServiceAvailability() {
 		// Create empty availability to prevent further errors
 		sac.serviceAvailability = &models.ServiceAvailability{}
 		sac.cached = true
+
 		return
 	}
 
@@ -94,6 +97,7 @@ func (sac *ServiceAvailabilityChecker) CheckServiceAvailable(serviceType models.
 	sac.suggestAlternatives(serviceType, actionDescription)
 
 	PrintWarning("To bypass this check, set SOUNDTOUCH_SKIP_AVAILABILITY_CHECK=true")
+
 	return false
 }
 
@@ -241,6 +245,7 @@ func (sac *ServiceAvailabilityChecker) suggestAlternatives(serviceType models.Se
 		if sac.serviceAvailability.HasTuneIn() {
 			PrintWarning("💡 Alternative: TuneIn Radio is available for music streaming")
 		}
+
 		if sac.serviceAvailability.HasPandora() {
 			PrintWarning("💡 Alternative: Pandora is available for music streaming")
 		}
@@ -249,6 +254,7 @@ func (sac *ServiceAvailabilityChecker) suggestAlternatives(serviceType models.Se
 		if sac.serviceAvailability.HasAirPlay() {
 			PrintWarning("💡 Alternative: AirPlay is available for wireless audio")
 		}
+
 		if sac.serviceAvailability.HasLocalMusic() {
 			PrintWarning("💡 Alternative: Local Music Library is available")
 		}
@@ -257,6 +263,7 @@ func (sac *ServiceAvailabilityChecker) suggestAlternatives(serviceType models.Se
 		if sac.serviceAvailability.HasSpotify() {
 			PrintWarning("💡 Alternative: Spotify is available for music streaming")
 		}
+
 		if sac.serviceAvailability.HasPandora() {
 			PrintWarning("💡 Alternative: Pandora is available for music streaming")
 		}
@@ -358,6 +365,7 @@ func (sac *ServiceAvailabilityChecker) PrintServiceAvailabilitySummary() {
 
 	// Show quick status for popular services
 	fmt.Printf("   Popular services:\n")
+
 	popularChecks := []struct {
 		check func() bool
 		name  string
@@ -374,6 +382,7 @@ func (sac *ServiceAvailabilityChecker) PrintServiceAvailabilitySummary() {
 		if check.check() {
 			status = "✅"
 		}
+
 		fmt.Printf("     %s %s\n", status, check.name)
 	}
 

@@ -43,6 +43,7 @@ func searchStations(c *cli.Context) error {
 	}
 
 	printSearchResults(response, searchTerm)
+
 	return nil
 }
 
@@ -77,6 +78,7 @@ func searchTuneIn(c *cli.Context) error {
 	}
 
 	printSearchResults(response, searchTerm)
+
 	return nil
 }
 
@@ -117,6 +119,7 @@ func searchPandora(c *cli.Context) error {
 	}
 
 	printSearchResults(response, searchTerm)
+
 	return nil
 }
 
@@ -157,6 +160,7 @@ func searchSpotify(c *cli.Context) error {
 	}
 
 	printSearchResults(response, searchTerm)
+
 	return nil
 }
 
@@ -206,6 +210,7 @@ func addStation(c *cli.Context) error {
 	}
 
 	PrintSuccess(fmt.Sprintf("Added and started playing station: %s", name))
+
 	return nil
 }
 
@@ -250,6 +255,7 @@ func removeStation(c *cli.Context) error {
 	}
 
 	PrintSuccess("Station removed successfully")
+
 	return nil
 }
 
@@ -282,18 +288,23 @@ func printSongs(songs []models.SearchResult) {
 	}
 
 	fmt.Printf("\n  🎵 Songs (%d):\n", len(songs))
+
 	for i := range songs {
 		song := &songs[i]
 		fmt.Printf("    %d. %s\n", i+1, song.GetDisplayName())
+
 		if song.Artist != "" {
 			fmt.Printf("       Artist: %s\n", song.Artist)
 		}
+
 		if song.Album != "" {
 			fmt.Printf("       Album: %s\n", song.Album)
 		}
+
 		if song.SourceAccount != "" {
 			fmt.Printf("       Account: %s\n", song.SourceAccount)
 		}
+
 		fmt.Printf("       Token: %s\n", song.Token)
 		fmt.Println()
 	}
@@ -306,12 +317,15 @@ func printArtists(artists []models.SearchResult) {
 	}
 
 	fmt.Printf("  🎤 Artists (%d):\n", len(artists))
+
 	for i := range artists {
 		artist := &artists[i]
 		fmt.Printf("    %d. %s\n", i+1, artist.GetDisplayName())
+
 		if artist.SourceAccount != "" {
 			fmt.Printf("       Account: %s\n", artist.SourceAccount)
 		}
+
 		fmt.Printf("       Token: %s\n", artist.Token)
 		fmt.Println()
 	}
@@ -324,16 +338,21 @@ func printStations(stations []models.SearchResult) {
 	}
 
 	fmt.Printf("  📻 Stations (%d):\n", len(stations))
+
 	for i := range stations {
 		station := &stations[i]
 		fmt.Printf("    %d. %s\n", i+1, station.GetDisplayName())
+
 		if station.SourceAccount != "" {
 			fmt.Printf("       Account: %s\n", station.SourceAccount)
 		}
+
 		fmt.Printf("       Token: %s\n", station.Token)
+
 		if station.Description != "" {
 			fmt.Printf("       Description: %s\n", station.Description)
 		}
+
 		fmt.Println()
 	}
 }
@@ -342,9 +361,11 @@ func printStations(stations []models.SearchResult) {
 func printSearchHints(response *models.SearchStationResponse, songs, artists, stations []models.SearchResult) {
 	fmt.Printf("💡 Usage hints:\n")
 	fmt.Printf("   • To add a station and play it: station add --source %s --token <token> --name <name>\n", response.Source)
+
 	if hasAccountResults(response) {
 		fmt.Printf("   • Include --source-account <account> when adding stations that require it\n")
 	}
+
 	if len(songs) > 0 || len(artists) > 0 || len(stations) > 0 {
 		fmt.Printf("   • Copy the token from results above to use with 'station add'\n")
 	}
@@ -358,6 +379,7 @@ func hasAccountResults(response *models.SearchStationResponse) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -393,6 +415,7 @@ func listStations(c *cli.Context) error {
 			PrintError("Pandora source account is required")
 			return fmt.Errorf("source account required for Pandora")
 		}
+
 		response, err = client.GetPandoraStations(sourceAccount)
 	default:
 		return fmt.Errorf("listing stations is not supported for source: %s", source)
@@ -404,6 +427,7 @@ func listStations(c *cli.Context) error {
 	}
 
 	printStationList(response, source)
+
 	return nil
 }
 
@@ -427,9 +451,11 @@ func printStationList(response *models.NavigateResponse, source string) {
 			if station.ContentItem.Location != "" {
 				fmt.Printf("     Location: %s\n", station.ContentItem.Location)
 			}
+
 			if station.ContentItem.SourceAccount != "" {
 				fmt.Printf("     Account: %s\n", station.ContentItem.SourceAccount)
 			}
+
 			if station.ContentItem.IsPresetable {
 				fmt.Printf("     Can be saved as preset: Yes\n")
 			}
@@ -438,6 +464,7 @@ func printStationList(response *models.NavigateResponse, source string) {
 		if station.Type != "" {
 			fmt.Printf("     Type: %s\n", station.Type)
 		}
+
 		fmt.Println()
 	}
 

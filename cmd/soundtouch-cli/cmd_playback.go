@@ -45,9 +45,11 @@ func getNowPlaying(c *cli.Context) error {
 // printBasicPlaybackInfo prints basic source and status information
 func printBasicPlaybackInfo(nowPlaying *models.NowPlaying) {
 	fmt.Printf("  Source: %s\n", nowPlaying.Source)
+
 	if nowPlaying.SourceAccount != "" {
 		fmt.Printf("  Source Account: %s\n", nowPlaying.SourceAccount)
 	}
+
 	fmt.Printf("  Status: %s\n", nowPlaying.PlayStatus.String())
 }
 
@@ -56,9 +58,11 @@ func printTrackInfo(nowPlaying *models.NowPlaying) {
 	if nowPlaying.Track != "" {
 		fmt.Printf("  Track: %s\n", nowPlaying.Track)
 	}
+
 	if nowPlaying.Artist != "" {
 		fmt.Printf("  Artist: %s\n", nowPlaying.Artist)
 	}
+
 	if nowPlaying.Album != "" {
 		fmt.Printf("  Album: %s\n", nowPlaying.Album)
 	}
@@ -71,6 +75,7 @@ func printTimeInfo(nowPlaying *models.NowPlaying) {
 	}
 
 	fmt.Printf("  Duration: %s\n", nowPlaying.FormatDuration())
+
 	if nowPlaying.Position != nil {
 		fmt.Printf("  Position: %s\n", nowPlaying.FormatPosition())
 	}
@@ -115,9 +120,11 @@ func printVerboseContentInfo(nowPlaying *models.NowPlaying, verbose bool) {
 	if nowPlaying.ContentItem.Type != "" {
 		fmt.Printf("  Content Type: %s\n", nowPlaying.ContentItem.Type)
 	}
+
 	if nowPlaying.ContentItem.ItemName != "" && nowPlaying.ContentItem.ItemName != nowPlaying.Track {
 		fmt.Printf("  Item Name: %s\n", nowPlaying.ContentItem.ItemName)
 	}
+
 	fmt.Printf("  Presetable: %t\n", nowPlaying.ContentItem.IsPresetable)
 }
 

@@ -298,6 +298,7 @@ func printFeatureCategories(featuresByCategory map[string][]models.EndpointFeatu
 		for _, feature := range features {
 			printFeatureStatus(feature, supportedURLs, verbose)
 		}
+
 		fmt.Println()
 	}
 }
@@ -315,6 +316,7 @@ func printFeatureStatus(feature models.EndpointFeature, supportedURLs *models.Su
 	if feature.Essential {
 		fmt.Printf(" ⭐")
 	}
+
 	fmt.Printf("\n")
 
 	if verbose {
@@ -342,6 +344,7 @@ func printVerboseFeatureDetails(feature models.EndpointFeature, supportedEndpoin
 	if supportedEndpoints < len(feature.Endpoints) {
 		fmt.Printf(" (partial)")
 	}
+
 	fmt.Printf("\n")
 }
 
@@ -353,6 +356,7 @@ func printMissingEssentialFeatures(supportedURLs *models.SupportedURLsResponse) 
 		for _, feature := range missingEssential {
 			fmt.Printf("    ❌ %s - %s\n", feature.Name, feature.Description)
 		}
+
 		fmt.Println()
 	}
 }
@@ -361,16 +365,20 @@ func printPartiallyImplementedFeatures(supportedURLs *models.SupportedURLsRespon
 	partial := supportedURLs.GetPartiallyImplementedFeatures()
 	if len(partial) > 0 && verbose {
 		fmt.Printf("⚠️  Partially Supported Features:\n")
+
 		for _, feature := range partial {
 			fmt.Printf("    🟡 %s\n", feature.Name)
+
 			for _, endpoint := range feature.Endpoints {
 				status := "❌"
 				if supportedURLs.HasURL(endpoint) {
 					status = "✅"
 				}
+
 				fmt.Printf("        %s %s\n", status, endpoint)
 			}
 		}
+
 		fmt.Println()
 	}
 }
@@ -387,6 +395,7 @@ func printDetailedEndpoints(supportedURLs *models.SupportedURLsResponse) {
 		for _, url := range coreURLs {
 			fmt.Printf("    • %s\n", url)
 		}
+
 		fmt.Println()
 	}
 
@@ -398,6 +407,7 @@ func printDetailedEndpoints(supportedURLs *models.SupportedURLsResponse) {
 		for _, url := range streamingURLs {
 			fmt.Printf("    • %s\n", url)
 		}
+
 		fmt.Println()
 	}
 
@@ -409,6 +419,7 @@ func printDetailedEndpoints(supportedURLs *models.SupportedURLsResponse) {
 		for _, url := range advancedURLs {
 			fmt.Printf("    • %s\n", url)
 		}
+
 		fmt.Println()
 	}
 
@@ -420,11 +431,13 @@ func printDetailedEndpoints(supportedURLs *models.SupportedURLsResponse) {
 		for _, url := range networkURLs {
 			fmt.Printf("    • %s\n", url)
 		}
+
 		fmt.Println()
 	}
 
 	// Show all supported URLs
 	fmt.Printf("📝 Complete Endpoint List:\n")
+
 	allURLs := supportedURLs.GetURLs()
 	for i, url := range allURLs {
 		fmt.Printf("    %3d. %s\n", i+1, url)
@@ -449,6 +462,7 @@ func getDeviceAnalysis(c *cli.Context) error {
 	}
 
 	printDeviceAnalysis(supportedURLs)
+
 	return nil
 }
 
@@ -469,10 +483,12 @@ func printDeviceAnalysis(supportedURLs *models.SupportedURLsResponse) {
 	missingEssential := supportedURLs.GetMissingEssentialFeatures()
 	if len(missingEssential) > 0 {
 		fmt.Printf("❌ Missing Essential Features:\n")
+
 		for _, feature := range missingEssential {
 			fmt.Printf("    • %s - %s\n", feature.Name, feature.Description)
 			fmt.Printf("      Impact: Device may not function properly without this\n")
 		}
+
 		fmt.Println()
 	} else {
 		fmt.Printf("✅ All essential features are supported\n\n")
@@ -481,14 +497,17 @@ func printDeviceAnalysis(supportedURLs *models.SupportedURLsResponse) {
 	// Show what works
 	supportedFeatures := supportedURLs.GetSupportedFeatures()
 	fmt.Printf("✅ Available Features (%d):\n", len(supportedFeatures))
+
 	categoryCount := make(map[string]int)
 	for _, feature := range supportedFeatures {
 		categoryCount[feature.Category]++
 	}
+
 	for category, count := range categoryCount {
 		emoji := getCategoryEmoji(category)
 		fmt.Printf("    %s %s: %d features\n", emoji, category, count)
 	}
+
 	fmt.Println()
 
 	// Show what's missing
@@ -499,6 +518,7 @@ func printDeviceAnalysis(supportedURLs *models.SupportedURLsResponse) {
 		for _, feature := range unsupportedFeatures {
 			fmt.Printf("    • %s - %s\n", feature.Name, feature.Description)
 		}
+
 		fmt.Println()
 	}
 
@@ -515,8 +535,10 @@ func printDeviceAnalysis(supportedURLs *models.SupportedURLsResponse) {
 					supportedCount++
 				}
 			}
+
 			fmt.Printf("    • %s (%d/%d endpoints)\n", feature.Name, supportedCount, len(feature.Endpoints))
 		}
+
 		fmt.Println()
 	}
 

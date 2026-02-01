@@ -1441,9 +1441,11 @@ func (c *Client) Navigate(source, sourceAccount string, startItem, numItems int)
 	if source == "" {
 		return nil, fmt.Errorf("source cannot be empty")
 	}
+
 	if startItem < 1 {
 		return nil, fmt.Errorf("startItem must be >= 1, got %d", startItem)
 	}
+
 	if numItems < 1 {
 		return nil, fmt.Errorf("numItems must be >= 1, got %d", numItems)
 	}
@@ -1451,6 +1453,7 @@ func (c *Client) Navigate(source, sourceAccount string, startItem, numItems int)
 	request := models.NewNavigateRequest(source, sourceAccount, startItem, numItems)
 
 	var response models.NavigateResponse
+
 	err := c.postWithResponse("/navigate", request, &response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to navigate %s: %w", source, err)
@@ -1464,9 +1467,11 @@ func (c *Client) NavigateWithMenu(source, sourceAccount, menu, sort string, star
 	if source == "" {
 		return nil, fmt.Errorf("source cannot be empty")
 	}
+
 	if startItem < 1 {
 		return nil, fmt.Errorf("startItem must be >= 1, got %d", startItem)
 	}
+
 	if numItems < 1 {
 		return nil, fmt.Errorf("numItems must be >= 1, got %d", numItems)
 	}
@@ -1474,6 +1479,7 @@ func (c *Client) NavigateWithMenu(source, sourceAccount, menu, sort string, star
 	request := models.NewNavigateRequestWithMenu(source, sourceAccount, menu, sort, startItem, numItems)
 
 	var response models.NavigateResponse
+
 	err := c.postWithResponse("/navigate", request, &response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to navigate %s with menu %s: %w", source, menu, err)
@@ -1487,12 +1493,15 @@ func (c *Client) NavigateContainer(source, sourceAccount string, startItem, numI
 	if source == "" {
 		return nil, fmt.Errorf("source cannot be empty")
 	}
+
 	if containerItem == nil {
 		return nil, fmt.Errorf("container item cannot be nil")
 	}
+
 	if startItem < 1 {
 		return nil, fmt.Errorf("startItem must be >= 1, got %d", startItem)
 	}
+
 	if numItems < 1 {
 		return nil, fmt.Errorf("numItems must be >= 1, got %d", numItems)
 	}
@@ -1500,6 +1509,7 @@ func (c *Client) NavigateContainer(source, sourceAccount string, startItem, numI
 	request := models.NewNavigateRequestWithItem(source, sourceAccount, startItem, numItems, containerItem)
 
 	var response models.NavigateResponse
+
 	err := c.postWithResponse("/navigate", request, &response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to navigate container in %s: %w", source, err)
@@ -1513,9 +1523,11 @@ func (c *Client) AddStation(source, sourceAccount, token, name string) error {
 	if source == "" {
 		return fmt.Errorf("source cannot be empty")
 	}
+
 	if token == "" {
 		return fmt.Errorf("token cannot be empty")
 	}
+
 	if name == "" {
 		return fmt.Errorf("station name cannot be empty")
 	}
@@ -1523,6 +1535,7 @@ func (c *Client) AddStation(source, sourceAccount, token, name string) error {
 	request := models.NewAddStationRequest(source, sourceAccount, token, name)
 
 	var response models.StationResponse
+
 	err := c.postWithResponse("/addStation", request, &response)
 	if err != nil {
 		return fmt.Errorf("failed to add station '%s' to %s: %w", name, source, err)
@@ -1536,14 +1549,17 @@ func (c *Client) RemoveStation(contentItem *models.ContentItem) error {
 	if contentItem == nil {
 		return fmt.Errorf("content item cannot be nil")
 	}
+
 	if contentItem.Source == "" {
 		return fmt.Errorf("content item source cannot be empty")
 	}
+
 	if contentItem.Location == "" {
 		return fmt.Errorf("content item location cannot be empty")
 	}
 
 	var response models.StationResponse
+
 	err := c.postWithResponse("/removeStation", contentItem, &response)
 	if err != nil {
 		return fmt.Errorf("failed to remove station from %s: %w", contentItem.Source, err)
@@ -1580,6 +1596,7 @@ func (c *Client) SearchStation(source, sourceAccount, searchTerm string) (*model
 	if source == "" {
 		return nil, fmt.Errorf("source cannot be empty")
 	}
+
 	if searchTerm == "" {
 		return nil, fmt.Errorf("search term cannot be empty")
 	}
@@ -1587,6 +1604,7 @@ func (c *Client) SearchStation(source, sourceAccount, searchTerm string) (*model
 	request := models.NewSearchStationRequest(source, sourceAccount, searchTerm)
 
 	var response models.SearchStationResponse
+
 	err := c.postWithResponse("/searchStation", request, &response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to search stations in %s: %w", source, err)

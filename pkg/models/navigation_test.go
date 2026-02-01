@@ -15,9 +15,11 @@ func TestNavigateRequest_NewNavigateRequest(t *testing.T) {
 	if req.SourceAccount != "user@example.com" {
 		t.Errorf("Expected sourceAccount user@example.com, got %s", req.SourceAccount)
 	}
+
 	if req.StartItem != 1 {
 		t.Errorf("Expected startItem 1, got %d", req.StartItem)
 	}
+
 	if req.NumItems != 50 {
 		t.Errorf("Expected numItems 50, got %d", req.NumItems)
 	}
@@ -29,9 +31,11 @@ func TestNavigateRequest_NewNavigateRequestWithMenu(t *testing.T) {
 	if req.Source != "PANDORA" {
 		t.Errorf("Expected source PANDORA, got %s", req.Source)
 	}
+
 	if req.Menu != "radioStations" {
 		t.Errorf("Expected menu radioStations, got %s", req.Menu)
 	}
+
 	if req.Sort != "dateCreated" {
 		t.Errorf("Expected sort dateCreated, got %s", req.Sort)
 	}
@@ -99,6 +103,7 @@ func TestNavigateRequest_XMLMarshalWithItem(t *testing.T) {
 	if !contains(xmlStr, `source="STORED_MUSIC"`) {
 		t.Error("XML should contain source attribute")
 	}
+
 	if !contains(xmlStr, `<startItem>1</startItem>`) {
 		t.Error("XML should contain startItem element")
 	}
@@ -110,6 +115,7 @@ func TestNavigateRequest_XMLMarshalWithItem(t *testing.T) {
 	if !contains(xmlStr, `<item`) {
 		t.Error("XML should contain item element")
 	}
+
 	if !contains(xmlStr, `<ContentItem`) {
 		t.Error("XML should contain ContentItem element")
 	}
@@ -149,9 +155,11 @@ func TestNavigateResponse_XMLUnmarshal(t *testing.T) {
 	if response.Source != "STORED_MUSIC" {
 		t.Errorf("Expected source STORED_MUSIC, got %s", response.Source)
 	}
+
 	if response.TotalItems != 2 {
 		t.Errorf("Expected totalItems 2, got %d", response.TotalItems)
 	}
+
 	if len(response.Items) != 2 {
 		t.Errorf("Expected 2 items, got %d", len(response.Items))
 	}
@@ -161,12 +169,15 @@ func TestNavigateResponse_XMLUnmarshal(t *testing.T) {
 	if firstItem.Name != "Album Artists" {
 		t.Errorf("Expected first item name 'Album Artists', got %s", firstItem.Name)
 	}
+
 	if firstItem.Type != "dir" {
 		t.Errorf("Expected first item type 'dir', got %s", firstItem.Type)
 	}
+
 	if !firstItem.IsPlayable() {
 		t.Error("Expected first item to be playable")
 	}
+
 	if !firstItem.IsDirectory() {
 		t.Error("Expected first item to be a directory")
 	}
@@ -176,6 +187,7 @@ func TestNavigateResponse_XMLUnmarshal(t *testing.T) {
 	if secondItem.Name != "Test Track" {
 		t.Errorf("Expected second item name 'Test Track', got %s", secondItem.Name)
 	}
+
 	if secondItem.ArtistName != "Test Artist" {
 		t.Errorf("Expected artist name 'Test Artist', got %s", secondItem.ArtistName)
 	}
@@ -218,6 +230,7 @@ func TestNavigateResponse_FilterMethods(t *testing.T) {
 	if len(directories) != 1 {
 		t.Errorf("Expected 1 directory, got %d", len(directories))
 	}
+
 	if directories[0].Name != "Directory 1" {
 		t.Errorf("Expected directory name 'Directory 1', got %s", directories[0].Name)
 	}
@@ -227,6 +240,7 @@ func TestNavigateResponse_FilterMethods(t *testing.T) {
 	if len(tracks) != 1 {
 		t.Errorf("Expected 1 track, got %d", len(tracks))
 	}
+
 	if tracks[0].Name != "Track 1" {
 		t.Errorf("Expected track name 'Track 1', got %s", tracks[0].Name)
 	}
@@ -236,6 +250,7 @@ func TestNavigateResponse_FilterMethods(t *testing.T) {
 	if len(stations) != 1 {
 		t.Errorf("Expected 1 station, got %d", len(stations))
 	}
+
 	if stations[0].Name != "Station 1" {
 		t.Errorf("Expected station name 'Station 1', got %s", stations[0].Name)
 	}
@@ -388,9 +403,11 @@ func TestRemoveStationRequest(t *testing.T) {
 	if !contains(xmlStr, `source="PANDORA"`) {
 		t.Error("XML should contain source attribute")
 	}
+
 	if !contains(xmlStr, `location="126740707481236361"`) {
 		t.Error("XML should contain location attribute")
 	}
+
 	if !contains(xmlStr, `<itemName>Test Station</itemName>`) {
 		t.Error("XML should contain itemName element")
 	}
@@ -402,9 +419,11 @@ func TestSearchStationRequest_NewSearchStationRequest(t *testing.T) {
 	if req.Source != "PANDORA" {
 		t.Errorf("Expected source PANDORA, got %s", req.Source)
 	}
+
 	if req.SourceAccount != "user123" {
 		t.Errorf("Expected sourceAccount user123, got %s", req.SourceAccount)
 	}
+
 	if req.SearchTerm != "Zach Williams" {
 		t.Errorf("Expected searchTerm 'Zach Williams', got %s", req.SearchTerm)
 	}
@@ -483,15 +502,19 @@ func TestSearchStationResponse_XMLUnmarshal(t *testing.T) {
 	if response.DeviceID != "1004567890AA" {
 		t.Errorf("Expected deviceID '1004567890AA', got %s", response.DeviceID)
 	}
+
 	if response.Source != "PANDORA" {
 		t.Errorf("Expected source PANDORA, got %s", response.Source)
 	}
+
 	if len(response.Songs) != 1 {
 		t.Errorf("Expected 1 song result, got %d", len(response.Songs))
 	}
+
 	if len(response.Artists) != 1 {
 		t.Errorf("Expected 1 artist result, got %d", len(response.Artists))
 	}
+
 	if len(response.Stations) != 1 {
 		t.Errorf("Expected 1 station result, got %d", len(response.Stations))
 	}
@@ -501,9 +524,11 @@ func TestSearchStationResponse_XMLUnmarshal(t *testing.T) {
 	if song.Name != "Old Church Choir" {
 		t.Errorf("Expected song name 'Old Church Choir', got %s", song.Name)
 	}
+
 	if song.Artist != "Zach Williams" {
 		t.Errorf("Expected artist 'Zach Williams', got %s", song.Artist)
 	}
+
 	if song.Token != "S10657777" {
 		t.Errorf("Expected token 'S10657777', got %s", song.Token)
 	}
@@ -513,6 +538,7 @@ func TestSearchStationResponse_XMLUnmarshal(t *testing.T) {
 	if artist.Name != "Zach Williams" {
 		t.Errorf("Expected artist name 'Zach Williams', got %s", artist.Name)
 	}
+
 	if !artist.IsArtist() {
 		t.Error("Expected result to be identified as artist")
 	}
@@ -522,6 +548,7 @@ func TestSearchStationResponse_XMLUnmarshal(t *testing.T) {
 	if station.Name != "Classic Rock Station" {
 		t.Errorf("Expected station name 'Classic Rock Station', got %s", station.Name)
 	}
+
 	if !station.IsStation() {
 		t.Error("Expected result to be identified as station")
 	}
@@ -585,6 +612,7 @@ func TestSearchStationResponse_HelperMethods(t *testing.T) {
 	if !emptyResponse.IsEmpty() {
 		t.Error("Expected empty response to be empty")
 	}
+
 	if emptyResponse.HasResults() {
 		t.Error("Expected empty response to have no results")
 	}
@@ -630,6 +658,7 @@ func TestSearchResult_HelperMethods(t *testing.T) {
 				if !tt.result.IsSong() {
 					t.Error("Expected result to be identified as song")
 				}
+
 				if tt.result.IsArtist() || tt.result.IsStation() {
 					t.Error("Result incorrectly identified as artist or station")
 				}
@@ -637,6 +666,7 @@ func TestSearchResult_HelperMethods(t *testing.T) {
 				if !tt.result.IsArtist() {
 					t.Error("Expected result to be identified as artist")
 				}
+
 				if tt.result.IsSong() || tt.result.IsStation() {
 					t.Error("Result incorrectly identified as song or station")
 				}
@@ -644,6 +674,7 @@ func TestSearchResult_HelperMethods(t *testing.T) {
 				if !tt.result.IsStation() {
 					t.Error("Expected result to be identified as station")
 				}
+
 				if tt.result.IsSong() || tt.result.IsArtist() {
 					t.Error("Result incorrectly identified as song or artist")
 				}
@@ -685,5 +716,6 @@ func containsSubstring(s, substr string) bool {
 			return true
 		}
 	}
+
 	return false
 }

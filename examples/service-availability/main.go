@@ -113,8 +113,10 @@ func displayServiceCategories(sa *models.ServiceAvailability) {
 			status = "✅"
 			availableCount++
 		}
+
 		fmt.Printf("  %s %s\n", status, formatServiceName(service.Type))
 	}
+
 	fmt.Printf("  Summary: %d/%d streaming services available\n", availableCount, len(streamingServices))
 
 	fmt.Println("\n🔗 LOCAL INPUT SERVICES:")

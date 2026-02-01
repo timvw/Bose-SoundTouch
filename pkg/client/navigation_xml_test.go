@@ -50,8 +50,10 @@ func TestClient_NavigateXMLValidation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var capturedXML string
-			var capturedEndpoint string
+			var (
+				capturedXML      string
+				capturedEndpoint string
+			)
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				capturedEndpoint = r.URL.Path
@@ -277,9 +279,11 @@ func TestClient_RemoveStationXMLValidation(t *testing.T) {
 	if !strings.Contains(capturedXML, `source="PANDORA"`) {
 		t.Error("XML should contain source attribute")
 	}
+
 	if !strings.Contains(capturedXML, `location="126740707481236361"`) {
 		t.Error("XML should contain location attribute")
 	}
+
 	if !strings.Contains(capturedXML, `<itemName>Test Station</itemName>`) {
 		t.Error("XML should contain itemName element")
 	}
@@ -373,6 +377,7 @@ func TestClient_NavigationResponseParsing(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error but got none")
 				}
+
 				return
 			}
 
@@ -410,9 +415,11 @@ func TestClient_NavigationResponseParsing(t *testing.T) {
 				if !firstItem.IsPlayable() {
 					t.Error("First item should be playable")
 				}
+
 				if !firstItem.IsDirectory() {
 					t.Error("First item should be directory")
 				}
+
 				if firstItem.GetArtwork() == "" {
 					t.Error("First item should have artwork")
 				}
@@ -421,6 +428,7 @@ func TestClient_NavigationResponseParsing(t *testing.T) {
 				if !secondItem.IsTrack() {
 					t.Error("Second item should be track")
 				}
+
 				if secondItem.ArtistName != "Test Artist" {
 					t.Errorf("Expected artist 'Test Artist', got %s", secondItem.ArtistName)
 				}
@@ -488,6 +496,7 @@ func TestClient_SearchStationResponseParsing(t *testing.T) {
 	if response.DeviceID != "1004567890AA" {
 		t.Errorf("Expected deviceID '1004567890AA', got %s", response.DeviceID)
 	}
+
 	if response.Source != "PANDORA" {
 		t.Errorf("Expected source PANDORA, got %s", response.Source)
 	}
@@ -518,6 +527,7 @@ func TestClient_SearchStationResponseParsing(t *testing.T) {
 	if !song.IsSong() {
 		t.Error("First result should be identified as song")
 	}
+
 	if song.GetFullTitle() != "Old Church Choir - Zach Williams" {
 		t.Errorf("Expected 'Old Church Choir - Zach Williams', got %s", song.GetFullTitle())
 	}
@@ -526,6 +536,7 @@ func TestClient_SearchStationResponseParsing(t *testing.T) {
 	if !artist.IsArtist() {
 		t.Error("Artist result should be identified as artist")
 	}
+
 	if artist.GetDisplayName() != "Zach Williams" {
 		t.Errorf("Expected 'Zach Williams', got %s", artist.GetDisplayName())
 	}
@@ -534,6 +545,7 @@ func TestClient_SearchStationResponseParsing(t *testing.T) {
 	if !station.IsStation() {
 		t.Error("Station result should be identified as station")
 	}
+
 	if station.Description == "" {
 		t.Error("Station should have description")
 	}

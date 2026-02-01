@@ -41,9 +41,11 @@ func TestGetServiceAvailability(t *testing.T) {
 			expectError: false,
 			validate: func(t *testing.T, sa *models.ServiceAvailability) {
 				t.Helper()
+
 				if sa == nil {
 					t.Fatal("service availability should not be nil")
 				}
+
 				if sa.Services == nil {
 					t.Fatal("services should not be nil")
 				}
@@ -67,21 +69,27 @@ func TestGetServiceAvailability(t *testing.T) {
 				if !sa.HasSpotify() {
 					t.Error("should have Spotify")
 				}
+
 				if !sa.HasAirPlay() {
 					t.Error("should have AirPlay")
 				}
+
 				if !sa.HasTuneIn() {
 					t.Error("should have TuneIn")
 				}
+
 				if !sa.HasPandora() {
 					t.Error("should have Pandora")
 				}
+
 				if !sa.HasLocalMusic() {
 					t.Error("should have Local Music")
 				}
+
 				if sa.HasAlexa() {
 					t.Error("should not have Alexa")
 				}
+
 				if sa.HasBluetooth() {
 					t.Error("should not have Bluetooth")
 				}
@@ -91,9 +99,11 @@ func TestGetServiceAvailability(t *testing.T) {
 				if bluetoothService == nil {
 					t.Fatal("bluetooth service should not be nil")
 				}
+
 				if bluetoothService.IsAvailable {
 					t.Error("bluetooth service should not be available")
 				}
+
 				if bluetoothService.GetReason() != "INVALID_SOURCE_TYPE" {
 					t.Errorf("expected bluetooth reason 'INVALID_SOURCE_TYPE', got '%s'", bluetoothService.GetReason())
 				}
@@ -125,9 +135,11 @@ func TestGetServiceAvailability(t *testing.T) {
 			expectError: false,
 			validate: func(t *testing.T, sa *models.ServiceAvailability) {
 				t.Helper()
+
 				if sa == nil {
 					t.Fatal("service availability should not be nil")
 				}
+
 				if sa.Services == nil {
 					t.Fatal("services should not be nil")
 				}
@@ -135,9 +147,11 @@ func TestGetServiceAvailability(t *testing.T) {
 				if sa.GetServiceCount() != 3 {
 					t.Errorf("expected 3 services, got %d", sa.GetServiceCount())
 				}
+
 				if sa.GetAvailableServiceCount() != 3 {
 					t.Errorf("expected 3 available services, got %d", sa.GetAvailableServiceCount())
 				}
+
 				if sa.GetUnavailableServiceCount() != 0 {
 					t.Errorf("expected 0 unavailable services, got %d", sa.GetUnavailableServiceCount())
 				}
@@ -145,9 +159,11 @@ func TestGetServiceAvailability(t *testing.T) {
 				if !sa.HasSpotify() {
 					t.Error("should have Spotify")
 				}
+
 				if !sa.HasBluetooth() {
 					t.Error("should have Bluetooth")
 				}
+
 				if !sa.HasAirPlay() {
 					t.Error("should have AirPlay")
 				}
@@ -164,9 +180,11 @@ func TestGetServiceAvailability(t *testing.T) {
 			expectError: false,
 			validate: func(t *testing.T, sa *models.ServiceAvailability) {
 				t.Helper()
+
 				if sa == nil {
 					t.Fatal("service availability should not be nil")
 				}
+
 				if sa.Services == nil {
 					t.Fatal("services should not be nil")
 				}
@@ -174,9 +192,11 @@ func TestGetServiceAvailability(t *testing.T) {
 				if sa.GetServiceCount() != 0 {
 					t.Errorf("expected 0 services, got %d", sa.GetServiceCount())
 				}
+
 				if sa.GetAvailableServiceCount() != 0 {
 					t.Errorf("expected 0 available services, got %d", sa.GetAvailableServiceCount())
 				}
+
 				if sa.GetUnavailableServiceCount() != 0 {
 					t.Errorf("expected 0 unavailable services, got %d", sa.GetUnavailableServiceCount())
 				}
@@ -184,6 +204,7 @@ func TestGetServiceAvailability(t *testing.T) {
 				if sa.HasSpotify() {
 					t.Error("should not have Spotify")
 				}
+
 				if sa.HasBluetooth() {
 					t.Error("should not have Bluetooth")
 				}
@@ -212,6 +233,7 @@ func TestGetServiceAvailability(t *testing.T) {
 				if r.URL.Path != "/serviceAvailability" {
 					t.Errorf("expected path /serviceAvailability, got %s", r.URL.Path)
 				}
+
 				if r.Method != "GET" {
 					t.Errorf("expected GET method, got %s", r.Method)
 				}
@@ -232,6 +254,7 @@ func TestGetServiceAvailability(t *testing.T) {
 				if err == nil {
 					t.Error("expected an error but got none")
 				}
+
 				if result != nil {
 					t.Error("expected nil result on error")
 				}
@@ -239,6 +262,7 @@ func TestGetServiceAvailability(t *testing.T) {
 				if err != nil {
 					t.Fatalf("unexpected error: %v", err)
 				}
+
 				tt.validate(t, result)
 			}
 		})
@@ -250,13 +274,14 @@ func TestGetServiceAvailability_NetworkError(t *testing.T) {
 	client := createTestClient("http://invalid-host:99999")
 
 	result, err := client.GetServiceAvailability()
-
 	if err == nil {
 		t.Error("expected an error but got none")
 	}
+
 	if result != nil {
 		t.Error("expected nil result on error")
 	}
+
 	if err != nil && !contains(err.Error(), "failed to get service availability") {
 		t.Errorf("error message should contain 'failed to get service availability', got: %v", err)
 	}
@@ -269,27 +294,35 @@ func TestServiceAvailabilityModel_EdgeCases(t *testing.T) {
 		if sa.GetServiceCount() != 0 {
 			t.Errorf("expected 0 service count, got %d", sa.GetServiceCount())
 		}
+
 		if sa.GetAvailableServiceCount() != 0 {
 			t.Errorf("expected 0 available count, got %d", sa.GetAvailableServiceCount())
 		}
+
 		if sa.GetUnavailableServiceCount() != 0 {
 			t.Errorf("expected 0 unavailable count, got %d", sa.GetUnavailableServiceCount())
 		}
+
 		if sa.HasSpotify() {
 			t.Error("should not have Spotify")
 		}
+
 		if sa.GetServiceByType(models.ServiceTypeSpotify) != nil {
 			t.Error("service should be nil")
 		}
+
 		if len(sa.GetAvailableServices()) != 0 {
 			t.Error("available services should be empty")
 		}
+
 		if len(sa.GetUnavailableServices()) != 0 {
 			t.Error("unavailable services should be empty")
 		}
+
 		if len(sa.GetStreamingServices()) != 0 {
 			t.Error("streaming services should be empty")
 		}
+
 		if len(sa.GetLocalServices()) != 0 {
 			t.Error("local services should be empty")
 		}
@@ -304,6 +337,7 @@ func TestServiceAvailabilityModel_EdgeCases(t *testing.T) {
 		if !service.IsType(models.ServiceTypeSpotify) {
 			t.Error("service should be of type Spotify")
 		}
+
 		if service.IsType(models.ServiceTypeBluetooth) {
 			t.Error("service should not be of type Bluetooth")
 		}
@@ -324,6 +358,7 @@ func TestServiceAvailabilityModel_EdgeCases(t *testing.T) {
 		if serviceWithReason.GetReason() != "DEVICE_NOT_CONNECTED" {
 			t.Errorf("expected DEVICE_NOT_CONNECTED, got %s", serviceWithReason.GetReason())
 		}
+
 		if serviceWithoutReason.GetReason() != "" {
 			t.Errorf("expected empty reason, got %s", serviceWithoutReason.GetReason())
 		}

@@ -96,6 +96,7 @@ func TestClient_GetSupportedURLs(t *testing.T) {
 				if r.URL.Path != "/supportedURLs" {
 					t.Errorf("Expected path '/supportedURLs', got '%s'", r.URL.Path)
 				}
+
 				if r.Method != "GET" {
 					t.Errorf("Expected GET method, got '%s'", r.Method)
 				}
@@ -124,6 +125,7 @@ func TestClient_GetSupportedURLs(t *testing.T) {
 			if tt.expectedError && err == nil {
 				t.Errorf("Expected error, but got none")
 			}
+
 			if !tt.expectedError && err != nil {
 				t.Errorf("Unexpected error: %v", err)
 			}
@@ -179,6 +181,7 @@ func TestClient_GetSupportedURLs_ServerError(t *testing.T) {
 	if err == nil {
 		t.Error("Expected error for server error response, but got none")
 	}
+
 	if supportedURLs != nil {
 		t.Error("Expected nil supportedURLs on error, but got result")
 	}
@@ -207,6 +210,7 @@ func TestClient_GetSupportedURLs_NotFound(t *testing.T) {
 	if err == nil {
 		t.Error("Expected error for 404 response, but got none")
 	}
+
 	if supportedURLs != nil {
 		t.Error("Expected nil supportedURLs on error, but got result")
 	}
@@ -236,6 +240,7 @@ func TestClient_GetSupportedURLs_InvalidXML(t *testing.T) {
 	if err == nil {
 		t.Error("Expected error for invalid XML, but got none")
 	}
+
 	if supportedURLs != nil {
 		t.Error("Expected nil supportedURLs on error, but got result")
 	}
@@ -268,6 +273,7 @@ func TestSupportedURLsResponse_Methods(t *testing.T) {
 		if len(urls) != 14 {
 			t.Errorf("Expected 14 URLs, got %d", len(urls))
 		}
+
 		if urls[0] != "/info" {
 			t.Errorf("Expected first URL to be '/info', got '%s'", urls[0])
 		}
@@ -277,9 +283,11 @@ func TestSupportedURLsResponse_Methods(t *testing.T) {
 		if !supportedURLs.HasURL("/info") {
 			t.Error("Expected '/info' to be found")
 		}
+
 		if !supportedURLs.HasURL("/capabilities") {
 			t.Error("Expected '/capabilities' to be found")
 		}
+
 		if supportedURLs.HasURL("/nonexistent") {
 			t.Error("Expected '/nonexistent' not to be found")
 		}
@@ -294,18 +302,22 @@ func TestSupportedURLsResponse_Methods(t *testing.T) {
 
 	t.Run("GetCoreURLs", func(t *testing.T) {
 		coreURLs := supportedURLs.GetCoreURLs()
+
 		expectedCore := []string{"/info", "/capabilities", "/sources", "/volume", "/bass", "/balance", "/presets", "/nowPlaying", "/key"}
 		if len(coreURLs) != len(expectedCore) {
 			t.Errorf("Expected %d core URLs, got %d", len(expectedCore), len(coreURLs))
 		}
+
 		for _, url := range expectedCore {
 			found := false
+
 			for _, core := range coreURLs {
 				if core == url {
 					found = true
 					break
 				}
 			}
+
 			if !found {
 				t.Errorf("Expected core URL '%s' not found", url)
 			}
@@ -314,6 +326,7 @@ func TestSupportedURLsResponse_Methods(t *testing.T) {
 
 	t.Run("GetStreamingURLs", func(t *testing.T) {
 		streamingURLs := supportedURLs.GetStreamingURLs()
+
 		expectedStreaming := []string{"/navigate", "/search", "/sources"}
 		if len(streamingURLs) != len(expectedStreaming) {
 			t.Errorf("Expected %d streaming URLs, got %d", len(expectedStreaming), len(streamingURLs))
@@ -322,6 +335,7 @@ func TestSupportedURLsResponse_Methods(t *testing.T) {
 
 	t.Run("GetAdvancedURLs", func(t *testing.T) {
 		advancedURLs := supportedURLs.GetAdvancedURLs()
+
 		expectedAdvanced := []string{"/audiodspcontrols", "/setZone"}
 		if len(advancedURLs) != len(expectedAdvanced) {
 			t.Errorf("Expected %d advanced URLs, got %d", len(expectedAdvanced), len(advancedURLs))
@@ -330,6 +344,7 @@ func TestSupportedURLsResponse_Methods(t *testing.T) {
 
 	t.Run("GetNetworkURLs", func(t *testing.T) {
 		networkURLs := supportedURLs.GetNetworkURLs()
+
 		expectedNetwork := []string{"/networkInfo"}
 		if len(networkURLs) != len(expectedNetwork) {
 			t.Errorf("Expected %d network URLs, got %d", len(expectedNetwork), len(networkURLs))
@@ -369,18 +384,22 @@ func TestSupportedURLsResponse_Methods(t *testing.T) {
 	t.Run("GetUnsupportedURLs", func(t *testing.T) {
 		checkList := []string{"/info", "/nonexistent1", "/capabilities", "/nonexistent2"}
 		unsupported := supportedURLs.GetUnsupportedURLs(checkList)
+
 		expectedUnsupported := []string{"/nonexistent1", "/nonexistent2"}
 		if len(unsupported) != len(expectedUnsupported) {
 			t.Errorf("Expected %d unsupported URLs, got %d", len(expectedUnsupported), len(unsupported))
 		}
+
 		for _, url := range expectedUnsupported {
 			found := false
+
 			for _, unsup := range unsupported {
 				if unsup == url {
 					found = true
 					break
 				}
 			}
+
 			if !found {
 				t.Errorf("Expected unsupported URL '%s' not found", url)
 			}
@@ -399,12 +418,15 @@ func TestSupportedURLsResponse_EmptyURLs(t *testing.T) {
 		if supportedURLs.GetURLCount() != 0 {
 			t.Errorf("Expected 0 URLs, got %d", supportedURLs.GetURLCount())
 		}
+
 		if supportedURLs.HasURL("/info") {
 			t.Error("Expected '/info' not to be found in empty list")
 		}
+
 		if supportedURLs.HasCorePlaybackSupport() {
 			t.Error("Expected no core playback support with empty URLs")
 		}
+
 		if supportedURLs.HasPresetSupport() {
 			t.Error("Expected no preset support with empty URLs")
 		}
@@ -536,6 +558,7 @@ func TestSupportedURLsResponse_FeatureMapping(t *testing.T) {
 		// With our comprehensive test data, should have no missing essential features
 		if len(missing) > 0 {
 			t.Errorf("Expected no missing essential features with comprehensive data, got %d", len(missing))
+
 			for _, feature := range missing {
 				t.Errorf("Missing essential feature: %s", feature.Name)
 			}
@@ -602,15 +625,19 @@ func TestEndpointFeatureMap(t *testing.T) {
 			if feature.Name == "" {
 				t.Error("Feature should have a name")
 			}
+
 			if feature.Description == "" {
 				t.Error("Feature should have a description")
 			}
+
 			if len(feature.Endpoints) == 0 {
 				t.Errorf("Feature '%s' should have at least one endpoint", feature.Name)
 			}
+
 			if feature.Category == "" {
 				t.Errorf("Feature '%s' should have a category", feature.Name)
 			}
+
 			if feature.CLICommand == "" {
 				t.Errorf("Feature '%s' should have CLI command info", feature.Name)
 			}
@@ -633,6 +660,7 @@ func TestEndpointFeatureMap(t *testing.T) {
 
 	t.Run("EssentialFeatures", func(t *testing.T) {
 		essentialCount := 0
+
 		for _, feature := range features {
 			if feature.Essential {
 				essentialCount++

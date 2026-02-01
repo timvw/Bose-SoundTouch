@@ -108,6 +108,7 @@ func TestResolveLocation(t *testing.T) {
 			if gotSource != tt.expectedSource {
 				t.Errorf("resolveLocation() gotSource = %v, want %v", gotSource, tt.expectedSource)
 			}
+
 			if gotLocation != tt.expectedLocation {
 				t.Errorf("resolveLocation() gotLocation = %v, want %v", gotLocation, tt.expectedLocation)
 			}

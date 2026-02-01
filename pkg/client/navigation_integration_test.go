@@ -51,6 +51,7 @@ func TestClient_Navigation_Integration(t *testing.T) {
 		if err != nil {
 			t.Logf("Navigate TUNEIN failed (may not be available): %v", err)
 			t.Skip("TUNEIN not available on test device")
+
 			return
 		}
 
@@ -68,6 +69,7 @@ func TestClient_Navigation_Integration(t *testing.T) {
 		if err != nil {
 			t.Logf("GetTuneInStations failed (may not be available): %v", err)
 			t.Skip("TuneIn not available on test device")
+
 			return
 		}
 
@@ -86,6 +88,7 @@ func TestClient_Navigation_Integration(t *testing.T) {
 		}
 
 		var storedMusicAccount string
+
 		for _, source := range sources.SourceItem {
 			if source.Source == "STORED_MUSIC" && source.Status.IsReady() {
 				storedMusicAccount = source.SourceAccount
@@ -119,6 +122,7 @@ func TestClient_Navigation_Integration(t *testing.T) {
 		if err != nil {
 			t.Logf("SearchTuneInStations failed (may not be supported): %v", err)
 			t.Skip("TuneIn search not supported on test device")
+
 			return
 		}
 
@@ -137,6 +141,7 @@ func TestClient_Navigation_Integration(t *testing.T) {
 		if len(stations) > 0 {
 			station := stations[0]
 			t.Logf("  First station: %s", station.GetDisplayName())
+
 			if station.Token != "" {
 				t.Logf("  Station token: %s", station.Token)
 			}
@@ -206,6 +211,7 @@ func TestClient_StationManagement_Integration(t *testing.T) {
 		if err != nil {
 			t.Logf("SearchPandoraStations failed: %v", err)
 			t.Skip("Pandora search not working")
+
 			return
 		}
 
@@ -321,8 +327,10 @@ func TestClient_Navigation_ErrorHandling_Integration(t *testing.T) {
 	var finalHost string
 
 	var finalPort int
+
 	if strings.Contains(host, ":") {
 		parts := strings.Split(host, ":")
+
 		finalHost = parts[0]
 		if len(parts) > 1 {
 			finalPort = 8090
@@ -398,8 +406,10 @@ func BenchmarkClient_Navigate_Integration(b *testing.B) {
 	var finalHost string
 
 	var finalPort int
+
 	if strings.Contains(host, ":") {
 		parts := strings.Split(host, ":")
+
 		finalHost = parts[0]
 		if len(parts) > 1 {
 			finalPort = 8090
@@ -426,6 +436,7 @@ func BenchmarkClient_Navigate_Integration(b *testing.B) {
 			if err != nil {
 				b.Logf("Navigate failed: %v", err)
 				b.Skip("TuneIn not available")
+
 				return
 			}
 		}
@@ -436,10 +447,12 @@ func BenchmarkClient_Navigate_Integration(b *testing.B) {
 
 		for i := 0; i < b.N; i++ {
 			term := searchTerms[i%len(searchTerms)]
+
 			_, err := client.SearchTuneInStations(term)
 			if err != nil {
 				b.Logf("Search failed: %v", err)
 				b.Skip("TuneIn search not available")
+
 				return
 			}
 		}

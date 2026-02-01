@@ -50,6 +50,7 @@ func TestGetServiceAvailability_Integration(t *testing.T) {
 						status += " (" + service.Reason + ")"
 					}
 				}
+
 				t.Logf("Service %s: %s", service.Type, status)
 			}
 		}
@@ -66,6 +67,7 @@ func TestGetServiceAvailability_Integration(t *testing.T) {
 		// Test service categorization
 		streamingServices := serviceAvailability.GetStreamingServices()
 		t.Logf("Streaming services count: %d", len(streamingServices))
+
 		for _, service := range streamingServices {
 			t.Logf("  - Streaming: %s (%v)", service.Type, service.IsAvailable)
 		}
@@ -181,6 +183,7 @@ func TestGetServiceAvailability_UserFeedback(t *testing.T) {
 		availableServices := serviceAvailability.GetAvailableServices()
 		if len(availableServices) > 0 {
 			t.Log("\nAvailable Services:")
+
 			for _, service := range availableServices {
 				t.Logf("  ✅ %s", formatServiceName(service.Type))
 			}
@@ -189,11 +192,13 @@ func TestGetServiceAvailability_UserFeedback(t *testing.T) {
 		unavailableServices := serviceAvailability.GetUnavailableServices()
 		if len(unavailableServices) > 0 {
 			t.Log("\nUnavailable Services:")
+
 			for _, service := range unavailableServices {
 				reason := ""
 				if service.Reason != "" {
 					reason = " - " + service.Reason
 				}
+
 				t.Logf("  ❌ %s%s", formatServiceName(service.Type), reason)
 			}
 		}
@@ -201,21 +206,25 @@ func TestGetServiceAvailability_UserFeedback(t *testing.T) {
 		// Streaming services summary
 		streamingServices := serviceAvailability.GetStreamingServices()
 		availableStreaming := 0
+
 		for _, service := range streamingServices {
 			if service.IsAvailable {
 				availableStreaming++
 			}
 		}
+
 		t.Logf("\nStreaming Services: %d/%d available", availableStreaming, len(streamingServices))
 
 		// Local services summary
 		localServices := serviceAvailability.GetLocalServices()
 		availableLocal := 0
+
 		for _, service := range localServices {
 			if service.IsAvailable {
 				availableLocal++
 			}
 		}
+
 		t.Logf("Local Input Services: %d/%d available", availableLocal, len(localServices))
 
 		t.Log("\n=== END REPORT ===")

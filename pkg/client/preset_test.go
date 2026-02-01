@@ -103,6 +103,7 @@ func TestClient_StorePreset(t *testing.T) {
 				if r.Method != http.MethodPost {
 					t.Errorf("Expected POST request, got %s", r.Method)
 				}
+
 				if r.URL.Path != "/storePreset" {
 					t.Errorf("Expected /storePreset endpoint, got %s", r.URL.Path)
 				}
@@ -116,6 +117,7 @@ func TestClient_StorePreset(t *testing.T) {
 				if tt.serverStatus != 0 {
 					w.WriteHeader(tt.serverStatus)
 				}
+
 				if tt.serverResponse != "" {
 					_, _ = w.Write([]byte(tt.serverResponse))
 				}
@@ -134,6 +136,7 @@ func TestClient_StorePreset(t *testing.T) {
 					t.Errorf("Expected error, but got nil")
 					return
 				}
+
 				if tt.errorContains != "" && !strings.Contains(err.Error(), tt.errorContains) {
 					t.Errorf("Expected error to contain '%s', but got: %v", tt.errorContains, err)
 				}
@@ -191,6 +194,7 @@ func TestClient_RemovePreset(t *testing.T) {
 				if r.Method != http.MethodPost {
 					t.Errorf("Expected POST request, got %s", r.Method)
 				}
+
 				if r.URL.Path != "/removePreset" {
 					t.Errorf("Expected /removePreset endpoint, got %s", r.URL.Path)
 				}
@@ -199,6 +203,7 @@ func TestClient_RemovePreset(t *testing.T) {
 				if tt.serverStatus != 0 {
 					w.WriteHeader(tt.serverStatus)
 				}
+
 				if tt.serverResponse != "" {
 					_, _ = w.Write([]byte(tt.serverResponse))
 				}
@@ -217,6 +222,7 @@ func TestClient_RemovePreset(t *testing.T) {
 					t.Errorf("Expected error, but got nil")
 					return
 				}
+
 				if tt.errorContains != "" && !strings.Contains(err.Error(), tt.errorContains) {
 					t.Errorf("Expected error to contain '%s', but got: %v", tt.errorContains, err)
 				}
@@ -342,6 +348,7 @@ func TestClient_StoreCurrentAsPreset(t *testing.T) {
 					} else {
 						w.WriteHeader(http.StatusOK)
 					}
+
 					if tt.nowPlayingResponse != "" {
 						_, _ = w.Write([]byte(tt.nowPlayingResponse))
 					}
@@ -351,6 +358,7 @@ func TestClient_StoreCurrentAsPreset(t *testing.T) {
 					} else {
 						w.WriteHeader(http.StatusOK)
 					}
+
 					_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><presets></presets>`))
 				default:
 					w.WriteHeader(http.StatusNotFound)
@@ -370,6 +378,7 @@ func TestClient_StoreCurrentAsPreset(t *testing.T) {
 					t.Errorf("Expected error, but got nil")
 					return
 				}
+
 				if tt.errorContains != "" && !strings.Contains(err.Error(), tt.errorContains) {
 					t.Errorf("Expected error to contain '%s', but got: %v", tt.errorContains, err)
 				}
@@ -384,6 +393,7 @@ func TestClient_StoreCurrentAsPreset(t *testing.T) {
 
 func TestClient_StorePreset_XMLGeneration(t *testing.T) {
 	var capturedXML string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body := make([]byte, r.ContentLength)
 		_, _ = r.Body.Read(body)
@@ -435,6 +445,7 @@ func TestClient_StorePreset_XMLGeneration(t *testing.T) {
 
 func TestClient_RemovePreset_XMLGeneration(t *testing.T) {
 	var capturedXML string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body := make([]byte, r.ContentLength)
 		_, _ = r.Body.Read(body)

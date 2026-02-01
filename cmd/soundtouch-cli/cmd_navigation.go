@@ -30,6 +30,7 @@ func browseContent(c *cli.Context) error {
 	}
 
 	printNavigationResults(response, "Content")
+
 	return nil
 }
 
@@ -58,6 +59,7 @@ func browseWithMenu(c *cli.Context) error {
 	}
 
 	printNavigationResults(response, "Menu Items")
+
 	return nil
 }
 
@@ -93,6 +95,7 @@ func browseContainer(c *cli.Context) error {
 	}
 
 	printNavigationResults(response, "Container Contents")
+
 	return nil
 }
 
@@ -127,6 +130,7 @@ func browseTuneIn(c *cli.Context) error {
 	}
 
 	printNavigationResults(response, "TuneIn Stations")
+
 	return nil
 }
 
@@ -155,6 +159,7 @@ func browsePandora(c *cli.Context) error {
 	}
 
 	printNavigationResults(response, "Pandora Stations")
+
 	return nil
 }
 
@@ -183,6 +188,7 @@ func browseStoredMusic(c *cli.Context) error {
 	}
 
 	printNavigationResults(response, "Stored Music Library")
+
 	return nil
 }
 
@@ -203,6 +209,7 @@ func printNavigationResults(response *models.NavigateResponse, title string) {
 	}
 
 	fmt.Printf("  Items:\n")
+
 	for i, item := range response.Items {
 		printNavigationItem(item, i+1, response.Source)
 	}
@@ -230,9 +237,11 @@ func printContentItemInfo(item models.NavigateItem, responseSource string) {
 	if item.ContentItem.Source != "" && item.ContentItem.Source != responseSource {
 		fmt.Printf("       Source: %s\n", item.ContentItem.Source)
 	}
+
 	if item.Type != "" {
 		fmt.Printf("       Type: %s\n", item.Type)
 	}
+
 	if item.ContentItem.Location != "" && len(item.ContentItem.Location) < 100 {
 		fmt.Printf("       Location: %s\n", item.ContentItem.Location)
 	}
@@ -243,6 +252,7 @@ func printItemMetadata(item models.NavigateItem) {
 	if item.ArtistName != "" {
 		fmt.Printf("       Artist: %s\n", item.ArtistName)
 	}
+
 	if item.AlbumName != "" {
 		fmt.Printf("       Album: %s\n", item.AlbumName)
 	}

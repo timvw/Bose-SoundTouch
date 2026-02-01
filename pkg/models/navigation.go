@@ -268,6 +268,7 @@ func (sr *SearchStationResponse) GetAllResults() []SearchResult {
 	allResults = append(allResults, sr.Songs...)
 	allResults = append(allResults, sr.Artists...)
 	allResults = append(allResults, sr.Stations...)
+
 	return allResults
 }
 
@@ -306,6 +307,7 @@ func (sr *SearchResult) GetDisplayName() string {
 	if sr.Name != "" {
 		return sr.Name
 	}
+
 	return "Unknown"
 }
 
@@ -337,5 +339,6 @@ func (sr *SearchResult) GetFullTitle() string {
 	if sr.Artist != "" {
 		return sr.Name + " - " + sr.Artist
 	}
+
 	return sr.Name
 }

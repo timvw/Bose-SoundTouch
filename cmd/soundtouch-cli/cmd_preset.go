@@ -41,19 +41,24 @@ func storeCurrentPreset(c *cli.Context) error {
 		PrintError("Current content cannot be saved as preset")
 		fmt.Printf("  Content: %s\n", nowPlaying.Track)
 		fmt.Printf("  Source: %s\n", nowPlaying.Source)
+
 		return fmt.Errorf("current content cannot be preset")
 	}
 
 	// Show what we're about to store
 	fmt.Printf("Current Content:\n")
 	fmt.Printf("  Track: %s\n", nowPlaying.Track)
+
 	if nowPlaying.Artist != "" {
 		fmt.Printf("  Artist: %s\n", nowPlaying.Artist)
 	}
+
 	if nowPlaying.Album != "" {
 		fmt.Printf("  Album: %s\n", nowPlaying.Album)
 	}
+
 	fmt.Printf("  Source: %s\n", nowPlaying.Source)
+
 	if nowPlaying.ContentItem.Location != "" {
 		fmt.Printf("  Location: %s\n", nowPlaying.ContentItem.Location)
 	}
@@ -105,14 +110,17 @@ func resolveLocationAndMetadata(params *presetParams) error {
 				if params.name == "" {
 					params.name = metadata.Name
 				}
+
 				if params.artwork == "" {
 					params.artwork = metadata.Artwork
 				}
 			}
 		}
 	}
+
 	params.source = resolvedSource
 	params.location = resolvedLocation
+
 	return nil
 }
 
@@ -121,9 +129,11 @@ func validatePresetParams(params *presetParams) error {
 	if params.source == "" {
 		return fmt.Errorf("source is required (use --source)")
 	}
+
 	if params.location == "" {
 		return fmt.Errorf("location is required (use --location)")
 	}
+
 	return nil
 }
 
@@ -160,9 +170,11 @@ func printPresetContent(params *presetParams) {
 	fmt.Printf("  Name: %s\n", params.name)
 	fmt.Printf("  Source: %s\n", params.source)
 	fmt.Printf("  Location: %s\n", params.location)
+
 	if params.sourceAccount != "" {
 		fmt.Printf("  Source Account: %s\n", params.sourceAccount)
 	}
+
 	if params.itemType != "" {
 		fmt.Printf("  Type: %s\n", params.itemType)
 	}

@@ -40,6 +40,7 @@ func ExampleClient_SearchStation() {
 	stations := results.GetStations()
 	for _, station := range stations {
 		fmt.Printf("Station: %s\n", station.GetDisplayName())
+
 		if station.Description != "" {
 			fmt.Printf("  Description: %s\n", station.Description)
 		}
@@ -83,6 +84,7 @@ func Example_navigationWorkflow() {
 
 	// 1. Search for content
 	fmt.Println("Searching for Taylor Swift...")
+
 	searchResults, err := client.SearchPandoraStations("user123", "Taylor Swift")
 	if err != nil {
 		log.Fatal(err)
@@ -111,6 +113,7 @@ func Example_navigationWorkflow() {
 
 	// 4. Browse existing Pandora stations
 	fmt.Println("\nBrowsing existing Pandora stations...")
+
 	pandoraStations, err := client.GetPandoraStations("user123")
 	if err != nil {
 		fmt.Printf("Could not get Pandora stations: %v\n", err)
@@ -173,9 +176,11 @@ func ExampleClient_NavigateContainer() {
 	// Show first few tracks
 	for i, track := range tracks[:minInt(3, len(tracks))] {
 		fmt.Printf("%d. %s", i+1, track.GetDisplayName())
+
 		if track.ArtistName != "" {
 			fmt.Printf(" - %s", track.ArtistName)
 		}
+
 		fmt.Println()
 	}
 }
@@ -205,9 +210,11 @@ func Example_searchAndPlayWorkflow() {
 
 	for i, station := range stations[:minInt(5, len(stations))] {
 		fmt.Printf("%d. %s", i+1, station.GetDisplayName())
+
 		if station.Description != "" {
 			fmt.Printf(" - %s", station.Description)
 		}
+
 		fmt.Println()
 	}
 
@@ -230,5 +237,6 @@ func minInt(a, b int) int {
 	if a < b {
 		return a
 	}
+
 	return b
 }

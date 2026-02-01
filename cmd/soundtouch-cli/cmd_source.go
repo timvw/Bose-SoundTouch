@@ -91,6 +91,7 @@ func listSources(c *cli.Context) error {
 
 	// Show service availability summary
 	fmt.Println()
+
 	checker := NewServiceAvailabilityChecker(client)
 	checker.PrintServiceAvailabilitySummary()
 
@@ -231,6 +232,7 @@ func getServiceAvailability(c *cli.Context) error {
 
 	// Show available services
 	fmt.Printf("\n✅ Available Services:\n")
+
 	availableServices := serviceAvailability.GetAvailableServices()
 	if len(availableServices) == 0 {
 		fmt.Printf("    None\n")
@@ -242,6 +244,7 @@ func getServiceAvailability(c *cli.Context) error {
 
 	// Show unavailable services with reasons
 	fmt.Printf("\n❌ Unavailable Services:\n")
+
 	unavailableServices := serviceAvailability.GetUnavailableServices()
 	if len(unavailableServices) == 0 {
 		fmt.Printf("    None\n")
@@ -251,35 +254,44 @@ func getServiceAvailability(c *cli.Context) error {
 			if service.Reason != "" {
 				reason = fmt.Sprintf(" (%s)", service.Reason)
 			}
+
 			fmt.Printf("    • %s%s\n", formatServiceTypeForDisplay(models.ServiceType(service.Type)), reason)
 		}
 	}
 
 	// Show service categories
 	fmt.Printf("\n🎵 Streaming Services:\n")
+
 	streamingServices := serviceAvailability.GetStreamingServices()
 	availableCount := 0
+
 	for _, service := range streamingServices {
 		status := "❌"
 		if service.IsAvailable {
 			status = "✅"
 			availableCount++
 		}
+
 		fmt.Printf("    %s %s\n", status, formatServiceTypeForDisplay(models.ServiceType(service.Type)))
 	}
+
 	fmt.Printf("    Summary: %d/%d streaming services available\n", availableCount, len(streamingServices))
 
 	fmt.Printf("\n🔗 Local Input Services:\n")
+
 	localServices := serviceAvailability.GetLocalServices()
 	localAvailableCount := 0
+
 	for _, service := range localServices {
 		status := "❌"
 		if service.IsAvailable {
 			status = "✅"
 			localAvailableCount++
 		}
+
 		fmt.Printf("    %s %s\n", status, formatServiceTypeForDisplay(models.ServiceType(service.Type)))
 	}
+
 	fmt.Printf("    Summary: %d/%d local services available\n", localAvailableCount, len(localServices))
 
 	return nil
@@ -360,6 +372,7 @@ func compareServiceStatus(serviceName string, configured, available bool, servic
 	default:
 		fmt.Printf("    ➖ %s is neither configured nor available\n", serviceName)
 	}
+
 	fmt.Println()
 }
 
@@ -387,7 +400,6 @@ func printSourceSummary(sources *models.Sources, serviceAvailability *models.Ser
 	fmt.Printf("    Ready configured sources: %d\n", sources.GetReadySourceCount())
 	fmt.Printf("    Total available services: %d\n", serviceAvailability.GetAvailableServiceCount())
 	fmt.Printf("    Total possible services: %d\n", serviceAvailability.GetServiceCount())
-
 }
 
 // boolToStatus converts boolean to user-friendly status
@@ -395,5 +407,6 @@ func boolToStatus(b bool) string {
 	if b {
 		return "✅ Yes"
 	}
+
 	return "❌ No"
 }

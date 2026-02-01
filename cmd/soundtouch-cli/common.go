@@ -146,6 +146,7 @@ func resolveLocation(source, location string) (string, string) {
 	// Example: https://tunein.com/radio/WDR-2-Rheinland-1004-s213886/
 	if strings.Contains(location, "tunein.com/radio/") {
 		trimmed := strings.TrimSuffix(location, "/")
+
 		parts := strings.Split(trimmed, "-")
 		if len(parts) > 0 {
 			lastPart := parts[len(parts)-1]
@@ -155,6 +156,7 @@ func resolveLocation(source, location string) (string, string) {
 		}
 		// Fallback for URLs like https://tunein.com/radio/s213886/
 		parts = strings.Split(trimmed, "/")
+
 		lastPart := parts[len(parts)-1]
 		if strings.HasPrefix(lastPart, "s") {
 			return "TUNEIN", "/v1/playback/station/" + lastPart
@@ -203,6 +205,7 @@ func fetchTuneInMetadata(url string) (*TuneInMetadata, error) {
 	titlePrefix := `property="og:title" content="`
 	if idx := strings.Index(html, titlePrefix); idx != -1 {
 		start := idx + len(titlePrefix)
+
 		end := strings.Index(html[start:], `"`)
 		if end != -1 {
 			title := html[start : start+end]
@@ -210,9 +213,11 @@ func fetchTuneInMetadata(url string) (*TuneInMetadata, error) {
 			if pipeIdx := strings.Index(title, " | "); pipeIdx != -1 {
 				title = title[:pipeIdx]
 			}
+
 			if commaIdx := strings.Index(title, ", "); commaIdx != -1 {
 				title = title[:commaIdx]
 			}
+
 			metadata.Name = title
 		}
 	}
@@ -220,6 +225,7 @@ func fetchTuneInMetadata(url string) (*TuneInMetadata, error) {
 	imagePrefix := `property="og:image" content="`
 	if idx := strings.Index(html, imagePrefix); idx != -1 {
 		start := idx + len(imagePrefix)
+
 		end := strings.Index(html[start:], `"`)
 		if end != -1 {
 			metadata.Artwork = html[start : start+end]

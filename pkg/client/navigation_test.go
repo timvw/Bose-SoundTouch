@@ -117,6 +117,7 @@ func TestClient_Navigate(t *testing.T) {
 				if tt.serverStatus != 0 {
 					w.WriteHeader(tt.serverStatus)
 				}
+
 				if tt.serverResponse != "" {
 					_, _ = w.Write([]byte(tt.serverResponse))
 				}
@@ -140,6 +141,7 @@ func TestClient_Navigate(t *testing.T) {
 				} else if tt.errorContains != "" && !contains(err.Error(), tt.errorContains) {
 					t.Errorf("Expected error to contain '%s', got: %v", tt.errorContains, err)
 				}
+
 				return
 			}
 
@@ -178,6 +180,7 @@ func TestClient_NavigateWithMenu(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Verify request body contains menu and sort parameters
 		var request models.NavigateRequest
+
 		err := xml.NewDecoder(r.Body).Decode(&request)
 		if err != nil {
 			t.Errorf("Failed to decode request: %v", err)
@@ -186,6 +189,7 @@ func TestClient_NavigateWithMenu(t *testing.T) {
 		if request.Menu != "radioStations" {
 			t.Errorf("Expected menu 'radioStations', got %s", request.Menu)
 		}
+
 		if request.Sort != "dateCreated" {
 			t.Errorf("Expected sort 'dateCreated', got %s", request.Sort)
 		}
@@ -202,8 +206,8 @@ func TestClient_NavigateWithMenu(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-	response, err := client.NavigateWithMenu("PANDORA", "user123", "radioStations", "dateCreated", 1, 100)
 
+	response, err := client.NavigateWithMenu("PANDORA", "user123", "radioStations", "dateCreated", 1, 100)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 		return
@@ -212,6 +216,7 @@ func TestClient_NavigateWithMenu(t *testing.T) {
 	if response.Source != "PANDORA" {
 		t.Errorf("Expected source PANDORA, got %s", response.Source)
 	}
+
 	if response.TotalItems != 5 {
 		t.Errorf("Expected totalItems 5, got %d", response.TotalItems)
 	}
@@ -253,8 +258,8 @@ func TestClient_NavigateContainer(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-	response, err := client.NavigateContainer("STORED_MUSIC", "device123/0", 1, 1000, containerItem)
 
+	response, err := client.NavigateContainer("STORED_MUSIC", "device123/0", 1, 1000, containerItem)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 		return
@@ -341,6 +346,7 @@ func TestClient_AddStation(t *testing.T) {
 				if tt.serverStatus != 0 {
 					w.WriteHeader(tt.serverStatus)
 				}
+
 				if tt.serverResponse != "" {
 					_, _ = w.Write([]byte(tt.serverResponse))
 				}
@@ -348,6 +354,7 @@ func TestClient_AddStation(t *testing.T) {
 				// Verify request format
 				if !tt.expectError {
 					var request models.AddStationRequest
+
 					err := xml.NewDecoder(r.Body).Decode(&request)
 					if err != nil {
 						t.Errorf("Failed to decode request: %v", err)
@@ -356,9 +363,11 @@ func TestClient_AddStation(t *testing.T) {
 					if request.Source != tt.source {
 						t.Errorf("Expected source %s, got %s", tt.source, request.Source)
 					}
+
 					if request.Token != tt.token {
 						t.Errorf("Expected token %s, got %s", tt.token, request.Token)
 					}
+
 					if request.Name != tt.stationName {
 						t.Errorf("Expected name %s, got %s", tt.stationName, request.Name)
 					}
@@ -454,6 +463,7 @@ func TestClient_RemoveStation(t *testing.T) {
 				if tt.serverStatus != 0 {
 					w.WriteHeader(tt.serverStatus)
 				}
+
 				if tt.serverResponse != "" {
 					_, _ = w.Write([]byte(tt.serverResponse))
 				}
@@ -461,6 +471,7 @@ func TestClient_RemoveStation(t *testing.T) {
 				// Verify request format
 				if !tt.expectError && tt.contentItem != nil {
 					var request models.ContentItem
+
 					err := xml.NewDecoder(r.Body).Decode(&request)
 					if err != nil {
 						t.Errorf("Failed to decode request: %v", err)
@@ -469,6 +480,7 @@ func TestClient_RemoveStation(t *testing.T) {
 					if request.Source != tt.contentItem.Source {
 						t.Errorf("Expected source %s, got %s", tt.contentItem.Source, request.Source)
 					}
+
 					if request.Location != tt.contentItem.Location {
 						t.Errorf("Expected location %s, got %s", tt.contentItem.Location, request.Location)
 					}
@@ -520,14 +532,17 @@ func TestClient_GetPandoraStations(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Verify it's calling navigate with the right parameters
 		var request models.NavigateRequest
+
 		_ = xml.NewDecoder(r.Body).Decode(&request)
 
 		if request.Source != "PANDORA" {
 			t.Errorf("Expected source PANDORA, got %s", request.Source)
 		}
+
 		if request.Menu != "radioStations" {
 			t.Errorf("Expected menu radioStations, got %s", request.Menu)
 		}
+
 		if request.Sort != "dateCreated" {
 			t.Errorf("Expected sort dateCreated, got %s", request.Sort)
 		}
@@ -544,8 +559,8 @@ func TestClient_GetPandoraStations(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-	response, err := client.GetPandoraStations("user123")
 
+	response, err := client.GetPandoraStations("user123")
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 		return
@@ -590,8 +605,8 @@ func TestClient_GetTuneInStations(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-	response, err := client.GetTuneInStations("Rock")
 
+	response, err := client.GetTuneInStations("Rock")
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 		return
@@ -630,8 +645,8 @@ func TestClient_GetStoredMusicLibrary(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-	response, err := client.GetStoredMusicLibrary("device123/0")
 
+	response, err := client.GetStoredMusicLibrary("device123/0")
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 		return
@@ -733,6 +748,7 @@ func TestClient_SearchStation(t *testing.T) {
 				if tt.serverStatus != 0 {
 					w.WriteHeader(tt.serverStatus)
 				}
+
 				if tt.serverResponse != "" {
 					_, _ = w.Write([]byte(tt.serverResponse))
 				}
@@ -740,6 +756,7 @@ func TestClient_SearchStation(t *testing.T) {
 				// Verify request format for valid requests
 				if !tt.expectError {
 					var request models.SearchStationRequest
+
 					err := xml.NewDecoder(r.Body).Decode(&request)
 					if err != nil {
 						t.Errorf("Failed to decode request: %v", err)
@@ -748,6 +765,7 @@ func TestClient_SearchStation(t *testing.T) {
 					if request.Source != tt.source {
 						t.Errorf("Expected source %s, got %s", tt.source, request.Source)
 					}
+
 					if request.SearchTerm != tt.searchTerm {
 						t.Errorf("Expected searchTerm %s, got %s", tt.searchTerm, request.SearchTerm)
 					}
@@ -771,6 +789,7 @@ func TestClient_SearchStation(t *testing.T) {
 				} else if tt.errorContains != "" && !contains(err.Error(), tt.errorContains) {
 					t.Errorf("Expected error to contain '%s', got: %v", tt.errorContains, err)
 				}
+
 				return
 			}
 
@@ -805,14 +824,17 @@ func TestClient_SearchPandoraStations(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Verify it's calling searchStation with the right parameters
 		var request models.SearchStationRequest
+
 		_ = xml.NewDecoder(r.Body).Decode(&request)
 
 		if request.Source != "PANDORA" {
 			t.Errorf("Expected source PANDORA, got %s", request.Source)
 		}
+
 		if request.SourceAccount != "user123" {
 			t.Errorf("Expected sourceAccount user123, got %s", request.SourceAccount)
 		}
+
 		if request.SearchTerm != "Taylor Swift" {
 			t.Errorf("Expected searchTerm 'Taylor Swift', got %s", request.SearchTerm)
 		}
@@ -829,8 +851,8 @@ func TestClient_SearchPandoraStations(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-	response, err := client.SearchPandoraStations("user123", "Taylor Swift")
 
+	response, err := client.SearchPandoraStations("user123", "Taylor Swift")
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 		return
@@ -872,8 +894,8 @@ func TestClient_SearchTuneInStations(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-	response, err := client.SearchTuneInStations("Jazz")
 
+	response, err := client.SearchTuneInStations("Jazz")
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 		return
@@ -914,8 +936,8 @@ func TestClient_SearchSpotifyContent(t *testing.T) {
 	}
 	client := NewClient(config)
 	client.baseURL = server.URL
-	response, err := client.SearchSpotifyContent("user@example.com", "Queen")
 
+	response, err := client.SearchSpotifyContent("user@example.com", "Queen")
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 		return

@@ -75,6 +75,7 @@ func (sa *ServiceAvailability) GetAvailableServices() []Service {
 			available = append(available, service)
 		}
 	}
+
 	return available
 }
 
@@ -85,11 +86,13 @@ func (sa *ServiceAvailability) GetUnavailableServices() []Service {
 	}
 
 	var unavailable []Service
+
 	for _, service := range sa.Services.Service {
 		if !service.IsAvailable {
 			unavailable = append(unavailable, service)
 		}
 	}
+
 	return unavailable
 }
 
@@ -104,6 +107,7 @@ func (sa *ServiceAvailability) IsServiceAvailable(serviceType ServiceType) bool 
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -118,6 +122,7 @@ func (sa *ServiceAvailability) GetServiceByType(serviceType ServiceType) *Servic
 			return &service
 		}
 	}
+
 	return nil
 }
 
@@ -182,6 +187,7 @@ func (sa *ServiceAvailability) GetStreamingServices() []Service {
 			}
 		}
 	}
+
 	return streaming
 }
 
@@ -198,6 +204,7 @@ func (sa *ServiceAvailability) GetLocalServices() []Service {
 	}
 
 	var local []Service
+
 	for _, service := range sa.Services.Service {
 		for _, localType := range localTypes {
 			if service.Type == string(localType) {
@@ -206,6 +213,7 @@ func (sa *ServiceAvailability) GetLocalServices() []Service {
 			}
 		}
 	}
+
 	return local
 }
 
@@ -214,6 +222,7 @@ func (sa *ServiceAvailability) GetServiceCount() int {
 	if sa.Services == nil {
 		return 0
 	}
+
 	return len(sa.Services.Service)
 }
 
