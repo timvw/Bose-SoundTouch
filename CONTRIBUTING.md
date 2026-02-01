@@ -24,7 +24,7 @@ This project adheres to our [Code of Conduct](CODE_OF_CONDUCT.md). By participat
 
 ### Prerequisites
 
-- **Go 1.25.5 or later**: [Download Go](https://golang.org/dl/)
+- **Go 1.25.6 or later**: [Download Go](https://golang.org/dl/)
 - **Git**: For version control
 - **Make**: For build automation (optional but recommended)
 - **SoundTouch Device**: For testing (optional but valuable)
@@ -135,6 +135,12 @@ make build
 # Run linting and formatting
 make check
 
+# Run golangci-lint specifically
+golangci-lint run
+
+# Auto-fix linting issues where possible
+golangci-lint run --fix
+
 # Install CLI locally
 go install ./cmd/soundtouch-cli
 
@@ -198,7 +204,8 @@ SOUNDTOUCH_DEBUG=true
 Follow standard Go conventions:
 
 - **gofmt** for formatting
-- **golint** and **go vet** for code quality
+- **golangci-lint** for comprehensive code quality checks
+- **go vet** for static analysis
 - **Effective Go** principles
 - **Standard library patterns** where applicable
 

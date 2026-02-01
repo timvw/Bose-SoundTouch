@@ -18,7 +18,7 @@ const (
 	// EventTypeConnectionState indicates a connection state change
 	EventTypeConnectionState WebSocketEventType = "connectionStateUpdated"
 	// EventTypePresetUpdated indicates a preset configuration change
-	EventTypePresetUpdated WebSocketEventType = "presetUpdated"
+	EventTypePresetUpdated WebSocketEventType = "presetsUpdated"
 	// EventTypeZoneUpdated indicates a zone configuration change
 	EventTypeZoneUpdated WebSocketEventType = "zoneUpdated"
 	// EventTypeBassUpdated indicates a bass level change
@@ -78,7 +78,7 @@ type WebSocketEvent struct {
 	NowPlayingUpdated      *NowPlayingUpdatedEvent      `xml:"nowPlayingUpdated,omitempty"`
 	VolumeUpdated          *VolumeUpdatedEvent          `xml:"volumeUpdated,omitempty"`
 	ConnectionStateUpdated *ConnectionStateUpdatedEvent `xml:"connectionStateUpdated,omitempty"`
-	PresetUpdated          *PresetUpdatedEvent          `xml:"presetUpdated,omitempty"`
+	PresetUpdated          *PresetUpdatedEvent          `xml:"presetsUpdated,omitempty"`
 	ZoneUpdated            *ZoneUpdatedEvent            `xml:"zoneUpdated,omitempty"`
 	BassUpdated            *BassUpdatedEvent            `xml:"bassUpdated,omitempty"`
 	ClockTimeUpdated       *ClockTimeUpdatedEvent       `xml:"clockTimeUpdated,omitempty"`
@@ -195,9 +195,9 @@ func (cs *ConnectionState) GetSignalStrength() string {
 
 // PresetUpdatedEvent represents a preset update event
 type PresetUpdatedEvent struct {
-	XMLName  xml.Name `xml:"presetUpdated"`
+	XMLName  xml.Name `xml:"presetsUpdated"`
 	DeviceID string   `xml:"deviceID,attr"`
-	Preset   Preset   `xml:"preset"`
+	Presets  Presets  `xml:"presets"`
 }
 
 // ZoneUpdatedEvent represents a multiroom zone update event

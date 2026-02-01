@@ -89,6 +89,12 @@ func listSources(c *cli.Context) error {
 		}
 	}
 
+	// Show service availability summary
+	fmt.Println()
+
+	checker := NewServiceAvailabilityChecker(client)
+	checker.PrintServiceAvailabilitySummary()
+
 	return nil
 }
 
@@ -103,6 +109,14 @@ func selectSource(c *cli.Context) error {
 
 	sourceName := strings.ToUpper(c.String("source"))
 	sourceAccount := c.String("account")
+
+	// Check service availability
+	checker := NewServiceAvailabilityChecker(client)
+
+	actionDescription := fmt.Sprintf("select %s source", strings.ToLower(sourceName))
+	if !checker.CheckSourceAvailable(sourceName, actionDescription) {
+		return fmt.Errorf("source '%s' is not available", sourceName)
+	}
 
 	PrintDeviceHeader(fmt.Sprintf("Selecting source '%s'", sourceName), clientConfig.Host, clientConfig.Port)
 
@@ -129,6 +143,12 @@ func selectSpotify(c *cli.Context) error {
 		return err
 	}
 
+	// Check Spotify availability
+	checker := NewServiceAvailabilityChecker(client)
+	if !checker.ValidateSpotifyAvailable("select Spotify source") {
+		return fmt.Errorf("spotify is not available on this device")
+	}
+
 	PrintDeviceHeader("Selecting Spotify source", clientConfig.Host, clientConfig.Port)
 
 	err = client.SelectSpotify("")
@@ -148,6 +168,12 @@ func selectBluetooth(c *cli.Context) error {
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
 		return err
+	}
+
+	// Check Bluetooth availability
+	checker := NewServiceAvailabilityChecker(client)
+	if !checker.ValidateBluetoothAvailable("select Bluetooth source") {
+		return fmt.Errorf("bluetooth is not available on this device")
 	}
 
 	PrintDeviceHeader("Selecting Bluetooth source", clientConfig.Host, clientConfig.Port)
@@ -181,4 +207,206 @@ func selectAux(c *cli.Context) error {
 	PrintSuccess("AUX input source selected")
 
 	return nil
+}
+
+// getServiceAvailability handles displaying service availability information
+func getServiceAvailability(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		return err
+	}
+
+	PrintDeviceHeader("Getting service availability", clientConfig.Host, clientConfig.Port)
+
+	serviceAvailability, err := client.GetServiceAvailability()
+	if err != nil {
+		return fmt.Errorf("failed to get service availability: %w", err)
+	}
+
+	fmt.Printf("Service Availability Report:\n")
+	fmt.Printf("  Total Services: %d\n", serviceAvailability.GetServiceCount())
+	fmt.Printf("  Available Services: %d\n", serviceAvailability.GetAvailableServiceCount())
+	fmt.Printf("  Unavailable Services: %d\n", serviceAvailability.GetUnavailableServiceCount())
+
+	// Show available services
+	fmt.Printf("\n✅ Available Services:\n")
+
+	availableServices := serviceAvailability.GetAvailableServices()
+	if len(availableServices) == 0 {
+		fmt.Printf("    None\n")
+	} else {
+		for _, service := range availableServices {
+			fmt.Printf("    • %s\n", formatServiceTypeForDisplay(models.ServiceType(service.Type)))
+		}
+	}
+
+	// Show unavailable services with reasons
+	fmt.Printf("\n❌ Unavailable Services:\n")
+
+	unavailableServices := serviceAvailability.GetUnavailableServices()
+	if len(unavailableServices) == 0 {
+		fmt.Printf("    None\n")
+	} else {
+		for _, service := range unavailableServices {
+			reason := ""
+			if service.Reason != "" {
+				reason = fmt.Sprintf(" (%s)", service.Reason)
+			}
+
+			fmt.Printf("    • %s%s\n", formatServiceTypeForDisplay(models.ServiceType(service.Type)), reason)
+		}
+	}
+
+	// Show service categories
+	fmt.Printf("\n🎵 Streaming Services:\n")
+
+	streamingServices := serviceAvailability.GetStreamingServices()
+	availableCount := 0
+
+	for _, service := range streamingServices {
+		status := "❌"
+		if service.IsAvailable {
+			status = "✅"
+			availableCount++
+		}
+
+		fmt.Printf("    %s %s\n", status, formatServiceTypeForDisplay(models.ServiceType(service.Type)))
+	}
+
+	fmt.Printf("    Summary: %d/%d streaming services available\n", availableCount, len(streamingServices))
+
+	fmt.Printf("\n🔗 Local Input Services:\n")
+
+	localServices := serviceAvailability.GetLocalServices()
+	localAvailableCount := 0
+
+	for _, service := range localServices {
+		status := "❌"
+		if service.IsAvailable {
+			status = "✅"
+			localAvailableCount++
+		}
+
+		fmt.Printf("    %s %s\n", status, formatServiceTypeForDisplay(models.ServiceType(service.Type)))
+	}
+
+	fmt.Printf("    Summary: %d/%d local services available\n", localAvailableCount, len(localServices))
+
+	return nil
+}
+
+// compareSourcesAndAvailability compares configured sources with service availability
+func compareSourcesAndAvailability(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		return err
+	}
+
+	PrintDeviceHeader("Comparing sources and service availability", clientConfig.Host, clientConfig.Port)
+
+	// Get both sources and service availability
+	sources, err := client.GetSources()
+	if err != nil {
+		return fmt.Errorf("failed to get sources: %w", err)
+	}
+
+	serviceAvailability, err := client.GetServiceAvailability()
+	if err != nil {
+		return fmt.Errorf("failed to get service availability: %w", err)
+	}
+
+	fmt.Printf("Source vs Availability Comparison:\n\n")
+
+	performSourceComparisons(sources, serviceAvailability)
+	printSourceSummary(sources, serviceAvailability)
+
+	return nil
+}
+
+// performSourceComparisons compares configured sources with availability
+func performSourceComparisons(sources *models.Sources, serviceAvailability *models.ServiceAvailability) {
+	// Check key services
+	comparisons := []struct {
+		name                 string
+		configuredCheck      func() bool
+		availableCheck       func() bool
+		getConfiguredSources func() []models.SourceItem
+	}{
+		{
+			"Spotify",
+			sources.HasSpotify,
+			serviceAvailability.HasSpotify,
+			sources.GetSpotifySources,
+		},
+		{
+			"Bluetooth",
+			sources.HasBluetooth,
+			serviceAvailability.HasBluetooth,
+			func() []models.SourceItem { return sources.GetSourcesByType("BLUETOOTH") },
+		},
+	}
+
+	for _, comp := range comparisons {
+		compareServiceStatus(comp.name, comp.configuredCheck(), comp.availableCheck(), serviceAvailability)
+	}
+}
+
+// compareServiceStatus compares a single service's configuration vs availability
+func compareServiceStatus(serviceName string, configured, available bool, serviceAvailability *models.ServiceAvailability) {
+	fmt.Printf("🔍 %s:\n", serviceName)
+	fmt.Printf("    Configured: %s\n", boolToStatus(configured))
+	fmt.Printf("    Available: %s\n", boolToStatus(available))
+
+	switch {
+	case available && !configured:
+		fmt.Printf("    💡 %s is available but not configured - consider setting it up\n", serviceName)
+	case configured && !available:
+		fmt.Printf("    ⚠️  %s is configured but not available - check device status\n", serviceName)
+		printServiceUnavailableReason(serviceName, serviceAvailability)
+	case configured && available:
+		fmt.Printf("    ✅ %s is properly configured and available\n", serviceName)
+	default:
+		fmt.Printf("    ➖ %s is neither configured nor available\n", serviceName)
+	}
+
+	fmt.Println()
+}
+
+// printServiceUnavailableReason prints the reason why a service is unavailable
+func printServiceUnavailableReason(serviceName string, serviceAvailability *models.ServiceAvailability) {
+	var service *models.Service
+
+	switch serviceName {
+	case "Spotify":
+		service = serviceAvailability.GetServiceByType(models.ServiceTypeSpotify)
+	case "Bluetooth":
+		service = serviceAvailability.GetServiceByType(models.ServiceTypeBluetooth)
+	}
+
+	if service != nil && service.Reason != "" {
+		fmt.Printf("    📝 Reason: %s\n", service.Reason)
+	}
+}
+
+// printSourceSummary prints a summary of sources and services
+func printSourceSummary(sources *models.Sources, serviceAvailability *models.ServiceAvailability) {
+	// Summary
+	fmt.Printf("📊 Summary:\n")
+	fmt.Printf("    Total configured sources: %d\n", sources.GetSourceCount())
+	fmt.Printf("    Ready configured sources: %d\n", sources.GetReadySourceCount())
+	fmt.Printf("    Total available services: %d\n", serviceAvailability.GetAvailableServiceCount())
+	fmt.Printf("    Total possible services: %d\n", serviceAvailability.GetServiceCount())
+}
+
+// boolToStatus converts boolean to user-friendly status
+func boolToStatus(b bool) string {
+	if b {
+		return "✅ Yes"
+	}
+
+	return "❌ No"
 }

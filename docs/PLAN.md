@@ -29,7 +29,9 @@ This document describes the planning for a Golang-based API client for the Bose 
 - `GET/POST /bass` - Bass settings
 - `GET/POST /sources` - Available sources
 - `POST /select` - Select source
-- `GET /presets` - Read presets (1-6) - POST officially not supported
+- `GET /presets` - Read presets (1-6) ✅ COMPLETE
+- `POST /storePreset` - Store/update presets ✅ COMPLETE (via SoundTouch Plus Wiki)
+- `POST /removePreset` - Remove presets ✅ COMPLETE (via SoundTouch Plus Wiki)
 - `WebSocket /` - Live updates for events
 
 ## Architecture Based on Modern Go Patterns
@@ -376,9 +378,12 @@ func (c Config) Validate() error
   - GET/POST /balance - Stereo balance (-50 to +50)
   - Balance adjustment with clamping
   - Left/right convenience methods
-- [x] **Preset Management (Read-Only)** ✅ DONE
+- [x] **Preset Management (Complete)** ✅ DONE
   - Complete preset analysis and helper methods
-  - Note: POST /presets is officially marked as "N/A" by Bose - no API client can implement preset creation
+  - ✅ Implemented `/storePreset` and `/removePreset` endpoints (discovered via [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API))
+  - Full CRUD operations: Create, Read, Update, Delete presets
+  - CLI commands: `preset store`, `preset store-current`, `preset remove`
+  - Note: Official docs marked POST /presets as "N/A" but working endpoints found via community documentation
 - [x] **System Features** ✅ DONE
   - GET/POST /clockTime - Device time management
   - GET/POST /clockDisplay - Clock display settings

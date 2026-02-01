@@ -2,6 +2,8 @@
 
 This document provides a comprehensive overview of the available API endpoints verified against the official Bose SoundTouch Web API v1.0 specification (January 7, 2026).
 
+**Acknowledgment**: Additional endpoints beyond the official API were discovered through the comprehensive [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API) maintained by the SoundTouch Plus community. Special thanks to @thlucas1 and contributors for documenting these working endpoints that enable full preset management and content navigation functionality.
+
 ## Implementation Status Legend
 - ✅ **Implemented** - Fully implemented with tests and real device validation
 - 🔍 **Extra** - Implemented but not in official API v1.0 (may be newer version or undocumented)
@@ -227,10 +229,39 @@ Retrieves the configured presets.
 </presets>
 ```
 
-### POST /presets ℹ️ **N/A**
+### POST /storePreset ✅ **IMPLEMENTED**
 Creates or updates a preset.
 
-**Status**: According to the official Bose SoundTouch API documentation, POST operations on `/presets` are marked as "N/A" - this endpoint officially does not support preset creation or modification via any API client.
+**Status**: While the official Bose SoundTouch API documentation marks POST `/presets` as "N/A", we discovered and implemented the actual working endpoint `/storePreset` through the comprehensive [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API). This enables full preset management functionality.
+
+**Implementation**: 
+- Client method: `StorePreset(id, contentItem)`, `StoreCurrentAsPreset(id)`  
+- CLI: `preset store`, `preset store-current`
+- Supports all content sources: Spotify, TuneIn, local music, etc.
+
+**XML Request**:
+```xml
+<preset id="1" createdOn="1640995200" updatedOn="1640995200">
+  <ContentItem source="SPOTIFY" type="uri" location="spotify:playlist:123" isPresetable="true">
+    <itemName>My Playlist</itemName>
+  </ContentItem>
+</preset>
+```
+
+**Response**: Updated preset configuration
+
+### POST /removePreset ✅ **IMPLEMENTED**
+Removes/clears a preset slot.
+
+**Implementation**:
+- Client method: `RemovePreset(id)`
+- CLI: `preset remove --slot <1-6>`
+- WebSocket events: Triggers `presetsUpdated` notifications
+
+**XML Request**:
+```xml
+<preset id="3"/>
+```
 
 **Alternative Methods**:
 - Use the official Bose SoundTouch mobile app
@@ -527,7 +558,12 @@ func SendKey(deviceIP string, key string) error {
 ## Comprehensive Endpoint Discovery
 
 ### GET /supportedURLs ✅ **Implemented**
-Retrieves all supported endpoints for the specific device.
+Retrieves all supported endpoints for the specific device with comprehensive feature mapping.
+
+**Client Method**: `GetSupportedURLs() (*models.SupportedURLsResponse, error)`
+**CLI Commands**: 
+- `soundtouch-cli supported-urls [--features] [--verbose]` - Show endpoint-to-feature mapping
+- `soundtouch-cli analyze` - Comprehensive device capability analysis with recommendations
 
 **Response XML Structure:**
 ```xml
@@ -538,12 +574,21 @@ Retrieves all supported endpoints for the specific device.
 </supportedURLs>
 ```
 
+**Feature Mapping System**: The implementation includes a comprehensive endpoint-to-feature mapping system that:
+- Maps 103+ discovered endpoints to 15+ functional features
+- Categorizes features by type (Core, Audio, Playback, Sources, Content, etc.)
+- Identifies essential vs. optional features for device classification
+- Provides feature completeness scoring (0-100%)
+- Shows CLI command mappings for each supported feature
+- Detects partial implementations and missing capabilities
+- Offers personalized usage recommendations
+
 **Complete Endpoint List** (103 endpoints discovered from real devices):
 
 **Core Device Information:**
 - `/info` ✅ - Device information
 - `/capabilities` ✅ - Device capabilities 
-- `/supportedURLs` ✅ - This endpoint (self-reference)
+- `/supportedURLs` ✅ - This endpoint (self-reference) - **FULLY IMPLEMENTED with Feature Mapping**
 - `/networkInfo` ✅ - Network configuration
 - `/name` ✅ - Device name management
 - `/netStats` - Network statistics
@@ -589,7 +634,7 @@ Retrieves all supported endpoints for the specific device.
 - `/setMusicServiceAccount` - Configure music service account (Pandora, Spotify, etc.)
 - `/setMusicServiceOAuthAccount` - OAuth account setup
 - `/removeMusicServiceAccount` - Remove music service account
-- `/serviceAvailability` - Check service availability
+- `/serviceAvailability` ✅ **Implemented** - Check service availability
 - `/introspect` - Get introspect data for specific sources
 
 **Station Management (Radio/Streaming):**

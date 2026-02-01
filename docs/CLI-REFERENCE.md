@@ -91,9 +91,92 @@ Get device capabilities and features.
 soundtouch-cli --host <device> capabilities
 ```
 
-#### `presets`
+### Preset Management
 
-Get configured presets.
+Manage device presets (favorite content shortcuts).
+
+#### `preset <subcommand>`
+
+Preset management commands.
+
+```bash
+# List all presets
+soundtouch-cli --host <device> preset list
+
+# Store currently playing content as preset
+soundtouch-cli --host <device> preset store-current --slot <1-6>
+
+# Store specific content as preset
+soundtouch-cli --host <device> preset store --slot <1-6> --source <SOURCE> --location <LOCATION> [options]
+
+# Select and play a preset
+soundtouch-cli --host <device> preset select --slot <1-6>
+
+# Remove a preset
+soundtouch-cli --host <device> preset remove --slot <1-6>
+```
+
+**Store Current Content Examples:**
+```bash
+# Store what's currently playing as preset 1
+soundtouch-cli --host 192.168.1.10 preset store-current --slot 1
+
+# Store current Spotify track as preset 3
+soundtouch-cli --host 192.168.1.10 preset store-current --slot 3
+```
+
+**Store Specific Content Examples:**
+```bash
+# Store Spotify playlist
+soundtouch-cli --host 192.168.1.10 preset store \
+  --slot 1 \
+  --source SPOTIFY \
+  --location "spotify:playlist:37i9dQZF1DXcBWIGoYBM5M" \
+  --source-account "your_username" \
+  --name "Today's Top Hits"
+
+# Store radio station
+soundtouch-cli --host 192.168.1.10 preset store \
+  --slot 2 \
+  --source TUNEIN \
+  --location "/v1/playbook/station/s33828" \
+  --name "K-LOVE Radio"
+
+# Store internet radio
+soundtouch-cli --host 192.168.1.10 preset store \
+  --slot 3 \
+  --source LOCAL_INTERNET_RADIO \
+  --location "https://stream.example.com/jazz" \
+  --name "Jazz Radio Stream"
+```
+
+**Selection and Management Examples:**
+```bash
+# List all presets
+soundtouch-cli --host 192.168.1.10 preset list
+
+# Select preset 1
+soundtouch-cli --host 192.168.1.10 preset select --slot 1
+
+# Remove preset 6
+soundtouch-cli --host 192.168.1.10 preset remove --slot 6
+```
+
+**Getting Content Locations:**
+
+To find content locations for the `--location` parameter:
+
+```bash
+# Show current content details (includes location for all sources)
+soundtouch-cli --host 192.168.1.10 play now
+
+# Show detailed content information
+soundtouch-cli --host 192.168.1.10 play now --verbose
+```
+
+#### `presets` (Legacy)
+
+Get configured presets (legacy command for backward compatibility).
 
 ```bash
 soundtouch-cli --host <device> presets
@@ -461,6 +544,134 @@ soundtouch-cli --host 192.168.1.10 zone remove --member 192.168.1.12
 
 # Dissolve the zone (make all speakers independent)
 soundtouch-cli --host 192.168.1.10 zone dissolve
+```
+
+### Browse and Navigation
+
+Browse and navigate content sources on your device.
+
+#### `browse <subcommand>`
+
+Browse content from different sources.
+
+```bash
+# Browse TuneIn stations
+soundtouch-cli --host <device> browse tunein
+
+# Browse Pandora stations (requires account)
+soundtouch-cli --host <device> browse pandora --source-account <pandora_account>
+
+# Browse stored music library (requires device ID)
+soundtouch-cli --host <device> browse stored-music --source-account <device_id>
+
+# Browse any content source with pagination
+soundtouch-cli --host <device> browse content --source <SOURCE> [--start <num>] [--limit <num>]
+
+# Browse with menu navigation (for sources that support it)
+soundtouch-cli --host <device> browse menu --source <SOURCE> --menu <MENU_TYPE> [--sort <SORT_ORDER>]
+
+# Browse into a container/directory
+soundtouch-cli --host <device> browse container --source <SOURCE> --location <LOCATION> [--type <TYPE>]
+```
+
+**Examples:**
+```bash
+# Browse TuneIn stations
+soundtouch-cli --host 192.168.1.10 browse tunein
+
+# Browse first 50 TuneIn stations
+soundtouch-cli --host 192.168.1.10 browse tunein --limit 50
+
+# Browse Pandora radio stations
+soundtouch-cli --host 192.168.1.10 browse pandora --source-account myuser123
+
+# Browse Pandora with menu navigation
+soundtouch-cli --host 192.168.1.10 browse menu --source PANDORA --source-account myuser123 --menu radioStations --sort dateCreated
+
+# Browse stored music library
+soundtouch-cli --host 192.168.1.10 browse stored-music --source-account device_12345
+
+# Browse into a music album container
+soundtouch-cli --host 192.168.1.10 browse container --source STORED_MUSIC --location "album:983" --type dir
+```
+
+### Station Search and Management
+
+Search for and manage radio stations and streaming content.
+
+#### `station <subcommand>`
+
+Search and manage stations.
+
+```bash
+# Search across any source
+soundtouch-cli --host <device> station search --source <SOURCE> --query <SEARCH_TERM>
+
+# Search TuneIn specifically
+soundtouch-cli --host <device> station search-tunein --query <SEARCH_TERM>
+
+# Search Pandora specifically (requires account)
+soundtouch-cli --host <device> station search-pandora --source-account <ACCOUNT> --query <SEARCH_TERM>
+
+# Search Spotify specifically (requires account)
+soundtouch-cli --host <device> station search-spotify --source-account <ACCOUNT> --query <SEARCH_TERM>
+
+# Add station and play immediately
+soundtouch-cli --host <device> station add --source <SOURCE> --token <TOKEN> --name <NAME>
+
+# Remove station from collection
+soundtouch-cli --host <device> station remove --source <SOURCE> --location <LOCATION>
+```
+
+**Search Examples:**
+```bash
+# Search TuneIn for jazz stations
+soundtouch-cli --host 192.168.1.10 station search-tunein --query "jazz"
+
+# Search Pandora for Taylor Swift
+soundtouch-cli --host 192.168.1.10 station search-pandora --source-account myuser123 --query "Taylor Swift"
+
+# Search Spotify for workout playlists
+soundtouch-cli --host 192.168.1.10 station search-spotify --source-account spotify_user --query "workout playlist"
+
+# General search across any source
+soundtouch-cli --host 192.168.1.10 station search --source TUNEIN --query "classic rock"
+```
+
+**Station Management Examples:**
+```bash
+# Add a station found from search results (use token from search output)
+soundtouch-cli --host 192.168.1.10 station add \
+  --source TUNEIN \
+  --token "c121508" \
+  --name "Classic Rock Radio"
+
+# Add Pandora station with account
+soundtouch-cli --host 192.168.1.10 station add \
+  --source PANDORA \
+  --source-account myuser123 \
+  --token "TR:12345" \
+  --name "My Custom Station"
+
+# Remove a station (use location from browse/search results)
+soundtouch-cli --host 192.168.1.10 station remove \
+  --source TUNEIN \
+  --location "/v1/playbook/station/s33828"
+```
+
+**Workflow Example - Discover and Play New Content:**
+```bash
+# 1. Search for content
+soundtouch-cli --host 192.168.1.10 station search-tunein --query "smooth jazz"
+
+# 2. Add interesting station from results (copy token from output)
+soundtouch-cli --host 192.168.1.10 station add \
+  --source TUNEIN \
+  --token "c456789" \
+  --name "Smooth Jazz 24/7"
+
+# 3. Station is automatically playing! Or browse for more options:
+soundtouch-cli --host 192.168.1.10 browse tunein --limit 10
 ```
 
 ## Common Usage Patterns

@@ -250,6 +250,18 @@ func (c *Client) GetSources() (*models.Sources, error) {
 	return &sources, nil
 }
 
+// GetServiceAvailability retrieves service availability status from the /serviceAvailability endpoint
+func (c *Client) GetServiceAvailability() (*models.ServiceAvailability, error) {
+	var serviceAvailability models.ServiceAvailability
+
+	err := c.get("/serviceAvailability", &serviceAvailability)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get service availability: %w", err)
+	}
+
+	return &serviceAvailability, nil
+}
+
 // GetName retrieves the device name from the /name endpoint
 func (c *Client) GetName() (*models.Name, error) {
 	var name models.Name
@@ -272,6 +284,18 @@ func (c *Client) GetCapabilities() (*models.Capabilities, error) {
 	}
 
 	return &capabilities, nil
+}
+
+// GetSupportedURLs retrieves all supported endpoints from the /supportedURLs endpoint
+func (c *Client) GetSupportedURLs() (*models.SupportedURLsResponse, error) {
+	var supportedURLs models.SupportedURLsResponse
+
+	err := c.get("/supportedURLs", &supportedURLs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get supported URLs: %w", err)
+	}
+
+	return &supportedURLs, nil
 }
 
 // GetPresets retrieves configured presets from the /presets endpoint
@@ -314,6 +338,70 @@ func (c *Client) IsCurrentContentPresetable() (bool, error) {
 	}
 
 	return nowPlaying.ContentItem.IsPresetable, nil
+}
+
+// StorePreset saves content as a preset on the SoundTouch device
+func (c *Client) StorePreset(id int, contentItem *models.ContentItem) error {
+	if id < 1 || id > 6 {
+		return fmt.Errorf("preset ID must be between 1 and 6, got %d", id)
+	}
+
+	if contentItem == nil {
+		return fmt.Errorf("content item cannot be nil")
+	}
+
+	now := time.Now().Unix()
+	preset := &models.Preset{
+		ID:          id,
+		CreatedOn:   &now,
+		UpdatedOn:   &now,
+		ContentItem: contentItem,
+	}
+
+	err := c.post("/storePreset", preset)
+	if err != nil {
+		return fmt.Errorf("failed to store preset %d: %w", id, err)
+	}
+
+	return nil
+}
+
+// StoreCurrentAsPreset saves currently playing content as preset
+func (c *Client) StoreCurrentAsPreset(id int) error {
+	if id < 1 || id > 6 {
+		return fmt.Errorf("preset ID must be between 1 and 6, got %d", id)
+	}
+
+	nowPlaying, err := c.GetNowPlaying()
+	if err != nil {
+		return fmt.Errorf("failed to get current content: %w", err)
+	}
+
+	if nowPlaying.IsEmpty() || nowPlaying.ContentItem == nil {
+		return fmt.Errorf("no content currently playing")
+	}
+
+	if !nowPlaying.ContentItem.IsPresetable {
+		return fmt.Errorf("current content cannot be saved as preset")
+	}
+
+	return c.StorePreset(id, nowPlaying.ContentItem)
+}
+
+// RemovePreset deletes a preset from the SoundTouch device
+func (c *Client) RemovePreset(id int) error {
+	if id < 1 || id > 6 {
+		return fmt.Errorf("preset ID must be between 1 and 6, got %d", id)
+	}
+
+	preset := &models.Preset{ID: id}
+
+	err := c.post("/removePreset", preset)
+	if err != nil {
+		return fmt.Errorf("failed to remove preset %d: %w", id, err)
+	}
+
+	return nil
 }
 
 // SendKey sends a key press command to the device (press followed by release)
@@ -910,6 +998,68 @@ func (c *Client) post(endpoint string, payload interface{}) error {
 	return nil
 }
 
+// postWithResponse performs a POST request with XML body and parses the response
+func (c *Client) postWithResponse(endpoint string, payload, result interface{}) error {
+	url := c.baseURL + endpoint
+
+	var body io.Reader
+
+	if payload != nil {
+		xmlData, err := xml.Marshal(payload)
+		if err != nil {
+			return fmt.Errorf("failed to marshal XML request: %w", err)
+		}
+
+		body = bytes.NewReader(xmlData)
+	}
+
+	req, err := http.NewRequest("POST", url, body)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("User-Agent", c.userAgent)
+	req.Header.Set("Content-Type", "application/xml")
+	req.Header.Set("Accept", "application/xml")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to execute request: %w", err)
+	}
+
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			// Log the error but don't override the main error
+			_ = closeErr // Explicitly ignore the error
+		}
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		responseBody, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(responseBody))
+	}
+
+	if result != nil {
+		responseBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("failed to read response body: %w", err)
+		}
+
+		// Parse the actual response first
+		if err := xml.Unmarshal(responseBody, result); err != nil {
+			// Check if it might be an API error response instead
+			var apiError models.APIError
+			if xmlErr := xml.Unmarshal(responseBody, &apiError); xmlErr == nil && apiError.Message != "" {
+				return &apiError
+			}
+
+			return fmt.Errorf("failed to unmarshal XML response: %w", err)
+		}
+	}
+
+	return nil
+}
+
 // GetZone gets the current multiroom zone configuration
 func (c *Client) GetZone() (*models.ZoneInfo, error) {
 	var zone models.ZoneInfo
@@ -1284,6 +1434,206 @@ func (c *Client) RequestToken() (*models.BearerToken, error) {
 	}
 
 	return &token, nil
+}
+
+// Navigate browses content within a source (e.g., browse music libraries, stations)
+func (c *Client) Navigate(source, sourceAccount string, startItem, numItems int) (*models.NavigateResponse, error) {
+	if source == "" {
+		return nil, fmt.Errorf("source cannot be empty")
+	}
+
+	if startItem < 1 {
+		return nil, fmt.Errorf("startItem must be >= 1, got %d", startItem)
+	}
+
+	if numItems < 1 {
+		return nil, fmt.Errorf("numItems must be >= 1, got %d", numItems)
+	}
+
+	request := models.NewNavigateRequest(source, sourceAccount, startItem, numItems)
+
+	var response models.NavigateResponse
+
+	err := c.postWithResponse("/navigate", request, &response)
+	if err != nil {
+		return nil, fmt.Errorf("failed to navigate %s: %w", source, err)
+	}
+
+	return &response, nil
+}
+
+// NavigateWithMenu browses content with menu and sort parameters (e.g., Pandora stations)
+func (c *Client) NavigateWithMenu(source, sourceAccount, menu, sort string, startItem, numItems int) (*models.NavigateResponse, error) {
+	if source == "" {
+		return nil, fmt.Errorf("source cannot be empty")
+	}
+
+	if startItem < 1 {
+		return nil, fmt.Errorf("startItem must be >= 1, got %d", startItem)
+	}
+
+	if numItems < 1 {
+		return nil, fmt.Errorf("numItems must be >= 1, got %d", numItems)
+	}
+
+	request := models.NewNavigateRequestWithMenu(source, sourceAccount, menu, sort, startItem, numItems)
+
+	var response models.NavigateResponse
+
+	err := c.postWithResponse("/navigate", request, &response)
+	if err != nil {
+		return nil, fmt.Errorf("failed to navigate %s with menu %s: %w", source, menu, err)
+	}
+
+	return &response, nil
+}
+
+// NavigateContainer browses a specific container/directory within a source
+func (c *Client) NavigateContainer(source, sourceAccount string, startItem, numItems int, containerItem *models.ContentItem) (*models.NavigateResponse, error) {
+	if source == "" {
+		return nil, fmt.Errorf("source cannot be empty")
+	}
+
+	if containerItem == nil {
+		return nil, fmt.Errorf("container item cannot be nil")
+	}
+
+	if startItem < 1 {
+		return nil, fmt.Errorf("startItem must be >= 1, got %d", startItem)
+	}
+
+	if numItems < 1 {
+		return nil, fmt.Errorf("numItems must be >= 1, got %d", numItems)
+	}
+
+	request := models.NewNavigateRequestWithItem(source, sourceAccount, startItem, numItems, containerItem)
+
+	var response models.NavigateResponse
+
+	err := c.postWithResponse("/navigate", request, &response)
+	if err != nil {
+		return nil, fmt.Errorf("failed to navigate container in %s: %w", source, err)
+	}
+
+	return &response, nil
+}
+
+// AddStation adds a station to a music service collection and immediately starts playing it
+func (c *Client) AddStation(source, sourceAccount, token, name string) error {
+	if source == "" {
+		return fmt.Errorf("source cannot be empty")
+	}
+
+	if token == "" {
+		return fmt.Errorf("token cannot be empty")
+	}
+
+	if name == "" {
+		return fmt.Errorf("station name cannot be empty")
+	}
+
+	request := models.NewAddStationRequest(source, sourceAccount, token, name)
+
+	var response models.StationResponse
+
+	err := c.postWithResponse("/addStation", request, &response)
+	if err != nil {
+		return fmt.Errorf("failed to add station '%s' to %s: %w", name, source, err)
+	}
+
+	return nil
+}
+
+// RemoveStation removes a station from a music service collection
+func (c *Client) RemoveStation(contentItem *models.ContentItem) error {
+	if contentItem == nil {
+		return fmt.Errorf("content item cannot be nil")
+	}
+
+	if contentItem.Source == "" {
+		return fmt.Errorf("content item source cannot be empty")
+	}
+
+	if contentItem.Location == "" {
+		return fmt.Errorf("content item location cannot be empty")
+	}
+
+	var response models.StationResponse
+
+	err := c.postWithResponse("/removeStation", contentItem, &response)
+	if err != nil {
+		return fmt.Errorf("failed to remove station from %s: %w", contentItem.Source, err)
+	}
+
+	return nil
+}
+
+// GetPandoraStations gets all Pandora radio stations for an account
+func (c *Client) GetPandoraStations(sourceAccount string) (*models.NavigateResponse, error) {
+	if sourceAccount == "" {
+		return nil, fmt.Errorf("pandora source account cannot be empty")
+	}
+
+	return c.NavigateWithMenu("PANDORA", sourceAccount, "radioStations", "dateCreated", 1, 100)
+}
+
+// GetTuneInStations browses TuneIn stations/content
+func (c *Client) GetTuneInStations(sourceAccount string) (*models.NavigateResponse, error) {
+	return c.Navigate("TUNEIN", sourceAccount, 1, 100)
+}
+
+// GetStoredMusicLibrary browses stored music library
+func (c *Client) GetStoredMusicLibrary(sourceAccount string) (*models.NavigateResponse, error) {
+	if sourceAccount == "" {
+		return nil, fmt.Errorf("stored music source account cannot be empty")
+	}
+
+	return c.Navigate("STORED_MUSIC", sourceAccount, 1, 1000)
+}
+
+// SearchStation searches for stations/content within a music service
+func (c *Client) SearchStation(source, sourceAccount, searchTerm string) (*models.SearchStationResponse, error) {
+	if source == "" {
+		return nil, fmt.Errorf("source cannot be empty")
+	}
+
+	if searchTerm == "" {
+		return nil, fmt.Errorf("search term cannot be empty")
+	}
+
+	request := models.NewSearchStationRequest(source, sourceAccount, searchTerm)
+
+	var response models.SearchStationResponse
+
+	err := c.postWithResponse("/searchStation", request, &response)
+	if err != nil {
+		return nil, fmt.Errorf("failed to search stations in %s: %w", source, err)
+	}
+
+	return &response, nil
+}
+
+// SearchPandoraStations searches for Pandora stations by artist/song name
+func (c *Client) SearchPandoraStations(sourceAccount, searchTerm string) (*models.SearchStationResponse, error) {
+	if sourceAccount == "" {
+		return nil, fmt.Errorf("pandora source account cannot be empty")
+	}
+
+	return c.SearchStation("PANDORA", sourceAccount, searchTerm)
+}
+
+// SearchTuneInStations searches for TuneIn stations/content
+func (c *Client) SearchTuneInStations(searchTerm string) (*models.SearchStationResponse, error) {
+	return c.SearchStation("TUNEIN", "", searchTerm)
+}
+
+// SearchSpotifyContent searches for Spotify content (playlists, tracks, etc.)
+func (c *Client) SearchSpotifyContent(sourceAccount, searchTerm string) (*models.SearchStationResponse, error) {
+	if sourceAccount == "" {
+		return nil, fmt.Errorf("spotify source account cannot be empty")
+	}
+
+	return c.SearchStation("SPOTIFY", sourceAccount, searchTerm)
 }
 
 // hasCapability checks if a capability is present in the device capabilities

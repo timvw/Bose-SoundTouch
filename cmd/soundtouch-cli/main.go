@@ -98,14 +98,13 @@ func main() {
 	app := &cli.App{
 		Name:  "soundtouch-cli",
 		Usage: "Command-line interface for controlling Bose SoundTouch devices",
-		Description: `A comprehensive CLI tool for interacting with Bose SoundTouch devices.
+		Description: `⠎⠕⠥⠝⠙⠤⠞⠕⠥⠉⠓ A comprehensive CLI tool for interacting with Bose SoundTouch devices.
    Supports device discovery, playback control, volume/bass/balance adjustment,
    source selection, zone management, and more.`,
 		Version: version,
 		Authors: []*cli.Author{
 			{
-				Name:  "SoundTouch CLI Contributors",
-				Email: "info@example.com",
+				Name: "Tobias Gesellchen, and the SoundTouch CLI Contributors",
 			},
 		},
 		Flags: CommonFlags,
@@ -179,6 +178,32 @@ func main() {
 				Before: RequireHost,
 			},
 			{
+				Name:    "supported-urls",
+				Aliases: []string{"urls"},
+				Usage:   "Get supported device endpoints",
+				Action:  getSupportedURLs,
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:    "verbose",
+						Aliases: []string{"v"},
+						Usage:   "Show complete endpoint list",
+					},
+					&cli.BoolFlag{
+						Name:    "features",
+						Aliases: []string{"f"},
+						Usage:   "Show detailed feature mapping and CLI commands",
+					},
+				},
+				Before: RequireHost,
+			},
+			{
+				Name:    "analyze",
+				Aliases: []string{"analysis"},
+				Usage:   "Analyze device capabilities and provide recommendations",
+				Action:  getDeviceAnalysis,
+				Before:  RequireHost,
+			},
+			{
 				Name:   "presets",
 				Usage:  "Get configured presets",
 				Action: getPresets,
@@ -195,6 +220,13 @@ func main() {
 						Usage:  "Get current playback status",
 						Action: getNowPlaying,
 						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.BoolFlag{
+								Name:    "verbose",
+								Aliases: []string{"v"},
+								Usage:   "Show detailed content information (including Spotify URIs)",
+							},
+						},
 					},
 					{
 						Name:   "start",
@@ -230,17 +262,403 @@ func main() {
 			},
 			// Preset commands
 			{
-				Name:   "preset",
-				Usage:  "Select preset by number",
-				Action: selectPreset,
-				Flags: []cli.Flag{
-					&cli.IntFlag{
-						Name:     "preset",
-						Usage:    "Preset number (1-6)",
-						Required: true,
+				Name:  "preset",
+				Usage: "Preset management commands",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "store-current",
+						Usage:  "Store currently playing content as preset",
+						Action: storeCurrentPreset,
+						Flags: []cli.Flag{
+							&cli.IntFlag{
+								Name:     "slot",
+								Usage:    "Preset slot number (1-6)",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "store",
+						Usage:  "Store specific content as preset",
+						Action: storePreset,
+						Flags: []cli.Flag{
+							&cli.IntFlag{
+								Name:     "slot",
+								Usage:    "Preset slot number (1-6)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "source",
+								Usage:    "Content source (SPOTIFY, TUNEIN, LOCAL_INTERNET_RADIO, etc.)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "location",
+								Usage:    "Content location (URI, URL, or ID)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "source-account",
+								Usage: "Source account (username, device ID, etc.)",
+							},
+							&cli.StringFlag{
+								Name:  "name",
+								Usage: "Display name for the preset",
+							},
+							&cli.StringFlag{
+								Name:  "type",
+								Usage: "Content type (uri, stationurl, etc.)",
+							},
+							&cli.StringFlag{
+								Name:  "artwork",
+								Usage: "Artwork URL",
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "remove",
+						Usage:  "Remove a preset",
+						Action: removePreset,
+						Flags: []cli.Flag{
+							&cli.IntFlag{
+								Name:     "slot",
+								Usage:    "Preset slot number (1-6)",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "select",
+						Usage:  "Select and play a preset",
+						Action: selectPresetNew,
+						Flags: []cli.Flag{
+							&cli.IntFlag{
+								Name:     "slot",
+								Usage:    "Preset slot number (1-6)",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "list",
+						Usage:  "List all presets",
+						Action: listPresets,
+						Before: RequireHost,
 					},
 				},
-				Before: RequireHost,
+			},
+			// Browse/Navigation commands
+			{
+				Name:    "browse",
+				Aliases: []string{"nav"},
+				Usage:   "Browse and navigate content sources",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "content",
+						Usage:  "Browse content from a source",
+						Action: browseContent,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source",
+								Usage:    "Content source (TUNEIN, PANDORA, SPOTIFY, STORED_MUSIC)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "source-account",
+								Usage: "Source account (username, device ID, etc.)",
+							},
+							&cli.IntFlag{
+								Name:  "start",
+								Usage: "Starting item number",
+								Value: 1,
+							},
+							&cli.IntFlag{
+								Name:  "limit",
+								Usage: "Number of items to return",
+								Value: 20,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "menu",
+						Usage:  "Browse content with menu navigation",
+						Action: browseWithMenu,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source",
+								Usage:    "Content source (PANDORA, etc.)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "source-account",
+								Usage: "Source account (required for some sources)",
+							},
+							&cli.StringFlag{
+								Name:     "menu",
+								Usage:    "Menu type (radioStations, etc.)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "sort",
+								Usage: "Sort order (dateCreated, etc.)",
+								Value: "dateCreated",
+							},
+							&cli.IntFlag{
+								Name:  "start",
+								Usage: "Starting item number",
+								Value: 1,
+							},
+							&cli.IntFlag{
+								Name:  "limit",
+								Usage: "Number of items to return",
+								Value: 20,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "container",
+						Usage:  "Browse into a container/directory",
+						Action: browseContainer,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source",
+								Usage:    "Content source",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "source-account",
+								Usage: "Source account",
+							},
+							&cli.StringFlag{
+								Name:     "location",
+								Usage:    "Container location",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "type",
+								Usage: "Container type",
+							},
+							&cli.IntFlag{
+								Name:  "start",
+								Usage: "Starting item number",
+								Value: 1,
+							},
+							&cli.IntFlag{
+								Name:  "limit",
+								Usage: "Number of items to return",
+								Value: 20,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "tunein",
+						Usage:  "Browse TuneIn stations",
+						Action: browseTuneIn,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:  "source-account",
+								Usage: "TuneIn account (optional)",
+							},
+							&cli.IntFlag{
+								Name:  "start",
+								Usage: "Starting item number",
+								Value: 1,
+							},
+							&cli.IntFlag{
+								Name:  "limit",
+								Usage: "Number of items to return",
+								Value: 100,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "pandora",
+						Usage:  "Browse Pandora stations",
+						Action: browsePandora,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source-account",
+								Usage:    "Pandora account (required)",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "stored-music",
+						Usage:  "Browse stored music library",
+						Action: browseStoredMusic,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source-account",
+								Usage:    "Device ID (required)",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+				},
+			},
+			// Station commands
+			{
+				Name:    "station",
+				Aliases: []string{"st"},
+				Usage:   "Search and manage stations",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "search",
+						Usage:  "Search for stations and content",
+						Action: searchStations,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source",
+								Usage:    "Search source (TUNEIN, PANDORA, SPOTIFY)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "source-account",
+								Usage: "Source account (required for Pandora/Spotify)",
+							},
+							&cli.StringFlag{
+								Name:     "query",
+								Aliases:  []string{"q"},
+								Usage:    "Search query",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "search-tunein",
+						Usage:  "Search TuneIn stations",
+						Action: searchTuneIn,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "query",
+								Aliases:  []string{"q"},
+								Usage:    "Search query",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "search-pandora",
+						Usage:  "Search Pandora stations",
+						Action: searchPandora,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source-account",
+								Usage:    "Pandora account (required)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "query",
+								Aliases:  []string{"q"},
+								Usage:    "Search query",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "search-spotify",
+						Usage:  "Search Spotify content",
+						Action: searchSpotify,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source-account",
+								Usage:    "Spotify account (required)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "query",
+								Aliases:  []string{"q"},
+								Usage:    "Search query",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "add",
+						Usage:  "Add station and play immediately",
+						Action: addStation,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source",
+								Usage:    "Station source (TUNEIN, PANDORA, SPOTIFY)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "source-account",
+								Usage: "Source account (required for some sources)",
+							},
+							&cli.StringFlag{
+								Name:     "token",
+								Usage:    "Station token (from search results)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "name",
+								Usage:    "Station name",
+								Required: true,
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "remove",
+						Usage:  "Remove station from collection",
+						Action: removeStation,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source",
+								Usage:    "Station source",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "source-account",
+								Usage: "Source account",
+							},
+							&cli.StringFlag{
+								Name:     "location",
+								Usage:    "Station location",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "type",
+								Usage: "Station type",
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "list",
+						Usage:  "List saved stations",
+						Action: listStations,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source",
+								Usage:    "Station source (TUNEIN, PANDORA)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:  "source-account",
+								Usage: "Source account (required for Pandora)",
+							},
+						},
+						Before: RequireHost,
+					},
+				},
 			},
 			// Key commands
 			{
@@ -410,6 +828,18 @@ func main() {
 						Name:   "aux",
 						Usage:  "Select AUX input source",
 						Action: selectAux,
+						Before: RequireHost,
+					},
+					{
+						Name:   "availability",
+						Usage:  "Show service availability",
+						Action: getServiceAvailability,
+						Before: RequireHost,
+					},
+					{
+						Name:   "compare",
+						Usage:  "Compare sources and service availability",
+						Action: compareSourcesAndAvailability,
 						Before: RequireHost,
 					},
 				},

@@ -54,7 +54,8 @@ This Go implementation provides **complete coverage** of the Bose SoundTouch Web
 
 | Endpoint | Method | Status | Official API Status |
 |----------|--------|--------|-------------------|
-| `/presets` | POST | ❌ **API Limitation** | Marked as "N/A" in official documentation |
+| `/storePreset` | POST | ✅ **IMPLEMENTED** | Found via [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API) (official docs marked `/presets` POST as "N/A") |
+| `/removePreset` | POST | ✅ **IMPLEMENTED** | Found via [SoundTouch Plus Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API) |
 
 ---
 
@@ -78,6 +79,8 @@ This Go implementation provides **complete coverage** of the Bose SoundTouch Web
 | **Device Discovery** | ✅ **Complete** | UPnP/SSDP + mDNS/Bonjour automatic discovery |
 | **Safety Features** | ✅ **Enhanced** | Volume limiting, bass clamping, input validation |
 | **High-Level Zone API** | ✅ **Superior** | Fluent zone management API replacing low-level slave operations |
+| **Preset Management** | ✅ **Wiki Documented** | Full preset CRUD via `/storePreset` and `/removePreset` endpoints (found via SoundTouch Plus Wiki) |
+| **Content Navigation** | ✅ **Complete** | Browse and search content via `/navigate`, `/searchStation`, `/addStation` (via SoundTouch Plus Wiki) |
 
 ---
 
