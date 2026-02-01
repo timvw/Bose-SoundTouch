@@ -373,7 +373,7 @@ This library supports all Bose SoundTouch-compatible devices, including:
 - ⚙️ [Advanced Features](docs/SYSTEM-ENDPOINTS.md) - Advanced functionality
 - 🏠 [Multiroom Setup](docs/zone-management.md) - Zone configuration guide
 - ⚡ [WebSocket Events](docs/websocket-events.md) - Real-time event handling
-- 🔔 [Speaker Notifications](SPEAKER_ENDPOINT.md) - TTS and audio notifications guide
+- 🔔 [Speaker Notifications](docs/SPEAKER_ENDPOINT.md) - TTS and audio notifications guide
 - 🔍 [Device Discovery](docs/DISCOVERY.md) - Discovery configuration
 - 🛠️ [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues and solutions
 
