@@ -355,6 +355,90 @@ client.SetBalanceSafe(10)    // Falls back gracefully
 
 ---
 
+## 🔔 **Speaker Notification Issues**
+
+### ❌ "speaker beep" command fails with status 400
+
+**Symptoms:**
+```bash
+$ go run ./cmd/soundtouch-cli --host 192.168.178.35 sp beep
+Playing notification beep from 192.168.178.35:8090...
+✗ Failed to play notification beep: API request failed with status 400
+```
+
+**Cause:**
+This was a bug in earlier versions where the Go client incorrectly used POST instead of GET for the `/playNotification` endpoint.
+
+**Solution:**
+Update to the latest version. The fix changed the `PlayNotificationBeep()` method to use GET requests:
+
+```go
+// Fixed implementation (v2025.02+)
+func (c *Client) PlayNotificationBeep() error {
+    var status models.StationResponse
+    return c.get("/playNotification", &status)
+}
+```
+
+**Verification:**
+Both commands should now work identically:
+```bash
+# CLI command
+go run ./cmd/soundtouch-cli --host 192.168.178.35 sp beep
+
+# Direct curl (for comparison)
+curl http://192.168.178.35:8090/playNotification
+```
+
+### ❌ "speaker" commands not supported
+
+**Symptoms:**
+```
+✗ Failed to play notification: endpoint not supported
+```
+
+**Causes & Solutions:**
+
+#### 1. **Device Model Compatibility**
+- ✅ **Supported**: SoundTouch 10 (ST-10), SoundTouch 20 (ST-20)  
+- ❌ **Not Supported**: SoundTouch 300 (ST-300), older models
+
+**Solution:** Verify device model with:
+```bash
+soundtouch-cli --host <device> info
+```
+
+#### 2. **Missing App Key (TTS/URL only)**
+TTS and URL playback require an app key, but beep does not:
+```bash
+# Beep - no app key needed
+soundtouch-cli --host <device> speaker beep
+
+# TTS - app key required
+soundtouch-cli --host <device> speaker tts --text "Hello" --app-key "your-key"
+```
+
+### ❌ "Device is busy" during notifications
+
+**Symptoms:**
+```
+✗ Failed to play notification: device is busy
+```
+
+**Solutions:**
+
+#### 1. **Wait for Current Notification to Complete**
+Only one notification can play at a time. Wait a few seconds and retry.
+
+#### 2. **Check Current Playback Status**
+```go
+nowPlaying, _ := client.GetNowPlaying()
+fmt.Printf("Current source: %s, status: %s\n", 
+    nowPlaying.Source, nowPlaying.PlayStatus)
+```
+
+---
+
 ## 📡 **WebSocket Issues**
 
 ### ❌ "WebSocket connection failed"

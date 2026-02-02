@@ -1677,7 +1677,8 @@ func (c *Client) PlayCustom(playInfo *models.PlayInfo) error {
 
 // PlayNotificationBeep plays a notification beep on the device
 func (c *Client) PlayNotificationBeep() error {
-	return c.post("/playNotification", nil)
+	var status models.StationResponse
+	return c.get("/playNotification", &status)
 }
 
 // postPlayInfo sends a PlayInfo request to the /speaker endpoint

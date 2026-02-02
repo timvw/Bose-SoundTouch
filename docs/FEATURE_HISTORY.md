@@ -231,6 +231,20 @@ This document tracks the detailed evolution of features and capabilities in the 
 - **Parameter Validation**: Complete input validation and error handling
 - **Usage Examples**: Extensive real-world usage examples
 
+### Phase 9: Bug Fixes and Stability (February 2025)
+
+#### Critical Bug Fixes
+- **PlayNotificationBeep HTTP Method Fix**: Corrected `/playNotification` endpoint to use GET instead of POST
+  - **Issue**: `go run ./cmd/soundtouch-cli --host <device> sp beep` was failing with HTTP 400 status
+  - **Root Cause**: Go client was sending POST requests while SoundTouch devices expect GET requests
+  - **Fix**: Updated `PlayNotificationBeep()` method to use the existing `c.get()` method with `StationResponse` model
+  - **Verification**: Tested with SoundTouch 20, confirmed compatibility with curl equivalent (`curl http://<device>:8090/playNotification`)
+
+#### Code Quality Improvements
+- **Consistent HTTP Method Usage**: Leveraged existing client patterns instead of manual HTTP handling
+- **Model Reuse**: Used existing `StationResponse` struct for `/playNotification` XML response parsing
+- **Documentation Updates**: Added troubleshooting guide for speaker notification issues
+
 ## Feature Implementation Statistics
 
 ### API Endpoint Coverage Evolution
@@ -245,6 +259,7 @@ This document tracks the detailed evolution of features and capabilities in the 
 | Phase 6 | 2 | 24 | 92% |
 | Phase 7 | 3 | 27 | 96% |
 | Phase 8 | 2 | 29 | 100% |
+| Phase 9 | 0 | 29 | 100% (Bug fixes) |
 
 ### Testing Evolution
 
@@ -257,6 +272,7 @@ This document tracks the detailed evolution of features and capabilities in the 
 - **Phase 6**: Zone management tests (250 tests)
 - **Phase 7**: Advanced audio tests (300+ tests)
 - **Phase 8**: Speaker notification tests (330+ tests)
+- **Phase 9**: Bug fix verification tests (335+ tests)
 
 #### Integration Test Coverage
 - **Real Device Testing**: SoundTouch 10 and SoundTouch 20
@@ -275,6 +291,7 @@ This document tracks the detailed evolution of features and capabilities in the 
 - **Phase 6**: `zone`
 - **Phase 7**: Advanced audio commands
 - **Phase 8**: `speaker` (TTS, URL, beep notifications)
+- **Phase 9**: Bug fixes (speaker beep reliability)
 
 #### CLI Feature Enhancements
 - **Host:Port Parsing**: Support for `192.168.1.100:8090` format

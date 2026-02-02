@@ -39,6 +39,8 @@ Plays notification content on the speaker.
 
 Plays a simple notification beep sound.
 
+**Important**: This endpoint requires a GET request, not POST. Earlier versions of this client library incorrectly used POST and would fail with HTTP 400 status.
+
 **Response:**
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -134,6 +136,7 @@ func main() {
 func main() {
     client := client.NewClient(config)
     
+    // Uses GET request (fixed in v2025.02+)
     err := client.PlayNotificationBeep()
     if err != nil {
         log.Fatal(err)
