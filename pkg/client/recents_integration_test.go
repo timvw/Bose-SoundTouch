@@ -85,6 +85,7 @@ func TestClient_GetRecents_Integration(t *testing.T) {
 		spotifyItems := response.GetSpotifyItems()
 		if len(spotifyItems) > 0 {
 			t.Logf("Spotify items: %d", len(spotifyItems))
+
 			for i, item := range spotifyItems {
 				if i < 3 { // Show first 3
 					t.Logf("  - %s", item.GetDisplayName())
@@ -135,6 +136,7 @@ func TestClient_GetRecents_Integration(t *testing.T) {
 
 		// Show all items with details
 		t.Log("\nAll recent items:")
+
 		for i, item := range response.Items {
 			if i >= 10 { // Limit to first 10 items to avoid spam
 				t.Logf("  ... and %d more items", len(response.Items)-i)
@@ -147,6 +149,7 @@ func TestClient_GetRecents_Integration(t *testing.T) {
 			utcTime := item.GetUTCTime()
 
 			timeStr := ""
+
 			if utcTime > 0 {
 				playTime := time.Unix(utcTime, 0)
 				timeStr = playTime.Format("2006-01-02 15:04:05")
@@ -214,9 +217,11 @@ func TestClient_GetRecents_ErrorConditions(t *testing.T) {
 		if err == nil {
 			t.Error("expected error for invalid host, got nil")
 		}
+
 		if response != nil {
 			t.Error("expected nil response for invalid host, got non-nil")
 		}
+
 		t.Logf("Expected error for invalid host: %v", err)
 	})
 
@@ -237,9 +242,11 @@ func TestClient_GetRecents_ErrorConditions(t *testing.T) {
 		if err == nil {
 			t.Log("Warning: expected timeout error, but request succeeded")
 		}
+
 		if response != nil && err != nil {
 			t.Error("got both response and error")
 		}
+
 		t.Logf("Timeout test result - error: %v, response nil: %t", err, response == nil)
 	})
 }
@@ -278,6 +285,7 @@ func ExampleClient_GetRecents() {
 	spotifyItems := response.GetSpotifyItems()
 	if len(spotifyItems) > 0 {
 		println("Recent Spotify tracks:")
+
 		for _, item := range spotifyItems {
 			println("-", item.GetDisplayName())
 		}
@@ -316,10 +324,12 @@ func ExampleRecentsResponse_filtering() {
 
 	// Get items from streaming services only
 	streamingItems := 0
+
 	for _, item := range response.Items {
 		if item.IsStreamingContent() {
 			streamingItems++
 		}
 	}
+
 	println("Streaming service items:", streamingItems)
 }

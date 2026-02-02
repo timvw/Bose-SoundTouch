@@ -1,3 +1,4 @@
+// Package main demonstrates content selection functionality for Bose SoundTouch devices.
 package main
 
 import (
@@ -41,35 +42,41 @@ func main() {
 func demonstrateContentSelection(c *client.Client) error {
 	// 1. Demonstrate LOCAL_INTERNET_RADIO with streamUrl format
 	fmt.Println("📻 Step 1: Demonstrating LOCAL_INTERNET_RADIO with streamUrl format...")
+
 	if err := demoLocalInternetRadioStreamUrl(c); err != nil {
 		return fmt.Errorf("failed LOCAL_INTERNET_RADIO demo: %w", err)
 	}
 
 	// Wait and show what's playing
 	time.Sleep(3 * time.Second)
+
 	if err := showNowPlaying(c); err != nil {
 		fmt.Printf("⚠️  Could not get now playing: %v\n", err)
 	}
 
 	// 2. Demonstrate LOCAL_INTERNET_RADIO with direct stream
 	fmt.Println("\n📻 Step 2: Demonstrating LOCAL_INTERNET_RADIO with direct stream...")
+
 	if err := demoLocalInternetRadioDirect(c); err != nil {
 		return fmt.Errorf("failed direct stream demo: %w", err)
 	}
 
 	// Wait and show what's playing
 	time.Sleep(3 * time.Second)
+
 	if err := showNowPlaying(c); err != nil {
 		fmt.Printf("⚠️  Could not get now playing: %v\n", err)
 	}
 
 	// 3. Demonstrate LOCAL_MUSIC selection
 	fmt.Println("\n💿 Step 3: Demonstrating LOCAL_MUSIC selection...")
+
 	if err := demoLocalMusic(c); err != nil {
 		fmt.Printf("⚠️  LOCAL_MUSIC demo failed (this requires SoundTouch App Media Server): %v\n", err)
 	} else {
 		// Wait and show what's playing
 		time.Sleep(3 * time.Second)
+
 		if err := showNowPlaying(c); err != nil {
 			fmt.Printf("⚠️  Could not get now playing: %v\n", err)
 		}
@@ -77,11 +84,13 @@ func demonstrateContentSelection(c *client.Client) error {
 
 	// 4. Demonstrate STORED_MUSIC selection
 	fmt.Println("\n💾 Step 4: Demonstrating STORED_MUSIC selection...")
+
 	if err := demoStoredMusic(c); err != nil {
 		fmt.Printf("⚠️  STORED_MUSIC demo failed (this requires UPnP/DLNA media server): %v\n", err)
 	} else {
 		// Wait and show what's playing
 		time.Sleep(3 * time.Second)
+
 		if err := showNowPlaying(c); err != nil {
 			fmt.Printf("⚠️  Could not get now playing: %v\n", err)
 		}
@@ -89,12 +98,14 @@ func demonstrateContentSelection(c *client.Client) error {
 
 	// 5. Demonstrate generic ContentItem selection
 	fmt.Println("\n🎯 Step 5: Demonstrating generic ContentItem selection...")
+
 	if err := demoGenericContentItem(c); err != nil {
 		return fmt.Errorf("failed generic ContentItem demo: %w", err)
 	}
 
 	// Wait and show what's playing
 	time.Sleep(3 * time.Second)
+
 	if err := showNowPlaying(c); err != nil {
 		fmt.Printf("⚠️  Could not get now playing: %v\n", err)
 	}
@@ -120,6 +131,7 @@ func demoLocalInternetRadioStreamUrl(c *client.Client) error {
 	}
 
 	fmt.Printf("  ✅ Successfully selected internet radio with streamUrl format\n")
+
 	return nil
 }
 
@@ -139,6 +151,7 @@ func demoLocalInternetRadioDirect(c *client.Client) error {
 	}
 
 	fmt.Printf("  ✅ Successfully selected direct internet radio stream\n")
+
 	return nil
 }
 
@@ -162,6 +175,7 @@ func demoLocalMusic(c *client.Client) error {
 	}
 
 	fmt.Printf("  ✅ Successfully selected local music content\n")
+
 	return nil
 }
 
@@ -184,6 +198,7 @@ func demoStoredMusic(c *client.Client) error {
 	}
 
 	fmt.Printf("  ✅ Successfully selected stored music content\n")
+
 	return nil
 }
 
@@ -211,6 +226,7 @@ func demoGenericContentItem(c *client.Client) error {
 	}
 
 	fmt.Printf("  ✅ Successfully selected content using ContentItem\n")
+
 	return nil
 }
 

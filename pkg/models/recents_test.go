@@ -97,12 +97,14 @@ func TestRecentsResponse_Unmarshal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var response RecentsResponse
+
 			err := xml.Unmarshal([]byte(tt.xmlData), &response)
 
 			if tt.expectError {
 				if err == nil {
 					t.Error("expected error, got nil")
 				}
+
 				return
 			}
 
@@ -126,9 +128,11 @@ func TestRecentsResponse_Unmarshal(t *testing.T) {
 				if actualItem.DeviceID != expectedItem.DeviceID {
 					t.Errorf("item %d: expected deviceID %s, got %s", i, expectedItem.DeviceID, actualItem.DeviceID)
 				}
+
 				if actualItem.UTCTime != expectedItem.UTCTime {
 					t.Errorf("item %d: expected utcTime %d, got %d", i, expectedItem.UTCTime, actualItem.UTCTime)
 				}
+
 				if actualItem.ID != expectedItem.ID {
 					t.Errorf("item %d: expected id %s, got %s", i, expectedItem.ID, actualItem.ID)
 				}
@@ -143,15 +147,19 @@ func TestRecentsResponse_Unmarshal(t *testing.T) {
 					if actualItem.ContentItem.Source != expectedItem.ContentItem.Source {
 						t.Errorf("item %d: expected source %s, got %s", i, expectedItem.ContentItem.Source, actualItem.ContentItem.Source)
 					}
+
 					if actualItem.ContentItem.Type != expectedItem.ContentItem.Type {
 						t.Errorf("item %d: expected type %s, got %s", i, expectedItem.ContentItem.Type, actualItem.ContentItem.Type)
 					}
+
 					if actualItem.ContentItem.Location != expectedItem.ContentItem.Location {
 						t.Errorf("item %d: expected location %s, got %s", i, expectedItem.ContentItem.Location, actualItem.ContentItem.Location)
 					}
+
 					if actualItem.ContentItem.ItemName != expectedItem.ContentItem.ItemName {
 						t.Errorf("item %d: expected itemName %s, got %s", i, expectedItem.ContentItem.ItemName, actualItem.ContentItem.ItemName)
 					}
+
 					if actualItem.ContentItem.IsPresetable != expectedItem.ContentItem.IsPresetable {
 						t.Errorf("item %d: expected isPresetable %t, got %t", i, expectedItem.ContentItem.IsPresetable, actualItem.ContentItem.IsPresetable)
 					}
@@ -299,42 +307,56 @@ func TestRecentItem_Methods(t *testing.T) {
 				},
 			},
 			test: func(t *testing.T, item *RecentsResponseItem) {
+				t.Helper()
+
 				if !item.HasContent() {
 					t.Error("expected HasContent() to return true")
 				}
+
 				if item.GetDisplayName() != "Test Song" {
 					t.Errorf("expected display name 'Test Song', got %s", item.GetDisplayName())
 				}
+
 				if item.GetSource() != "SPOTIFY" {
 					t.Errorf("expected source 'SPOTIFY', got %s", item.GetSource())
 				}
+
 				if !item.IsTrack() {
 					t.Error("expected IsTrack() to return true")
 				}
+
 				if !item.IsSpotifyContent() {
 					t.Error("expected IsSpotifyContent() to return true")
 				}
+
 				if !item.IsStreamingContent() {
 					t.Error("expected IsStreamingContent() to return true")
 				}
+
 				if item.IsLocalContent() {
 					t.Error("expected IsLocalContent() to return false")
 				}
+
 				if !item.IsPresetable() {
 					t.Error("expected IsPresetable() to return true")
 				}
+
 				if !item.HasArtwork() {
 					t.Error("expected HasArtwork() to return true")
 				}
+
 				if item.GetArtwork() != "https://example.com/art.jpg" {
 					t.Errorf("expected artwork URL, got %s", item.GetArtwork())
 				}
+
 				if item.GetUTCTime() != 1701200000 {
 					t.Errorf("expected UTC time 1701200000, got %d", item.GetUTCTime())
 				}
+
 				if !item.HasID() {
 					t.Error("expected HasID() to return true")
 				}
+
 				if item.GetID() != "spotify123" {
 					t.Errorf("expected ID 'spotify123', got %s", item.GetID())
 				}
@@ -354,18 +376,24 @@ func TestRecentItem_Methods(t *testing.T) {
 				},
 			},
 			test: func(t *testing.T, item *RecentsResponseItem) {
+				t.Helper()
+
 				if !item.IsLocalContent() {
 					t.Error("expected IsLocalContent() to return true")
 				}
+
 				if item.IsStreamingContent() {
 					t.Error("expected IsStreamingContent() to return false")
 				}
+
 				if item.IsSpotifyContent() {
 					t.Error("expected IsSpotifyContent() to return false")
 				}
+
 				if item.HasArtwork() {
 					t.Error("expected HasArtwork() to return false")
 				}
+
 				if item.GetArtwork() != "" {
 					t.Errorf("expected empty artwork, got %s", item.GetArtwork())
 				}
@@ -385,12 +413,16 @@ func TestRecentItem_Methods(t *testing.T) {
 				},
 			},
 			test: func(t *testing.T, item *RecentsResponseItem) {
+				t.Helper()
+
 				if !item.IsStation() {
 					t.Error("expected IsStation() to return true")
 				}
+
 				if item.IsTrack() {
 					t.Error("expected IsTrack() to return false")
 				}
+
 				if !item.IsStreamingContent() {
 					t.Error("expected IsStreamingContent() to return true")
 				}
@@ -403,21 +435,28 @@ func TestRecentItem_Methods(t *testing.T) {
 				UTCTime:  1701000000,
 			},
 			test: func(t *testing.T, item *RecentsResponseItem) {
+				t.Helper()
+
 				if item.HasContent() {
 					t.Error("expected HasContent() to return false")
 				}
+
 				if item.GetDisplayName() != "Unknown Item" {
 					t.Errorf("expected display name 'Unknown Item', got %s", item.GetDisplayName())
 				}
+
 				if item.GetSource() != "" {
 					t.Errorf("expected empty source, got %s", item.GetSource())
 				}
+
 				if item.IsTrack() {
 					t.Error("expected IsTrack() to return false")
 				}
+
 				if item.IsPresetable() {
 					t.Error("expected IsPresetable() to return false")
 				}
+
 				if item.HasID() {
 					t.Error("expected HasID() to return false")
 				}

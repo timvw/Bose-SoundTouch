@@ -238,6 +238,7 @@ func selectLocalInternetRadio(c *cli.Context) error {
 	if itemName != "" {
 		fmt.Printf("  Station: %s\n", itemName)
 	}
+
 	fmt.Printf("  Location: %s\n", location)
 
 	err = client.SelectLocalInternetRadio(location, sourceAccount, itemName, containerArt)
@@ -283,6 +284,7 @@ func selectLocalMusic(c *cli.Context) error {
 	if itemName != "" {
 		fmt.Printf("  Content: %s\n", itemName)
 	}
+
 	fmt.Printf("  Location: %s\n", location)
 	fmt.Printf("  Account: %s\n", sourceAccount)
 
@@ -329,6 +331,7 @@ func selectStoredMusic(c *cli.Context) error {
 	if itemName != "" {
 		fmt.Printf("  Content: %s\n", itemName)
 	}
+
 	fmt.Printf("  Location: %s\n", location)
 	fmt.Printf("  Account: %s\n", sourceAccount)
 
@@ -401,12 +404,15 @@ func selectContent(c *cli.Context) error {
 
 	fmt.Printf("  Source: %s\n", source)
 	fmt.Printf("  Location: %s\n", location)
+
 	if sourceAccount != "" {
 		fmt.Printf("  Account: %s\n", sourceAccount)
 	}
+
 	if itemName != "" {
 		fmt.Printf("  Name: %s\n", itemName)
 	}
+
 	if itemType != "" {
 		fmt.Printf("  Type: %s\n", itemType)
 	}

@@ -172,6 +172,7 @@ func TestClient_GetRecents(t *testing.T) {
 				if r.Method != "GET" {
 					t.Errorf("expected GET request, got %s", r.Method)
 				}
+
 				if r.URL.Path != "/recents" {
 					t.Errorf("expected /recents path, got %s", r.URL.Path)
 				}
@@ -183,7 +184,7 @@ func TestClient_GetRecents(t *testing.T) {
 
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(tt.responseXML))
+				_, _ = w.Write([]byte(tt.responseXML))
 			}))
 			defer server.Close()
 
@@ -202,9 +203,11 @@ func TestClient_GetRecents(t *testing.T) {
 					t.Errorf("expected error containing %q, got nil", tt.expectedError)
 					return
 				}
+
 				if !containsString(err.Error(), tt.expectedError) {
 					t.Errorf("expected error containing %q, got %q", tt.expectedError, err.Error())
 				}
+
 				return
 			}
 
@@ -234,9 +237,11 @@ func TestClient_GetRecents(t *testing.T) {
 				if actualItem.DeviceID != expectedItem.DeviceID {
 					t.Errorf("item %d: expected deviceID %s, got %s", i, expectedItem.DeviceID, actualItem.DeviceID)
 				}
+
 				if actualItem.UTCTime != expectedItem.UTCTime {
 					t.Errorf("item %d: expected utcTime %d, got %d", i, expectedItem.UTCTime, actualItem.UTCTime)
 				}
+
 				if actualItem.ID != expectedItem.ID {
 					t.Errorf("item %d: expected id %s, got %s", i, expectedItem.ID, actualItem.ID)
 				}
@@ -251,18 +256,23 @@ func TestClient_GetRecents(t *testing.T) {
 					if actualItem.ContentItem.Source != expectedItem.ContentItem.Source {
 						t.Errorf("item %d: expected source %s, got %s", i, expectedItem.ContentItem.Source, actualItem.ContentItem.Source)
 					}
+
 					if actualItem.ContentItem.Type != expectedItem.ContentItem.Type {
 						t.Errorf("item %d: expected type %s, got %s", i, expectedItem.ContentItem.Type, actualItem.ContentItem.Type)
 					}
+
 					if actualItem.ContentItem.Location != expectedItem.ContentItem.Location {
 						t.Errorf("item %d: expected location %s, got %s", i, expectedItem.ContentItem.Location, actualItem.ContentItem.Location)
 					}
+
 					if actualItem.ContentItem.ItemName != expectedItem.ContentItem.ItemName {
 						t.Errorf("item %d: expected itemName %s, got %s", i, expectedItem.ContentItem.ItemName, actualItem.ContentItem.ItemName)
 					}
+
 					if actualItem.ContentItem.IsPresetable != expectedItem.ContentItem.IsPresetable {
 						t.Errorf("item %d: expected isPresetable %t, got %t", i, expectedItem.ContentItem.IsPresetable, actualItem.ContentItem.IsPresetable)
 					}
+
 					if actualItem.ContentItem.ContainerArt != expectedItem.ContentItem.ContainerArt {
 						t.Errorf("item %d: expected containerArt %s, got %s", i, expectedItem.ContentItem.ContainerArt, actualItem.ContentItem.ContainerArt)
 					}
@@ -300,6 +310,7 @@ func TestRecentsResponse_MethodsIntegration(t *testing.T) {
 </recents>`
 
 	var response models.RecentsResponse
+
 	err := xml.Unmarshal([]byte(xmlData), &response)
 	if err != nil {
 		t.Fatalf("failed to unmarshal test data: %v", err)
@@ -339,6 +350,7 @@ func TestRecentsResponse_MethodsIntegration(t *testing.T) {
 		if mostRecent.GetDisplayName() != "Spotify Track" {
 			t.Errorf("expected most recent to be 'Spotify Track', got %s", mostRecent.GetDisplayName())
 		}
+
 		if mostRecent.GetUTCTime() != 1701300000 {
 			t.Errorf("expected most recent UTC time 1701300000, got %d", mostRecent.GetUTCTime())
 		}
@@ -350,12 +362,15 @@ func TestRecentsResponse_MethodsIntegration(t *testing.T) {
 			if !item.HasContent() {
 				t.Error("expected item to have content")
 			}
+
 			if item.GetDisplayName() == "" {
 				t.Error("expected item to have display name")
 			}
+
 			if item.GetSource() == "" {
 				t.Error("expected item to have source")
 			}
+
 			if item.GetUTCTime() == 0 {
 				t.Error("expected item to have UTC time")
 			}
@@ -366,9 +381,11 @@ func TestRecentsResponse_MethodsIntegration(t *testing.T) {
 				if !item.IsSpotifyContent() {
 					t.Error("expected first item to be Spotify content")
 				}
+
 				if !item.IsTrack() {
 					t.Error("expected first item to be a track")
 				}
+
 				if !item.IsStreamingContent() {
 					t.Error("expected first item to be streaming content")
 				}
@@ -376,6 +393,7 @@ func TestRecentsResponse_MethodsIntegration(t *testing.T) {
 				if !item.IsLocalContent() {
 					t.Error("expected second item to be local content")
 				}
+
 				if item.IsStreamingContent() {
 					t.Error("expected second item to not be streaming content")
 				}
@@ -383,6 +401,7 @@ func TestRecentsResponse_MethodsIntegration(t *testing.T) {
 				if !item.IsStation() {
 					t.Error("expected third item to be a station")
 				}
+
 				if item.IsTrack() {
 					t.Error("expected third item to not be a track")
 				}

@@ -1720,6 +1720,285 @@ func main() {
 					},
 				},
 			},
+			// Account management commands
+			{
+				Name:    "account",
+				Aliases: []string{"acc"},
+				Usage:   "Music service account management commands",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "list",
+						Usage:  "List configured music service accounts",
+						Action: listMusicServiceAccounts,
+						Before: RequireHost,
+					},
+					{
+						Name:   "add",
+						Usage:  "Add a music service account",
+						Action: addMusicServiceAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source",
+								Aliases:  []string{"s"},
+								Usage:    "Music service source (SPOTIFY, PANDORA, AMAZON, DEEZER, IHEART, STORED_MUSIC)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "Username or account identifier",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:    "password",
+								Aliases: []string{"p"},
+								Usage:   "Account password (not required for STORED_MUSIC)",
+							},
+							&cli.StringFlag{
+								Name:    "name",
+								Aliases: []string{"n"},
+								Usage:   "Display name for the service",
+							},
+						},
+					},
+					{
+						Name:   "remove",
+						Usage:  "Remove a music service account",
+						Action: removeMusicServiceAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source",
+								Aliases:  []string{"s"},
+								Usage:    "Music service source (SPOTIFY, PANDORA, AMAZON, DEEZER, IHEART, STORED_MUSIC)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "Username or account identifier",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:    "name",
+								Aliases: []string{"n"},
+								Usage:   "Display name for the service",
+							},
+						},
+					},
+					{
+						Name:   "add-spotify",
+						Usage:  "Add a Spotify Premium account",
+						Action: addSpotifyAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "Spotify username/email",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "password",
+								Aliases:  []string{"p"},
+								Usage:    "Spotify password",
+								Required: true,
+							},
+						},
+					},
+					{
+						Name:   "remove-spotify",
+						Usage:  "Remove a Spotify account",
+						Action: removeSpotifyAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "Spotify username/email to remove",
+								Required: true,
+							},
+						},
+					},
+					{
+						Name:   "add-pandora",
+						Usage:  "Add a Pandora account",
+						Action: addPandoraAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "Pandora username",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "password",
+								Aliases:  []string{"p"},
+								Usage:    "Pandora password",
+								Required: true,
+							},
+						},
+					},
+					{
+						Name:   "remove-pandora",
+						Usage:  "Remove a Pandora account",
+						Action: removePandoraAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "Pandora username to remove",
+								Required: true,
+							},
+						},
+					},
+					{
+						Name:   "add-nas",
+						Usage:  "Add a network music library (NAS/UPnP)",
+						Action: addStoredMusicAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "UPnP server GUID with /0 suffix (e.g., d09708a1-5953-44bc-a413-123456789012/0)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:    "name",
+								Aliases: []string{"n"},
+								Usage:   "Display name for the music library",
+								Value:   "Network Music Library",
+							},
+						},
+					},
+					{
+						Name:   "remove-nas",
+						Usage:  "Remove a network music library",
+						Action: removeStoredMusicAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "UPnP server GUID with /0 suffix to remove",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:    "name",
+								Aliases: []string{"n"},
+								Usage:   "Display name for the music library",
+								Value:   "Network Music Library",
+							},
+						},
+					},
+					{
+						Name:   "add-amazon",
+						Usage:  "Add an Amazon Music account",
+						Action: addAmazonMusicAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "Amazon Music username",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "password",
+								Aliases:  []string{"p"},
+								Usage:    "Amazon Music password",
+								Required: true,
+							},
+						},
+					},
+					{
+						Name:   "remove-amazon",
+						Usage:  "Remove an Amazon Music account",
+						Action: removeAmazonMusicAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "Amazon Music username to remove",
+								Required: true,
+							},
+						},
+					},
+					{
+						Name:   "add-deezer",
+						Usage:  "Add a Deezer Premium account",
+						Action: addDeezerAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "Deezer username",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "password",
+								Aliases:  []string{"p"},
+								Usage:    "Deezer password",
+								Required: true,
+							},
+						},
+					},
+					{
+						Name:   "remove-deezer",
+						Usage:  "Remove a Deezer account",
+						Action: removeDeezerAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "Deezer username to remove",
+								Required: true,
+							},
+						},
+					},
+					{
+						Name:   "add-iheart",
+						Usage:  "Add an iHeartRadio account",
+						Action: addIHeartRadioAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "iHeartRadio username",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "password",
+								Aliases:  []string{"p"},
+								Usage:    "iHeartRadio password",
+								Required: true,
+							},
+						},
+					},
+					{
+						Name:   "remove-iheart",
+						Usage:  "Remove an iHeartRadio account",
+						Action: removeIHeartRadioAccount,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "iHeartRadio username to remove",
+								Required: true,
+							},
+						},
+					},
+				},
+			},
 			// Token commands
 			{
 				Name:    "token",

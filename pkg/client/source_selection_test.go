@@ -632,9 +632,11 @@ func TestClient_SelectContentItem(t *testing.T) {
 				if r.URL.Path != "/select" {
 					t.Errorf("Expected path /select, got %s", r.URL.Path)
 				}
+
 				if r.Method != "POST" {
 					t.Errorf("Expected POST method, got %s", r.Method)
 				}
+
 				w.WriteHeader(http.StatusOK)
 			}))
 			defer server.Close()
@@ -713,6 +715,7 @@ func TestClient_SelectLocalInternetRadio(t *testing.T) {
 				if r.URL.Path != "/select" {
 					t.Errorf("Expected path /select, got %s", r.URL.Path)
 				}
+
 				w.WriteHeader(http.StatusOK)
 			}))
 			defer server.Close()
@@ -791,6 +794,7 @@ func TestClient_SelectLocalMusic(t *testing.T) {
 				if r.URL.Path != "/select" {
 					t.Errorf("Expected path /select, got %s", r.URL.Path)
 				}
+
 				w.WriteHeader(http.StatusOK)
 			}))
 			defer server.Close()
@@ -869,6 +873,7 @@ func TestClient_SelectStoredMusic(t *testing.T) {
 				if r.URL.Path != "/select" {
 					t.Errorf("Expected path /select, got %s", r.URL.Path)
 				}
+
 				w.WriteHeader(http.StatusOK)
 			}))
 			defer server.Close()

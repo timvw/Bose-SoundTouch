@@ -62,9 +62,11 @@ func TestClient_Introspect_Integration(t *testing.T) {
 		if response.SupportsSkipPrevious() {
 			t.Log("Spotify supports skip previous")
 		}
+
 		if response.SupportsSeek() {
 			t.Log("Spotify supports seek")
 		}
+
 		if response.SupportsResume() {
 			t.Log("Spotify supports resume")
 		}
@@ -110,6 +112,7 @@ func TestClient_Introspect_Integration(t *testing.T) {
 		// Test Pandora if available
 		if serviceAvailability.HasPandora() {
 			t.Log("Testing Pandora introspect...")
+
 			response, err := client.Introspect("PANDORA", "")
 			if err != nil {
 				t.Logf("Pandora introspect failed (expected for some configurations): %v", err)
@@ -121,6 +124,7 @@ func TestClient_Introspect_Integration(t *testing.T) {
 		// Test TuneIn if available
 		if serviceAvailability.HasTuneIn() {
 			t.Log("Testing TuneIn introspect...")
+
 			response, err := client.Introspect("TUNEIN", "")
 			if err != nil {
 				t.Logf("TuneIn introspect failed (expected for some configurations): %v", err)
@@ -153,9 +157,11 @@ func TestClient_Introspect_ErrorCases_Integration(t *testing.T) {
 		if err == nil {
 			t.Error("expected error for invalid source, got nil")
 		}
+
 		if response != nil {
 			t.Error("expected nil response for invalid source, got non-nil")
 		}
+
 		t.Logf("Expected error for invalid source: %v", err)
 	})
 
@@ -165,6 +171,7 @@ func TestClient_Introspect_ErrorCases_Integration(t *testing.T) {
 		if err == nil {
 			t.Error("expected error for empty source, got nil")
 		}
+
 		if response != nil {
 			t.Error("expected nil response for empty source, got non-nil")
 		}
@@ -188,6 +195,7 @@ func ExampleClient_Introspect() {
 	// Check service state
 	if response.IsActive() {
 		println("Spotify service is active")
+
 		if response.IsPlaying {
 			println("Currently playing:", response.CurrentURI)
 		}
@@ -199,6 +207,7 @@ func ExampleClient_Introspect() {
 	if response.SupportsSeek() {
 		println("Seek is supported")
 	}
+
 	if response.SupportsSkipPrevious() {
 		println("Skip previous is supported")
 	}
@@ -222,6 +231,7 @@ func ExampleClient_IntrospectSpotify() {
 	if response.HasUser() {
 		println("Spotify user:", response.User)
 	}
+
 	if response.HasSubscription() {
 		println("Subscription type:", response.SubscriptionType)
 	}

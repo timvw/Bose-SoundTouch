@@ -6,32 +6,9 @@ import (
 	"testing"
 
 	"github.com/gesellix/bose-soundtouch/pkg/models"
-	"github.com/urfave/cli/v2"
 )
 
 func TestIntrospectCommands(t *testing.T) {
-	// Test data - would be used in full integration tests
-	_ = &models.IntrospectResponse{
-		State:                       "Active",
-		User:                        "test_user",
-		IsPlaying:                   true,
-		ShuffleMode:                 "ON",
-		CurrentURI:                  "spotify://track/123",
-		SubscriptionType:            "Premium",
-		TokenLastChangedTimeSeconds: 1702566495,
-		PlayStatusState:             "2",
-		ReceivedPlaybackRequest:     false,
-		NowPlaying: &models.IntrospectNowPlaying{
-			SkipPreviousSupported: true,
-			SeekSupported:         true,
-			ResumeSupported:       true,
-			CollectData:           false,
-		},
-		ContentItemHistory: &models.ContentItemHistory{
-			MaxSize: 15,
-		},
-	}
-
 	tests := []struct {
 		name           string
 		args           []string
@@ -191,9 +168,11 @@ func TestPrintIntrospectBasicInfo(t *testing.T) {
 
 			// Restore stdout and read output
 			w.Close()
+
 			os.Stdout = oldStdout
 
 			var buf bytes.Buffer
+
 			_, err := buf.ReadFrom(r)
 			if err != nil {
 				t.Fatalf("failed to read output: %v", err)
@@ -212,9 +191,11 @@ func TestPrintIntrospectBasicInfo(t *testing.T) {
 			if tt.response.User == "" && containsSubstring(output, "User:") {
 				t.Error("expected no user information when user is empty")
 			}
+
 			if tt.response.CurrentURI == "" && containsSubstring(output, "Current Content:") {
 				t.Error("expected no current content when URI is empty")
 			}
+
 			if tt.response.SubscriptionType == "" && containsSubstring(output, "Subscription Type:") {
 				t.Error("expected no subscription information when type is empty")
 			}
@@ -281,9 +262,11 @@ func TestPrintIntrospectServiceState(t *testing.T) {
 
 			// Restore stdout and read output
 			w.Close()
+
 			os.Stdout = oldStdout
 
 			var buf bytes.Buffer
+
 			_, err := buf.ReadFrom(r)
 			if err != nil {
 				t.Fatalf("failed to read output: %v", err)
@@ -367,9 +350,11 @@ func TestPrintIntrospectCapabilities(t *testing.T) {
 
 			// Restore stdout and read output
 			w.Close()
+
 			os.Stdout = oldStdout
 
 			var buf bytes.Buffer
+
 			_, err := buf.ReadFrom(r)
 			if err != nil {
 				t.Fatalf("failed to read output: %v", err)
@@ -441,9 +426,11 @@ func TestPrintIntrospectSummary(t *testing.T) {
 
 			// Restore stdout and read output
 			w.Close()
+
 			os.Stdout = oldStdout
 
 			var buf bytes.Buffer
+
 			_, err := buf.ReadFrom(r)
 			if err != nil {
 				t.Fatalf("failed to read output: %v", err)
@@ -492,34 +479,4 @@ func TestFormatBooleanStatus(t *testing.T) {
 // Helper function to check if output contains a substring
 func containsSubstring(output, substring string) bool {
 	return bytes.Contains([]byte(output), []byte(substring))
-}
-
-// createTestApp creates a test CLI application for integration testing
-func createTestApp() *cli.App {
-	// This would create a minimal CLI app for testing
-	// In a real implementation, you'd want to create a version of the main app
-	// but with mock HTTP clients instead of real ones
-	app := &cli.App{
-		Name: "test-soundtouch-cli",
-		Commands: []*cli.Command{
-			{
-				Name: "source",
-				Subcommands: []*cli.Command{
-					{
-						Name:   "introspect",
-						Action: introspectService,
-					},
-					{
-						Name:   "introspect-spotify",
-						Action: introspectSpotify,
-					},
-					{
-						Name:   "introspect-all",
-						Action: introspectAllServices,
-					},
-				},
-			},
-		},
-	}
-	return app
 }

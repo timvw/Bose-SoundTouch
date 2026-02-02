@@ -28,6 +28,7 @@ func getRecents(c *cli.Context) error {
 	if response.IsEmpty() {
 		fmt.Printf("📭 No recent items found\n")
 		fmt.Printf("💡 Play some content to populate the recent items list\n")
+
 		return nil
 	}
 
@@ -45,6 +46,7 @@ func getRecents(c *cli.Context) error {
 	}
 
 	fmt.Printf("   By Source:\n")
+
 	for source, count := range sources {
 		if count > 0 {
 			fmt.Printf("     • %s: %d items\n", source, count)
@@ -58,15 +60,19 @@ func getRecents(c *cli.Context) error {
 	presetable := len(response.GetPresetableItems())
 
 	fmt.Printf("   By Type:\n")
+
 	if tracks > 0 {
 		fmt.Printf("     • 🎵 Tracks: %d\n", tracks)
 	}
+
 	if stations > 0 {
 		fmt.Printf("     • 📻 Stations: %d\n", stations)
 	}
+
 	if playlists > 0 {
 		fmt.Printf("     • 📋 Playlists/Albums: %d\n", playlists)
 	}
+
 	if presetable > 0 {
 		fmt.Printf("     • ⭐ Presetable: %d\n", presetable)
 	}
@@ -91,6 +97,73 @@ func getRecents(c *cli.Context) error {
 }
 
 // getRecentsFiltered handles getting filtered recent content
+// buildFilterDescription creates a description string for the applied filters
+func buildFilterDescription(source, contentType string) string {
+	switch {
+	case source != "" && contentType != "":
+		return fmt.Sprintf(" (filtered by source: %s, type: %s)", source, contentType)
+	case source != "":
+		return fmt.Sprintf(" (filtered by source: %s)", source)
+	case contentType != "":
+		return fmt.Sprintf(" (filtered by type: %s)", contentType)
+	default:
+		return ""
+	}
+}
+
+// applyContentTypeFilter filters items by content type
+func applyContentTypeFilter(items []models.RecentsResponseItem, contentType string) []models.RecentsResponseItem {
+	if contentType == "" {
+		return items
+	}
+
+	var typeFiltered []models.RecentsResponseItem
+
+	for _, item := range items {
+		if shouldIncludeItemByType(item, contentType) {
+			typeFiltered = append(typeFiltered, item)
+		}
+	}
+
+	return typeFiltered
+}
+
+// shouldIncludeItemByType checks if an item matches the specified content type
+func shouldIncludeItemByType(item models.RecentsResponseItem, contentType string) bool {
+	switch contentType {
+	case "track", "tracks":
+		return item.IsTrack()
+	case "station", "stations":
+		return item.IsStation()
+	case "playlist", "playlists":
+		return item.IsPlaylist()
+	case "album", "albums":
+		return item.IsAlbum()
+	case "container", "containers":
+		return item.IsContainer()
+	case "presetable":
+		return item.IsPresetable()
+	default:
+		return false
+	}
+}
+
+// displayFilteredResults prints the filtered recent items
+func displayFilteredResults(filteredItems []models.RecentsResponseItem, c *cli.Context) {
+	maxItems := c.Int("limit")
+	if maxItems <= 0 || maxItems > len(filteredItems) {
+		maxItems = len(filteredItems)
+	}
+
+	for i, item := range filteredItems[:maxItems] {
+		printRecentItem(i+1, &item, c.Bool("detailed"))
+	}
+
+	if len(filteredItems) > maxItems {
+		fmt.Printf("\n... and %d more items (use --limit to show more)\n", len(filteredItems)-maxItems)
+	}
+}
+
 func getRecentsFiltered(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
 
@@ -101,15 +174,7 @@ func getRecentsFiltered(c *cli.Context) error {
 
 	source := strings.ToUpper(c.String("source"))
 	contentType := strings.ToLower(c.String("type"))
-
-	filterDesc := ""
-	if source != "" && contentType != "" {
-		filterDesc = fmt.Sprintf(" (filtered by source: %s, type: %s)", source, contentType)
-	} else if source != "" {
-		filterDesc = fmt.Sprintf(" (filtered by source: %s)", source)
-	} else if contentType != "" {
-		filterDesc = fmt.Sprintf(" (filtered by type: %s)", contentType)
-	}
+	filterDesc := buildFilterDescription(source, contentType)
 
 	PrintDeviceHeader("Getting filtered recent content"+filterDesc, clientConfig.Host, clientConfig.Port)
 
@@ -123,9 +188,8 @@ func getRecentsFiltered(c *cli.Context) error {
 		return nil
 	}
 
-	// Apply filters
+	// Apply source filter
 	var filteredItems []models.RecentsResponseItem
-
 	if source != "" {
 		filteredItems = response.GetItemsBySource(source)
 	} else {
@@ -133,60 +197,17 @@ func getRecentsFiltered(c *cli.Context) error {
 	}
 
 	// Apply type filter
-	if contentType != "" {
-		var typeFiltered []models.RecentsResponseItem
-		for _, item := range filteredItems {
-			switch contentType {
-			case "track", "tracks":
-				if item.IsTrack() {
-					typeFiltered = append(typeFiltered, item)
-				}
-			case "station", "stations":
-				if item.IsStation() {
-					typeFiltered = append(typeFiltered, item)
-				}
-			case "playlist", "playlists":
-				if item.IsPlaylist() {
-					typeFiltered = append(typeFiltered, item)
-				}
-			case "album", "albums":
-				if item.IsAlbum() {
-					typeFiltered = append(typeFiltered, item)
-				}
-			case "container", "containers":
-				if item.IsContainer() {
-					typeFiltered = append(typeFiltered, item)
-				}
-			case "presetable":
-				if item.IsPresetable() {
-					typeFiltered = append(typeFiltered, item)
-				}
-			}
-		}
-		filteredItems = typeFiltered
-	}
+	filteredItems = applyContentTypeFilter(filteredItems, contentType)
 
 	if len(filteredItems) == 0 {
 		fmt.Printf("📭 No items match the specified filters\n")
 		fmt.Printf("💡 Try different filter criteria or check available content\n")
+
 		return nil
 	}
 
 	fmt.Printf("📊 Filtered Results: %d items\n\n", len(filteredItems))
-
-	// Display filtered items
-	maxItems := c.Int("limit")
-	if maxItems <= 0 || maxItems > len(filteredItems) {
-		maxItems = len(filteredItems)
-	}
-
-	for i, item := range filteredItems[:maxItems] {
-		printRecentItem(i+1, &item, c.Bool("detailed"))
-	}
-
-	if len(filteredItems) > maxItems {
-		fmt.Printf("\n... and %d more items (use --limit to show more)\n", len(filteredItems)-maxItems)
-	}
+	displayFilteredResults(filteredItems, c)
 
 	return nil
 }
@@ -236,8 +257,9 @@ func printRecentItem(index int, item *models.RecentsResponseItem, detailed bool)
 	fmt.Printf("   Source: %s", sourceDisplay)
 
 	if contentType != "" {
-		fmt.Printf(" | Type: %s", strings.Title(contentType))
+		fmt.Printf(" | Type: %s", contentType)
 	}
+
 	fmt.Printf("\n")
 
 	// Time information
@@ -275,9 +297,11 @@ func printRecentItem(index int, item *models.RecentsResponseItem, detailed bool)
 		if item.IsStreamingContent() {
 			classifications = append(classifications, "Streaming")
 		}
+
 		if item.IsLocalContent() {
 			classifications = append(classifications, "Local")
 		}
+
 		if len(classifications) > 0 {
 			fmt.Printf("   🏷️  Classification: %s\n", strings.Join(classifications, ", "))
 		}
@@ -288,18 +312,20 @@ func printRecentItem(index int, item *models.RecentsResponseItem, detailed bool)
 
 // getContentTypeIcon returns an emoji icon for the content type
 func getContentTypeIcon(item *models.RecentsResponseItem) string {
-	if item.IsTrack() {
+	switch {
+	case item.IsTrack():
 		return "🎵"
-	} else if item.IsStation() {
+	case item.IsStation():
 		return "📻"
-	} else if item.IsPlaylist() {
+	case item.IsPlaylist():
 		return "📋"
-	} else if item.IsAlbum() {
+	case item.IsAlbum():
 		return "💿"
-	} else if item.IsContainer() {
+	case item.IsContainer():
 		return "📁"
+	default:
+		return "🎶"
 	}
-	return "🎼"
 }
 
 // formatSourceForDisplay formats source names for user-friendly display
@@ -337,10 +363,132 @@ func truncateString(s string, maxLength int) string {
 	if len(s) <= maxLength {
 		return s
 	}
+
 	if maxLength <= 3 {
 		return "..."
 	}
+
 	return s[:maxLength-3] + "..."
+}
+
+// printBasicStats prints overall statistics about recent items
+func printBasicStats(response *models.RecentsResponse) {
+	fmt.Printf("Overall Statistics:\n")
+	fmt.Printf("  Total Items: %d\n", response.GetItemCount())
+
+	if !response.IsEmpty() {
+		mostRecent := response.GetMostRecent()
+		if mostRecent != nil {
+			lastPlayTime := time.Unix(mostRecent.GetUTCTime(), 0)
+			fmt.Printf("  Last Played: %s\n", lastPlayTime.Format("2006-01-02 15:04:05"))
+		}
+	}
+}
+
+// printSourceStats prints statistics broken down by source
+func printSourceStats(response *models.RecentsResponse) {
+	fmt.Printf("\nBy Source:\n")
+
+	sourceStats := map[string]int{
+		"Spotify":      len(response.GetSpotifyItems()),
+		"Pandora":      len(response.GetPandoraItems()),
+		"TuneIn":       len(response.GetTuneInItems()),
+		"Local Music":  len(response.GetLocalMusicItems()),
+		"Stored Music": len(response.GetStoredMusicItems()),
+	}
+
+	// Add other sources if they exist
+	otherSources := make(map[string]int)
+
+	for _, item := range response.Items {
+		source := item.GetSource()
+		found := false
+
+		for knownSource := range sourceStats {
+			if strings.Contains(strings.ToLower(knownSource), strings.ToLower(source)) ||
+				strings.Contains(strings.ToLower(source), strings.ToLower(knownSource)) {
+				found = true
+				break
+			}
+		}
+
+		if !found && source != "" {
+			otherSources[formatSourceForDisplay(source)]++
+		}
+	}
+
+	// Merge other sources
+	for source, count := range otherSources {
+		sourceStats[source] = count
+	}
+
+	for source, count := range sourceStats {
+		if count > 0 {
+			percentage := float64(count) / float64(response.GetItemCount()) * 100
+			fmt.Printf("  %-15s %3d items (%5.1f%%)\n", source+":", count, percentage)
+		}
+	}
+}
+
+// printContentTypeStats prints statistics broken down by content type
+func printContentTypeStats(response *models.RecentsResponse) {
+	fmt.Printf("\nBy Content Type:\n")
+
+	tracks := len(response.GetTracks())
+	stations := len(response.GetStations())
+	playlists := len(response.GetPlaylistsAndAlbums())
+
+	if tracks > 0 {
+		percentage := float64(tracks) / float64(response.GetItemCount()) * 100
+		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Tracks:", tracks, percentage)
+	}
+
+	if stations > 0 {
+		percentage := float64(stations) / float64(response.GetItemCount()) * 100
+		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Stations:", stations, percentage)
+	}
+
+	if playlists > 0 {
+		percentage := float64(playlists) / float64(response.GetItemCount()) * 100
+		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Playlists/Albums:", playlists, percentage)
+	}
+}
+
+// printSpecialCategoryStats prints statistics for special content categories
+func printSpecialCategoryStats(response *models.RecentsResponse) {
+	presetable := len(response.GetPresetableItems())
+	if presetable > 0 {
+		fmt.Printf("\nSpecial Categories:\n")
+
+		percentage := float64(presetable) / float64(response.GetItemCount()) * 100
+		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Presetable:", presetable, percentage)
+	}
+}
+
+// printSourceAnalysisStats prints streaming vs local content analysis
+func printSourceAnalysisStats(response *models.RecentsResponse) {
+	streamingCount := 0
+	localCount := 0
+
+	for _, item := range response.Items {
+		if item.IsStreamingContent() {
+			streamingCount++
+		} else if item.IsLocalContent() {
+			localCount++
+		}
+	}
+
+	fmt.Printf("\nSource Analysis:\n")
+
+	if streamingCount > 0 {
+		percentage := float64(streamingCount) / float64(response.GetItemCount()) * 100
+		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Streaming:", streamingCount, percentage)
+	}
+
+	if localCount > 0 {
+		percentage := float64(localCount) / float64(response.GetItemCount()) * 100
+		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Local:", localCount, percentage)
+	}
 }
 
 // recentsStats shows statistics about recent items
@@ -366,104 +514,11 @@ func recentsStats(c *cli.Context) error {
 
 	fmt.Printf("📊 Recent Items Statistics\n\n")
 
-	// Basic stats
-	fmt.Printf("Overall Statistics:\n")
-	fmt.Printf("  Total Items: %d\n", response.GetItemCount())
-
-	if !response.IsEmpty() {
-		mostRecent := response.GetMostRecent()
-		if mostRecent != nil {
-			lastPlayTime := time.Unix(mostRecent.GetUTCTime(), 0)
-			fmt.Printf("  Last Played: %s\n", lastPlayTime.Format("2006-01-02 15:04:05"))
-		}
-	}
-
-	// Source breakdown
-	fmt.Printf("\nBy Source:\n")
-	sourceStats := map[string]int{
-		"Spotify":      len(response.GetSpotifyItems()),
-		"Pandora":      len(response.GetPandoraItems()),
-		"TuneIn":       len(response.GetTuneInItems()),
-		"Local Music":  len(response.GetLocalMusicItems()),
-		"Stored Music": len(response.GetStoredMusicItems()),
-	}
-
-	// Add other sources if they exist
-	otherSources := make(map[string]int)
-	for _, item := range response.Items {
-		source := item.GetSource()
-		found := false
-		for knownSource := range sourceStats {
-			if strings.Contains(strings.ToLower(knownSource), strings.ToLower(source)) ||
-				strings.Contains(strings.ToLower(source), strings.ToLower(knownSource)) {
-				found = true
-				break
-			}
-		}
-		if !found && source != "" {
-			otherSources[formatSourceForDisplay(source)]++
-		}
-	}
-
-	// Merge other sources
-	for source, count := range otherSources {
-		sourceStats[source] = count
-	}
-
-	for source, count := range sourceStats {
-		if count > 0 {
-			percentage := float64(count) / float64(response.GetItemCount()) * 100
-			fmt.Printf("  %-15s %3d items (%5.1f%%)\n", source+":", count, percentage)
-		}
-	}
-
-	// Content type breakdown
-	fmt.Printf("\nBy Content Type:\n")
-	tracks := len(response.GetTracks())
-	stations := len(response.GetStations())
-	playlists := len(response.GetPlaylistsAndAlbums())
-
-	if tracks > 0 {
-		percentage := float64(tracks) / float64(response.GetItemCount()) * 100
-		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Tracks:", tracks, percentage)
-	}
-	if stations > 0 {
-		percentage := float64(stations) / float64(response.GetItemCount()) * 100
-		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Stations:", stations, percentage)
-	}
-	if playlists > 0 {
-		percentage := float64(playlists) / float64(response.GetItemCount()) * 100
-		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Playlists/Albums:", playlists, percentage)
-	}
-
-	// Special categories
-	presetable := len(response.GetPresetableItems())
-	if presetable > 0 {
-		fmt.Printf("\nSpecial Categories:\n")
-		percentage := float64(presetable) / float64(response.GetItemCount()) * 100
-		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Presetable:", presetable, percentage)
-	}
-
-	// Content source analysis
-	streamingCount := 0
-	localCount := 0
-	for _, item := range response.Items {
-		if item.IsStreamingContent() {
-			streamingCount++
-		} else if item.IsLocalContent() {
-			localCount++
-		}
-	}
-
-	fmt.Printf("\nSource Analysis:\n")
-	if streamingCount > 0 {
-		percentage := float64(streamingCount) / float64(response.GetItemCount()) * 100
-		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Streaming:", streamingCount, percentage)
-	}
-	if localCount > 0 {
-		percentage := float64(localCount) / float64(response.GetItemCount()) * 100
-		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Local:", localCount, percentage)
-	}
+	printBasicStats(response)
+	printSourceStats(response)
+	printContentTypeStats(response)
+	printSpecialCategoryStats(response)
+	printSourceAnalysisStats(response)
 
 	return nil
 }

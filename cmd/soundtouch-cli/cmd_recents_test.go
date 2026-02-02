@@ -9,33 +9,6 @@ import (
 )
 
 func TestRecentsCommands(t *testing.T) {
-	// Test data - would be used in full integration tests
-	_ = &models.RecentsResponse{
-		Items: []models.RecentsResponseItem{
-			{
-				DeviceID: "device1",
-				UTCTime:  1701200000,
-				ID:       "1",
-				ContentItem: &models.ContentItem{
-					Source:       "SPOTIFY",
-					Type:         "track",
-					ItemName:     "Test Song",
-					IsPresetable: true,
-				},
-			},
-			{
-				DeviceID: "device1",
-				UTCTime:  1701100000,
-				ID:       "2",
-				ContentItem: &models.ContentItem{
-					Source:   "LOCAL_MUSIC",
-					Type:     "track",
-					ItemName: "Local Song",
-				},
-			},
-		},
-	}
-
 	tests := []struct {
 		name           string
 		args           []string
@@ -182,9 +155,11 @@ func TestPrintRecentItem(t *testing.T) {
 
 			// Restore stdout and read output
 			w.Close()
+
 			os.Stdout = oldStdout
 
 			var buf bytes.Buffer
+
 			_, err := buf.ReadFrom(r)
 			if err != nil {
 				t.Fatalf("failed to read output: %v", err)

@@ -1844,3 +1844,135 @@ func (c *Client) GetRecents() (*models.RecentsResponse, error) {
 func (c *Client) postPlayInfo(playInfo *models.PlayInfo) error {
 	return c.post("/speaker", playInfo)
 }
+
+// SetMusicServiceAccount adds or updates a music service account
+func (c *Client) SetMusicServiceAccount(credentials *models.MusicServiceCredentials) error {
+	if credentials == nil {
+		return fmt.Errorf("credentials cannot be nil")
+	}
+
+	if err := credentials.Validate(); err != nil {
+		return fmt.Errorf("invalid credentials: %w", err)
+	}
+
+	var response models.MusicServiceAccountResponse
+
+	err := c.postWithResponse("/setMusicServiceAccount", credentials, &response)
+	if err != nil {
+		return fmt.Errorf("failed to set music service account for %s: %w", credentials.Source, err)
+	}
+
+	if !response.IsSuccess() {
+		return fmt.Errorf("music service account operation failed: unexpected response %s", response.Status)
+	}
+
+	return nil
+}
+
+// RemoveMusicServiceAccount removes an existing music service account
+func (c *Client) RemoveMusicServiceAccount(credentials *models.MusicServiceCredentials) error {
+	if credentials == nil {
+		return fmt.Errorf("credentials cannot be nil")
+	}
+
+	if credentials.Source == "" {
+		return fmt.Errorf("source cannot be empty")
+	}
+
+	if credentials.User == "" {
+		return fmt.Errorf("user cannot be empty")
+	}
+
+	// For removal, ensure password is empty
+	removalCredentials := &models.MusicServiceCredentials{
+		Source:      credentials.Source,
+		DisplayName: credentials.DisplayName,
+		User:        credentials.User,
+		Pass:        "", // Empty password indicates removal
+	}
+
+	var response models.MusicServiceAccountResponse
+
+	err := c.postWithResponse("/removeMusicServiceAccount", removalCredentials, &response)
+	if err != nil {
+		return fmt.Errorf("failed to remove music service account for %s: %w", credentials.Source, err)
+	}
+
+	if !response.IsSuccess() {
+		return fmt.Errorf("music service account removal failed: unexpected response %s", response.Status)
+	}
+
+	return nil
+}
+
+// AddSpotifyAccount adds a Spotify Premium account
+func (c *Client) AddSpotifyAccount(user, password string) error {
+	credentials := models.NewSpotifyCredentials(user, password)
+	return c.SetMusicServiceAccount(credentials)
+}
+
+// RemoveSpotifyAccount removes a Spotify account
+func (c *Client) RemoveSpotifyAccount(user string) error {
+	credentials := models.NewSpotifyCredentials(user, "")
+	return c.RemoveMusicServiceAccount(credentials)
+}
+
+// AddPandoraAccount adds a Pandora account
+func (c *Client) AddPandoraAccount(user, password string) error {
+	credentials := models.NewPandoraCredentials(user, password)
+	return c.SetMusicServiceAccount(credentials)
+}
+
+// RemovePandoraAccount removes a Pandora account
+func (c *Client) RemovePandoraAccount(user string) error {
+	credentials := models.NewPandoraCredentials(user, "")
+	return c.RemoveMusicServiceAccount(credentials)
+}
+
+// AddStoredMusicAccount adds a STORED_MUSIC (NAS/UPnP) account
+func (c *Client) AddStoredMusicAccount(user, displayName string) error {
+	credentials := models.NewStoredMusicCredentials(user, displayName)
+	return c.SetMusicServiceAccount(credentials)
+}
+
+// RemoveStoredMusicAccount removes a STORED_MUSIC account
+func (c *Client) RemoveStoredMusicAccount(user, displayName string) error {
+	credentials := models.NewStoredMusicCredentials(user, displayName)
+	return c.RemoveMusicServiceAccount(credentials)
+}
+
+// AddAmazonMusicAccount adds an Amazon Music account
+func (c *Client) AddAmazonMusicAccount(user, password string) error {
+	credentials := models.NewAmazonMusicCredentials(user, password)
+	return c.SetMusicServiceAccount(credentials)
+}
+
+// RemoveAmazonMusicAccount removes an Amazon Music account
+func (c *Client) RemoveAmazonMusicAccount(user string) error {
+	credentials := models.NewAmazonMusicCredentials(user, "")
+	return c.RemoveMusicServiceAccount(credentials)
+}
+
+// AddDeezerAccount adds a Deezer Premium account
+func (c *Client) AddDeezerAccount(user, password string) error {
+	credentials := models.NewDeezerCredentials(user, password)
+	return c.SetMusicServiceAccount(credentials)
+}
+
+// RemoveDeezerAccount removes a Deezer account
+func (c *Client) RemoveDeezerAccount(user string) error {
+	credentials := models.NewDeezerCredentials(user, "")
+	return c.RemoveMusicServiceAccount(credentials)
+}
+
+// AddIHeartRadioAccount adds an iHeartRadio account
+func (c *Client) AddIHeartRadioAccount(user, password string) error {
+	credentials := models.NewIHeartRadioCredentials(user, password)
+	return c.SetMusicServiceAccount(credentials)
+}
+
+// RemoveIHeartRadioAccount removes an iHeartRadio account
+func (c *Client) RemoveIHeartRadioAccount(user string) error {
+	credentials := models.NewIHeartRadioCredentials(user, "")
+	return c.RemoveMusicServiceAccount(credentials)
+}

@@ -548,6 +548,96 @@ soundtouch-cli --host 192.168.1.10 source introspect-all
 soundtouch-cli --host 192.168.1.10 source availability
 ```
 
+### Music Service Account Management
+
+Manage music streaming service accounts and network music library connections.
+
+#### `account <subcommand>`
+
+Music service account management commands.
+
+```bash
+# List configured accounts
+soundtouch-cli --host <device> account list
+
+# Add music service account (generic)
+soundtouch-cli --host <device> account add --source <SOURCE> --user <USER> --password <PASS> [--name <NAME>]
+
+# Remove music service account (generic)
+soundtouch-cli --host <device> account remove --source <SOURCE> --user <USER> [--name <NAME>]
+
+# Service-specific convenience commands
+soundtouch-cli --host <device> account add-spotify --user <EMAIL> --password <PASS>
+soundtouch-cli --host <device> account add-pandora --user <USER> --password <PASS>
+soundtouch-cli --host <device> account add-amazon --user <USER> --password <PASS>
+soundtouch-cli --host <device> account add-deezer --user <USER> --password <PASS>
+soundtouch-cli --host <device> account add-iheart --user <USER> --password <PASS>
+soundtouch-cli --host <device> account add-nas --user <GUID/0> [--name <NAME>]
+
+# Remove accounts
+soundtouch-cli --host <device> account remove-spotify --user <EMAIL>
+soundtouch-cli --host <device> account remove-pandora --user <USER>
+soundtouch-cli --host <device> account remove-amazon --user <USER>
+soundtouch-cli --host <device> account remove-deezer --user <USER>
+soundtouch-cli --host <device> account remove-iheart --user <USER>
+soundtouch-cli --host <device> account remove-nas --user <GUID/0> [--name <NAME>]
+```
+
+**Supported Services:**
+- **SPOTIFY**: Spotify Premium accounts
+- **PANDORA**: Pandora Music Service accounts
+- **AMAZON**: Amazon Music accounts
+- **DEEZER**: Deezer Premium accounts
+- **IHEART**: iHeartRadio accounts
+- **STORED_MUSIC**: Network music libraries (NAS/UPnP/DLNA servers)
+
+**Examples:**
+```bash
+# List all configured music service accounts
+soundtouch-cli --host 192.168.1.10 account list
+
+# Add a Spotify Premium account
+soundtouch-cli --host 192.168.1.10 account add-spotify \
+  --user "user@spotify.com" \
+  --password "mypassword"
+
+# Add a Pandora account
+soundtouch-cli --host 192.168.1.10 account add-pandora \
+  --user "pandora_username" \
+  --password "pandora_password"
+
+# Add an Amazon Music account
+soundtouch-cli --host 192.168.1.10 account add-amazon \
+  --user "amazon_user" \
+  --password "amazon_password"
+
+# Add a network music library (NAS/UPnP)
+soundtouch-cli --host 192.168.1.10 account add-nas \
+  --user "d09708a1-5953-44bc-a413-123456789012/0" \
+  --name "My Music Server"
+
+# Remove a Spotify account
+soundtouch-cli --host 192.168.1.10 account remove-spotify \
+  --user "user@spotify.com"
+
+# Generic account management
+soundtouch-cli --host 192.168.1.10 account add \
+  --source DEEZER \
+  --user "deezer_user" \
+  --password "deezer_pass" \
+  --name "Deezer Premium"
+
+soundtouch-cli --host 192.168.1.10 account remove \
+  --source DEEZER \
+  --user "deezer_user"
+```
+
+**Notes:**
+- Music service accounts must be configured before you can browse or play content from those services
+- Network music libraries (STORED_MUSIC) don't require passwords, only the UPnP server GUID
+- After adding an account, use `source list` to verify it appears as available
+- Some services may require additional authentication steps through their mobile apps
+
 ### Bass Control
 
 Adjust bass levels (equalizer).

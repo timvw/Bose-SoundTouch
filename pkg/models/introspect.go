@@ -159,6 +159,7 @@ func (ir *IntrospectResponse) GetMaxHistorySize() int {
 	if ir.ContentItemHistory != nil {
 		return ir.ContentItemHistory.MaxSize
 	}
+
 	return 0
 }
 
@@ -237,6 +238,7 @@ func (sir *SpotifyIntrospectResponse) GetMaxHistorySize() int {
 	if sir.ContentItemHistory != nil {
 		return sir.ContentItemHistory.MaxSize
 	}
+
 	return 0
 }
 

@@ -116,12 +116,14 @@ func TestIntrospectResponse_Unmarshal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var response IntrospectResponse
+
 			err := xml.Unmarshal([]byte(tt.xmlData), &response)
 
 			if tt.expectError {
 				if err == nil {
 					t.Error("expected error, got nil")
 				}
+
 				return
 			}
 
@@ -133,33 +135,42 @@ func TestIntrospectResponse_Unmarshal(t *testing.T) {
 			if response.State != tt.expected.State {
 				t.Errorf("expected state %s, got %s", tt.expected.State, response.State)
 			}
+
 			if response.User != tt.expected.User {
 				t.Errorf("expected user %s, got %s", tt.expected.User, response.User)
 			}
+
 			if response.IsPlaying != tt.expected.IsPlaying {
 				t.Errorf("expected isPlaying %t, got %t", tt.expected.IsPlaying, response.IsPlaying)
 			}
+
 			if response.TokenLastChangedTimeSeconds != tt.expected.TokenLastChangedTimeSeconds {
 				t.Errorf("expected tokenLastChangedTimeSeconds %d, got %d",
 					tt.expected.TokenLastChangedTimeSeconds, response.TokenLastChangedTimeSeconds)
 			}
+
 			if response.TokenLastChangedTimeMicroseconds != tt.expected.TokenLastChangedTimeMicroseconds {
 				t.Errorf("expected tokenLastChangedTimeMicroseconds %d, got %d",
 					tt.expected.TokenLastChangedTimeMicroseconds, response.TokenLastChangedTimeMicroseconds)
 			}
+
 			if response.ShuffleMode != tt.expected.ShuffleMode {
 				t.Errorf("expected shuffleMode %s, got %s", tt.expected.ShuffleMode, response.ShuffleMode)
 			}
+
 			if response.PlayStatusState != tt.expected.PlayStatusState {
 				t.Errorf("expected playStatusState %s, got %s", tt.expected.PlayStatusState, response.PlayStatusState)
 			}
+
 			if response.CurrentURI != tt.expected.CurrentURI {
 				t.Errorf("expected currentUri %s, got %s", tt.expected.CurrentURI, response.CurrentURI)
 			}
+
 			if response.ReceivedPlaybackRequest != tt.expected.ReceivedPlaybackRequest {
 				t.Errorf("expected receivedPlaybackRequest %t, got %t",
 					tt.expected.ReceivedPlaybackRequest, response.ReceivedPlaybackRequest)
 			}
+
 			if response.SubscriptionType != tt.expected.SubscriptionType {
 				t.Errorf("expected subscriptionType %s, got %s", tt.expected.SubscriptionType, response.SubscriptionType)
 			}
@@ -182,16 +193,19 @@ func TestIntrospectResponse_Unmarshal(t *testing.T) {
 							tt.expected.NowPlaying.SkipPreviousSupported,
 							response.NowPlaying.SkipPreviousSupported)
 					}
+
 					if response.NowPlaying.SeekSupported != tt.expected.NowPlaying.SeekSupported {
 						t.Errorf("expected seekSupported %t, got %t",
 							tt.expected.NowPlaying.SeekSupported,
 							response.NowPlaying.SeekSupported)
 					}
+
 					if response.NowPlaying.ResumeSupported != tt.expected.NowPlaying.ResumeSupported {
 						t.Errorf("expected resumeSupported %t, got %t",
 							tt.expected.NowPlaying.ResumeSupported,
 							response.NowPlaying.ResumeSupported)
 					}
+
 					if response.NowPlaying.CollectData != tt.expected.NowPlaying.CollectData {
 						t.Errorf("expected collectData %t, got %t",
 							tt.expected.NowPlaying.CollectData,
@@ -227,6 +241,7 @@ func TestSpotifyIntrospectResponse_Unmarshal(t *testing.T) {
 </spotifyAccountIntrospectResponse>`
 
 	var response SpotifyIntrospectResponse
+
 	err := xml.Unmarshal([]byte(xmlData), &response)
 	if err != nil {
 		t.Fatalf("failed to unmarshal spotify response: %v", err)
@@ -235,15 +250,19 @@ func TestSpotifyIntrospectResponse_Unmarshal(t *testing.T) {
 	if response.State != "InactiveUnselected" {
 		t.Errorf("expected state InactiveUnselected, got %s", response.State)
 	}
+
 	if response.User != "SpotifyConnectUserName" {
 		t.Errorf("expected user SpotifyConnectUserName, got %s", response.User)
 	}
+
 	if response.IsPlaying != false {
 		t.Errorf("expected isPlaying false, got %t", response.IsPlaying)
 	}
+
 	if response.TokenLastChangedTimeSeconds != 1702566495 {
 		t.Errorf("expected tokenLastChangedTimeSeconds 1702566495, got %d", response.TokenLastChangedTimeSeconds)
 	}
+
 	if response.ShuffleMode != "OFF" {
 		t.Errorf("expected shuffleMode OFF, got %s", response.ShuffleMode)
 	}
@@ -318,6 +337,7 @@ func TestNewIntrospectRequest(t *testing.T) {
 			if request.Source != tt.source {
 				t.Errorf("expected source %s, got %s", tt.source, request.Source)
 			}
+
 			if request.SourceAccount != tt.sourceAccount {
 				t.Errorf("expected sourceAccount %s, got %s", tt.sourceAccount, request.SourceAccount)
 			}
@@ -351,36 +371,48 @@ func TestIntrospectResponse_Methods(t *testing.T) {
 				},
 			},
 			testFunc: func(t *testing.T, r *IntrospectResponse) {
+				t.Helper()
+
 				if !r.IsActive() {
 					t.Error("expected IsActive() to return true")
 				}
+
 				if r.IsInactive() {
 					t.Error("expected IsInactive() to return false")
 				}
+
 				if !r.HasUser() {
 					t.Error("expected HasUser() to return true")
 				}
+
 				if !r.IsShuffleEnabled() {
 					t.Error("expected IsShuffleEnabled() to return true")
 				}
+
 				if !r.HasCurrentContent() {
 					t.Error("expected HasCurrentContent() to return true")
 				}
+
 				if !r.SupportsSkipPrevious() {
 					t.Error("expected SupportsSkipPrevious() to return true")
 				}
+
 				if !r.SupportsSeek() {
 					t.Error("expected SupportsSeek() to return true")
 				}
+
 				if !r.SupportsResume() {
 					t.Error("expected SupportsResume() to return true")
 				}
+
 				if r.CollectsData() {
 					t.Error("expected CollectsData() to return false")
 				}
+
 				if r.GetMaxHistorySize() != 15 {
 					t.Errorf("expected GetMaxHistorySize() to return 15, got %d", r.GetMaxHistorySize())
 				}
+
 				if !r.HasSubscription() {
 					t.Error("expected HasSubscription() to return true")
 				}
@@ -397,24 +429,32 @@ func TestIntrospectResponse_Methods(t *testing.T) {
 				SubscriptionType: "",
 			},
 			testFunc: func(t *testing.T, r *IntrospectResponse) {
+				t.Helper()
+
 				if r.IsActive() {
 					t.Error("expected IsActive() to return false")
 				}
+
 				if !r.IsInactive() {
 					t.Error("expected IsInactive() to return true")
 				}
+
 				if r.HasUser() {
 					t.Error("expected HasUser() to return false")
 				}
+
 				if r.IsShuffleEnabled() {
 					t.Error("expected IsShuffleEnabled() to return false")
 				}
+
 				if r.HasCurrentContent() {
 					t.Error("expected HasCurrentContent() to return false")
 				}
+
 				if r.HasSubscription() {
 					t.Error("expected HasSubscription() to return false")
 				}
+
 				if r.GetMaxHistorySize() != 0 {
 					t.Errorf("expected GetMaxHistorySize() to return 0, got %d", r.GetMaxHistorySize())
 				}
@@ -452,33 +492,43 @@ func TestSpotifyIntrospectResponse_Methods(t *testing.T) {
 	if !response.IsActive() {
 		t.Error("expected IsActive() to return true")
 	}
+
 	if response.IsInactive() {
 		t.Error("expected IsInactive() to return false")
 	}
+
 	if !response.HasUser() {
 		t.Error("expected HasUser() to return true")
 	}
+
 	if !response.IsShuffleEnabled() {
 		t.Error("expected IsShuffleEnabled() to return true")
 	}
+
 	if !response.HasCurrentContent() {
 		t.Error("expected HasCurrentContent() to return true")
 	}
+
 	if !response.SupportsSkipPrevious() {
 		t.Error("expected SupportsSkipPrevious() to return true")
 	}
+
 	if !response.SupportsSeek() {
 		t.Error("expected SupportsSeek() to return true")
 	}
+
 	if !response.SupportsResume() {
 		t.Error("expected SupportsResume() to return true")
 	}
+
 	if response.CollectsData() {
 		t.Error("expected CollectsData() to return false")
 	}
+
 	if response.GetMaxHistorySize() != 15 {
 		t.Errorf("expected GetMaxHistorySize() to return 15, got %d", response.GetMaxHistorySize())
 	}
+
 	if !response.HasSubscription() {
 		t.Error("expected HasSubscription() to return true")
 	}

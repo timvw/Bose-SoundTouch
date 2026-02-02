@@ -32,17 +32,20 @@ func (r *RecentsResponse) GetMostRecent() *RecentsResponseItem {
 	if len(r.Items) == 0 {
 		return nil
 	}
+
 	return &r.Items[0]
 }
 
 // GetItemsBySource returns recent items filtered by source type
 func (r *RecentsResponse) GetItemsBySource(source string) []RecentsResponseItem {
 	var filtered []RecentsResponseItem
+
 	for _, item := range r.Items {
 		if item.ContentItem != nil && item.ContentItem.Source == source {
 			filtered = append(filtered, item)
 		}
 	}
+
 	return filtered
 }
 
@@ -74,22 +77,26 @@ func (r *RecentsResponse) GetPandoraItems() []RecentsResponseItem {
 // GetPresetableItems returns recent items that can be saved as presets
 func (r *RecentsResponse) GetPresetableItems() []RecentsResponseItem {
 	var presetable []RecentsResponseItem
+
 	for _, item := range r.Items {
 		if item.ContentItem != nil && item.ContentItem.IsPresetable {
 			presetable = append(presetable, item)
 		}
 	}
+
 	return presetable
 }
 
 // GetItemsByType returns recent items filtered by content type
 func (r *RecentsResponse) GetItemsByType(contentType string) []RecentsResponseItem {
 	var filtered []RecentsResponseItem
+
 	for _, item := range r.Items {
 		if item.ContentItem != nil && item.ContentItem.Type == contentType {
 			filtered = append(filtered, item)
 		}
 	}
+
 	return filtered
 }
 
@@ -106,6 +113,7 @@ func (r *RecentsResponse) GetStations() []RecentsResponseItem {
 // GetPlaylistsAndAlbums returns playlist and album-type recent items
 func (r *RecentsResponse) GetPlaylistsAndAlbums() []RecentsResponseItem {
 	var items []RecentsResponseItem
+
 	for _, item := range r.Items {
 		if item.ContentItem != nil {
 			contentType := item.ContentItem.Type
@@ -114,6 +122,7 @@ func (r *RecentsResponse) GetPlaylistsAndAlbums() []RecentsResponseItem {
 			}
 		}
 	}
+
 	return items
 }
 
@@ -127,6 +136,7 @@ func (ri *RecentsResponseItem) GetDisplayName() string {
 	if ri.ContentItem != nil && ri.ContentItem.ItemName != "" {
 		return ri.ContentItem.ItemName
 	}
+
 	return "Unknown Item"
 }
 
@@ -135,6 +145,7 @@ func (ri *RecentsResponseItem) GetSource() string {
 	if ri.ContentItem != nil {
 		return ri.ContentItem.Source
 	}
+
 	return ""
 }
 
@@ -143,6 +154,7 @@ func (ri *RecentsResponseItem) GetSourceAccount() string {
 	if ri.ContentItem != nil {
 		return ri.ContentItem.SourceAccount
 	}
+
 	return ""
 }
 
@@ -151,6 +163,7 @@ func (ri *RecentsResponseItem) GetLocation() string {
 	if ri.ContentItem != nil {
 		return ri.ContentItem.Location
 	}
+
 	return ""
 }
 
@@ -159,6 +172,7 @@ func (ri *RecentsResponseItem) GetContentType() string {
 	if ri.ContentItem != nil {
 		return ri.ContentItem.Type
 	}
+
 	return ""
 }
 
@@ -207,6 +221,7 @@ func (ri *RecentsResponseItem) IsLocalContent() bool {
 // IsStreamingContent returns true if the recent item is from streaming services
 func (ri *RecentsResponseItem) IsStreamingContent() bool {
 	source := ri.GetSource()
+
 	return source == "SPOTIFY" || source == "PANDORA" || source == "TUNEIN" ||
 		source == "AMAZON" || source == "DEEZER" || source == "IHEART"
 }
@@ -216,6 +231,7 @@ func (ri *RecentsResponseItem) GetArtwork() string {
 	if ri.ContentItem != nil {
 		return ri.ContentItem.ContainerArt
 	}
+
 	return ""
 }
 

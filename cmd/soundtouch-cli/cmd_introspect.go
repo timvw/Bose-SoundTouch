@@ -32,6 +32,7 @@ func introspectService(c *cli.Context) error {
 	if sourceAccount != "" {
 		fmt.Printf("Source Account: %s\n", sourceAccount)
 	}
+
 	fmt.Println()
 
 	response, err := client.Introspect(source, sourceAccount)
@@ -88,6 +89,7 @@ func introspectSpotify(c *cli.Context) error {
 	if sourceAccount != "" {
 		fmt.Printf("Spotify Account: %s\n", sourceAccount)
 	}
+
 	fmt.Println()
 
 	response, err := client.IntrospectSpotify(sourceAccount)
@@ -110,9 +112,11 @@ func introspectSpotify(c *cli.Context) error {
 	// Show Spotify-specific recommendations
 	if response.IsInactive() {
 		fmt.Printf("\n💡 Spotify Setup Recommendations:\n")
+
 		if !response.HasUser() {
 			fmt.Printf("   • Sign in to your Spotify account on the device\n")
 		}
+
 		fmt.Printf("   • Use 'soundtouch-cli source select --source SPOTIFY' to activate Spotify\n")
 		fmt.Printf("   • Ensure you have Spotify Premium for full functionality\n")
 	}
@@ -172,12 +176,15 @@ func introspectAllServices(c *cli.Context) error {
 		response, err := client.Introspect(source, "")
 		if err != nil {
 			fmt.Printf("❌ %s: Failed to get introspect data - %v\n", source, err)
+
 			failCount++
+
 			continue
 		}
 
 		fmt.Printf("✅ %s: Successfully retrieved introspect data\n", source)
 		printIntrospectSummary(source, response)
+
 		successCount++
 	}
 
@@ -222,9 +229,11 @@ func printIntrospectServiceState(response *models.IntrospectResponse) {
 		fmt.Printf("✅ Service is ACTIVE\n")
 	} else if response.IsInactive() {
 		fmt.Printf("❌ Service is INACTIVE")
+
 		if response.GetState() == models.IntrospectStateInactiveUnselected {
 			fmt.Printf(" (Never been used)")
 		}
+
 		fmt.Println()
 	}
 
@@ -259,6 +268,7 @@ func printIntrospectCapabilities(response *models.IntrospectResponse) {
 		if cap.supported {
 			status = "✅"
 		}
+
 		fmt.Printf("%s %s %s\n", status, cap.icon, cap.feature)
 	}
 
@@ -296,29 +306,36 @@ func printIntrospectTechnicalDetails(response *models.IntrospectResponse) {
 }
 
 // printIntrospectSummary prints a brief summary for the "all" command
-func printIntrospectSummary(source string, response *models.IntrospectResponse) {
+func printIntrospectSummary(_ string, response *models.IntrospectResponse) {
 	fmt.Printf("   State: %s", response.State)
+
 	if response.HasUser() {
 		fmt.Printf(" (User: %s)", response.User)
 	}
+
 	fmt.Println()
 
 	fmt.Printf("   Playing: %s", formatBooleanStatus(response.IsPlaying))
+
 	if response.HasCurrentContent() {
 		fmt.Printf(" | Content: %.50s", response.CurrentURI)
+
 		if len(response.CurrentURI) > 50 {
 			fmt.Printf("...")
 		}
 	}
+
 	fmt.Println()
 
 	var capabilities []string
 	if response.SupportsSkipPrevious() {
 		capabilities = append(capabilities, "Skip")
 	}
+
 	if response.SupportsSeek() {
 		capabilities = append(capabilities, "Seek")
 	}
+
 	if response.SupportsResume() {
 		capabilities = append(capabilities, "Resume")
 	}
@@ -335,5 +352,6 @@ func formatBooleanStatus(value bool) string {
 	if value {
 		return "✅ Yes"
 	}
+
 	return "❌ No"
 }

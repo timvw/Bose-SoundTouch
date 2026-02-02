@@ -100,6 +100,7 @@ func TestClient_Introspect(t *testing.T) {
 				if r.Method != "POST" {
 					t.Errorf("expected POST request, got %s", r.Method)
 				}
+
 				if r.URL.Path != "/introspect" {
 					t.Errorf("expected /introspect path, got %s", r.URL.Path)
 				}
@@ -113,6 +114,7 @@ func TestClient_Introspect(t *testing.T) {
 				if requestBody.Source != tt.source {
 					t.Errorf("expected source %s, got %s", tt.source, requestBody.Source)
 				}
+
 				if requestBody.SourceAccount != tt.sourceAccount {
 					t.Errorf("expected sourceAccount %s, got %s", tt.sourceAccount, requestBody.SourceAccount)
 				}
@@ -125,7 +127,7 @@ func TestClient_Introspect(t *testing.T) {
 
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(tt.responseXML))
+				_, _ = w.Write([]byte(tt.responseXML))
 			}))
 			defer server.Close()
 
@@ -144,9 +146,11 @@ func TestClient_Introspect(t *testing.T) {
 					t.Errorf("expected error containing %q, got nil", tt.expectedError)
 					return
 				}
+
 				if !containsString(err.Error(), tt.expectedError) {
 					t.Errorf("expected error containing %q, got %q", tt.expectedError, err.Error())
 				}
+
 				return
 			}
 
@@ -164,18 +168,23 @@ func TestClient_Introspect(t *testing.T) {
 			if response.State != tt.wantResponse.State {
 				t.Errorf("expected state %s, got %s", tt.wantResponse.State, response.State)
 			}
+
 			if response.User != tt.wantResponse.User {
 				t.Errorf("expected user %s, got %s", tt.wantResponse.User, response.User)
 			}
+
 			if response.IsPlaying != tt.wantResponse.IsPlaying {
 				t.Errorf("expected isPlaying %t, got %t", tt.wantResponse.IsPlaying, response.IsPlaying)
 			}
+
 			if response.ShuffleMode != tt.wantResponse.ShuffleMode {
 				t.Errorf("expected shuffleMode %s, got %s", tt.wantResponse.ShuffleMode, response.ShuffleMode)
 			}
+
 			if response.CurrentURI != tt.wantResponse.CurrentURI {
 				t.Errorf("expected currentUri %s, got %s", tt.wantResponse.CurrentURI, response.CurrentURI)
 			}
+
 			if response.SubscriptionType != tt.wantResponse.SubscriptionType {
 				t.Errorf("expected subscriptionType %s, got %s", tt.wantResponse.SubscriptionType, response.SubscriptionType)
 			}
@@ -190,16 +199,19 @@ func TestClient_Introspect(t *testing.T) {
 							tt.wantResponse.NowPlaying.SkipPreviousSupported,
 							response.NowPlaying.SkipPreviousSupported)
 					}
+
 					if response.NowPlaying.SeekSupported != tt.wantResponse.NowPlaying.SeekSupported {
 						t.Errorf("expected seekSupported %t, got %t",
 							tt.wantResponse.NowPlaying.SeekSupported,
 							response.NowPlaying.SeekSupported)
 					}
+
 					if response.NowPlaying.ResumeSupported != tt.wantResponse.NowPlaying.ResumeSupported {
 						t.Errorf("expected resumeSupported %t, got %t",
 							tt.wantResponse.NowPlaying.ResumeSupported,
 							response.NowPlaying.ResumeSupported)
 					}
+
 					if response.NowPlaying.CollectData != tt.wantResponse.NowPlaying.CollectData {
 						t.Errorf("expected collectData %t, got %t",
 							tt.wantResponse.NowPlaying.CollectData,
@@ -246,6 +258,7 @@ func TestIntrospectResponse_Methods(t *testing.T) {
 	if !response.IsActive() {
 		t.Error("expected IsActive() to return true")
 	}
+
 	if response.IsInactive() {
 		t.Error("expected IsInactive() to return false")
 	}
@@ -269,12 +282,15 @@ func TestIntrospectResponse_Methods(t *testing.T) {
 	if !response.SupportsSkipPrevious() {
 		t.Error("expected SupportsSkipPrevious() to return true")
 	}
+
 	if !response.SupportsSeek() {
 		t.Error("expected SupportsSeek() to return true")
 	}
+
 	if !response.SupportsResume() {
 		t.Error("expected SupportsResume() to return true")
 	}
+
 	if response.CollectsData() {
 		t.Error("expected CollectsData() to return false")
 	}
@@ -304,6 +320,7 @@ func TestIntrospectResponse_InactiveState(t *testing.T) {
 	if response.IsActive() {
 		t.Error("expected IsActive() to return false")
 	}
+
 	if !response.IsInactive() {
 		t.Error("expected IsInactive() to return true")
 	}
@@ -312,12 +329,15 @@ func TestIntrospectResponse_InactiveState(t *testing.T) {
 	if response.HasUser() {
 		t.Error("expected HasUser() to return false")
 	}
+
 	if response.IsShuffleEnabled() {
 		t.Error("expected IsShuffleEnabled() to return false")
 	}
+
 	if response.HasCurrentContent() {
 		t.Error("expected HasCurrentContent() to return false")
 	}
+
 	if response.HasSubscription() {
 		t.Error("expected HasSubscription() to return false")
 	}
@@ -353,6 +373,7 @@ func TestNewIntrospectRequest(t *testing.T) {
 			if request.Source != tt.source {
 				t.Errorf("expected source %s, got %s", tt.source, request.Source)
 			}
+
 			if request.SourceAccount != tt.sourceAccount {
 				t.Errorf("expected sourceAccount %s, got %s", tt.sourceAccount, request.SourceAccount)
 			}

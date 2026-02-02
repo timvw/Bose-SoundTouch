@@ -1,3 +1,4 @@
+// Package main demonstrates recent content functionality for Bose SoundTouch devices.
 package main
 
 import (
@@ -12,6 +13,73 @@ import (
 	"github.com/gesellix/bose-soundtouch/pkg/models"
 )
 
+// applyFilters applies source and type filters to the items
+func applyFilters(response *models.RecentsResponse, source, itemType string) ([]models.RecentsResponseItem, error) {
+	items := response.Items
+
+	// Apply source filter
+	if source != "" {
+		items = response.GetItemsBySource(strings.ToUpper(source))
+		if len(items) == 0 {
+			fmt.Printf("📭 No items found for source: %s\n", source)
+			fmt.Println("💡 Available sources:", getAvailableSources(response))
+
+			return nil, fmt.Errorf("no items found for source")
+		}
+	}
+
+	// Apply type filter
+	if itemType != "" {
+		filteredItems, err := filterItemsByType(items, itemType)
+		if err != nil {
+			return nil, err
+		}
+
+		items = filteredItems
+
+		if len(items) == 0 {
+			fmt.Printf("📭 No items found for type: %s\n", itemType)
+			return nil, fmt.Errorf("no items found for type")
+		}
+	}
+
+	return items, nil
+}
+
+// filterItemsByType filters items by content type
+func filterItemsByType(items []models.RecentsResponseItem, itemType string) ([]models.RecentsResponseItem, error) {
+	// Define type predicates
+	predicates := map[string]func(*models.RecentsResponseItem) bool{
+		"track":      (*models.RecentsResponseItem).IsTrack,
+		"tracks":     (*models.RecentsResponseItem).IsTrack,
+		"station":    (*models.RecentsResponseItem).IsStation,
+		"stations":   (*models.RecentsResponseItem).IsStation,
+		"playlist":   (*models.RecentsResponseItem).IsPlaylist,
+		"playlists":  (*models.RecentsResponseItem).IsPlaylist,
+		"album":      (*models.RecentsResponseItem).IsAlbum,
+		"albums":     (*models.RecentsResponseItem).IsAlbum,
+		"presetable": (*models.RecentsResponseItem).IsPresetable,
+	}
+
+	predicate, exists := predicates[strings.ToLower(itemType)]
+	if !exists {
+		fmt.Printf("❌ Unknown type filter: %s\n", itemType)
+		fmt.Println("💡 Available types: track, station, playlist, album, presetable")
+
+		return nil, fmt.Errorf("unknown type filter")
+	}
+
+	var filteredItems []models.RecentsResponseItem
+
+	for _, item := range items {
+		if predicate(&item) {
+			filteredItems = append(filteredItems, item)
+		}
+	}
+
+	return filteredItems, nil
+}
+
 func main() {
 	var (
 		host     = flag.String("host", "", "SoundTouch device IP address")
@@ -22,6 +90,7 @@ func main() {
 		itemType = flag.String("type", "", "Filter by type (track, station, playlist, presetable)")
 		stats    = flag.Bool("stats", false, "Show statistics only")
 	)
+
 	flag.Parse()
 
 	if *host == "" {
@@ -47,6 +116,7 @@ func main() {
 	if response.IsEmpty() {
 		fmt.Println("\n📭 No recent items found")
 		fmt.Println("💡 Play some content to populate the recent items list")
+
 		return
 	}
 
@@ -57,63 +127,9 @@ func main() {
 	}
 
 	// Apply filters
-	items := response.Items
-
-	if *source != "" {
-		items = response.GetItemsBySource(strings.ToUpper(*source))
-		if len(items) == 0 {
-			fmt.Printf("📭 No items found for source: %s\n", *source)
-			fmt.Println("💡 Available sources:", getAvailableSources(response))
-			return
-		}
-	}
-
-	// Apply type filter
-	if *itemType != "" {
-		var filteredItems []models.RecentsResponseItem
-		switch strings.ToLower(*itemType) {
-		case "track", "tracks":
-			for _, item := range items {
-				if item.IsTrack() {
-					filteredItems = append(filteredItems, item)
-				}
-			}
-		case "station", "stations":
-			for _, item := range items {
-				if item.IsStation() {
-					filteredItems = append(filteredItems, item)
-				}
-			}
-		case "playlist", "playlists":
-			for _, item := range items {
-				if item.IsPlaylist() {
-					filteredItems = append(filteredItems, item)
-				}
-			}
-		case "album", "albums":
-			for _, item := range items {
-				if item.IsAlbum() {
-					filteredItems = append(filteredItems, item)
-				}
-			}
-		case "presetable":
-			for _, item := range items {
-				if item.IsPresetable() {
-					filteredItems = append(filteredItems, item)
-				}
-			}
-		default:
-			fmt.Printf("❌ Unknown type filter: %s\n", *itemType)
-			fmt.Println("💡 Available types: track, station, playlist, album, presetable")
-			return
-		}
-
-		items = filteredItems
-
-		if len(items) == 0 {
-			fmt.Printf("📭 No items found for type: %s\n", *itemType)
-			return
-		}
+	items, err := applyFilters(response, *source, *itemType)
+	if err != nil {
+		return
 	}
 
 	// Apply limit
@@ -123,12 +139,18 @@ func main() {
 
 	// Display results
 	displayResults(response, items, *detailed, *source, *itemType)
+
+	fmt.Println("\nDone!")
 }
 
-func showStatistics(response *models.RecentsResponse) {
-	fmt.Printf("\n📊 Recent Items Statistics\n\n")
+// sourceCount represents a count for a named category
+type sourceCount struct {
+	name  string
+	count int
+}
 
-	// Basic stats
+// printBasicStatistics prints overall statistics
+func printBasicStatistics(response *models.RecentsResponse) {
 	fmt.Printf("Overall Statistics:\n")
 	fmt.Printf("  Total Items: %d\n", response.GetItemCount())
 
@@ -139,9 +161,12 @@ func showStatistics(response *models.RecentsResponse) {
 			fmt.Printf("  Last Played: %s\n", lastPlayTime.Format("2006-01-02 15:04:05"))
 		}
 	}
+}
 
-	// Source breakdown
+// printSourceStatistics prints statistics by source
+func printSourceStatistics(response *models.RecentsResponse) {
 	fmt.Printf("\n📍 By Source:\n")
+
 	sourceStats := map[string]int{
 		"Spotify":      len(response.GetSpotifyItems()),
 		"Pandora":      len(response.GetPandoraItems()),
@@ -150,17 +175,14 @@ func showStatistics(response *models.RecentsResponse) {
 		"Stored Music": len(response.GetStoredMusicItems()),
 	}
 
-	// Sort sources by count
-	type sourceCount struct {
-		name  string
-		count int
-	}
 	var sources []sourceCount
+
 	for name, count := range sourceStats {
 		if count > 0 {
 			sources = append(sources, sourceCount{name, count})
 		}
 	}
+
 	sort.Slice(sources, func(i, j int) bool {
 		return sources[i].count > sources[j].count
 	})
@@ -169,9 +191,12 @@ func showStatistics(response *models.RecentsResponse) {
 		percentage := float64(sc.count) / float64(response.GetItemCount()) * 100
 		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", sc.name+":", sc.count, percentage)
 	}
+}
 
-	// Content type breakdown
+// printContentTypeStatistics prints statistics by content type
+func printContentTypeStatistics(response *models.RecentsResponse) {
 	fmt.Printf("\n🎼 By Content Type:\n")
+
 	tracks := len(response.GetTracks())
 	stations := len(response.GetStations())
 	playlists := len(response.GetPlaylistsAndAlbums())
@@ -188,18 +213,24 @@ func showStatistics(response *models.RecentsResponse) {
 			fmt.Printf("  %-15s %3d items (%5.1f%%)\n", ts.name+":", ts.count, percentage)
 		}
 	}
+}
 
-	// Special categories
+// printSpecialCategoryStatistics prints special category statistics
+func printSpecialCategoryStatistics(response *models.RecentsResponse) {
 	presetable := len(response.GetPresetableItems())
 	if presetable > 0 {
 		fmt.Printf("\n⭐ Special Categories:\n")
+
 		percentage := float64(presetable) / float64(response.GetItemCount()) * 100
 		fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Presetable:", presetable, percentage)
 	}
+}
 
-	// Content source analysis
+// printSourceAnalysis prints streaming vs local content analysis
+func printSourceAnalysis(response *models.RecentsResponse) {
 	streamingCount := 0
 	localCount := 0
+
 	for _, item := range response.Items {
 		if item.IsStreamingContent() {
 			streamingCount++
@@ -210,18 +241,23 @@ func showStatistics(response *models.RecentsResponse) {
 
 	if streamingCount > 0 || localCount > 0 {
 		fmt.Printf("\n📡 Source Analysis:\n")
+
 		if streamingCount > 0 {
 			percentage := float64(streamingCount) / float64(response.GetItemCount()) * 100
 			fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Streaming:", streamingCount, percentage)
 		}
+
 		if localCount > 0 {
 			percentage := float64(localCount) / float64(response.GetItemCount()) * 100
 			fmt.Printf("  %-15s %3d items (%5.1f%%)\n", "Local:", localCount, percentage)
 		}
 	}
+}
 
-	// Time analysis - show when items were played
+// printTimeAnalysis prints when items were played
+func printTimeAnalysis(response *models.RecentsResponse) {
 	fmt.Printf("\n🕐 Time Analysis:\n")
+
 	now := time.Now()
 	today := 0
 	yesterday := 0
@@ -233,13 +269,14 @@ func showStatistics(response *models.RecentsResponse) {
 			playTime := time.Unix(item.GetUTCTime(), 0)
 			diff := now.Sub(playTime)
 
-			if diff < 24*time.Hour {
+			switch {
+			case diff < 24*time.Hour:
 				today++
-			} else if diff < 48*time.Hour {
+			case diff < 48*time.Hour:
 				yesterday++
-			} else if diff < 7*24*time.Hour {
+			case diff < 7*24*time.Hour:
 				thisWeek++
-			} else {
+			default:
 				older++
 			}
 		}
@@ -248,15 +285,29 @@ func showStatistics(response *models.RecentsResponse) {
 	if today > 0 {
 		fmt.Printf("  %-15s %3d items\n", "Today:", today)
 	}
+
 	if yesterday > 0 {
 		fmt.Printf("  %-15s %3d items\n", "Yesterday:", yesterday)
 	}
+
 	if thisWeek > 0 {
 		fmt.Printf("  %-15s %3d items\n", "This Week:", thisWeek)
 	}
+
 	if older > 0 {
 		fmt.Printf("  %-15s %3d items\n", "Older:", older)
 	}
+}
+
+func showStatistics(response *models.RecentsResponse) {
+	fmt.Printf("\n📊 Recent Items Statistics\n\n")
+
+	printBasicStatistics(response)
+	printSourceStatistics(response)
+	printContentTypeStatistics(response)
+	printSpecialCategoryStatistics(response)
+	printSourceAnalysis(response)
+	printTimeAnalysis(response)
 }
 
 func displayResults(response *models.RecentsResponse, items []models.RecentsResponseItem, detailed bool, sourceFilter, typeFilter string) {
@@ -265,6 +316,7 @@ func displayResults(response *models.RecentsResponse, items []models.RecentsResp
 	if sourceFilter != "" {
 		filters = append(filters, fmt.Sprintf("source: %s", sourceFilter))
 	}
+
 	if typeFilter != "" {
 		filters = append(filters, fmt.Sprintf("type: %s", typeFilter))
 	}
@@ -277,9 +329,11 @@ func displayResults(response *models.RecentsResponse, items []models.RecentsResp
 	// Display header
 	fmt.Printf("\n📊 Recent Items Summary%s:\n", filterDesc)
 	fmt.Printf("   Showing: %d items", len(items))
+
 	if len(items) < response.GetItemCount() {
 		fmt.Printf(" (of %d total)", response.GetItemCount())
 	}
+
 	fmt.Println()
 
 	if len(filters) == 0 {
@@ -329,8 +383,9 @@ func displayItem(index int, item *models.RecentsResponseItem, detailed bool) {
 	fmt.Printf("   Source: %s", source)
 
 	if contentType != "" {
-		fmt.Printf(" | Type: %s", strings.Title(contentType))
+		fmt.Printf(" | Type: %s", contentType)
 	}
+
 	fmt.Println()
 
 	// Time information
@@ -370,9 +425,11 @@ func displayItem(index int, item *models.RecentsResponseItem, detailed bool) {
 		if item.IsStreamingContent() {
 			classifications = append(classifications, "Streaming")
 		}
+
 		if item.IsLocalContent() {
 			classifications = append(classifications, "Local")
 		}
+
 		if len(classifications) > 0 {
 			fmt.Printf("   🏷️  Type: %s\n", strings.Join(classifications, ", "))
 		}
@@ -382,18 +439,20 @@ func displayItem(index int, item *models.RecentsResponseItem, detailed bool) {
 }
 
 func getIcon(item *models.RecentsResponseItem) string {
-	if item.IsTrack() {
+	switch {
+	case item.IsTrack():
 		return "🎵"
-	} else if item.IsStation() {
+	case item.IsStation():
 		return "📻"
-	} else if item.IsPlaylist() {
+	case item.IsPlaylist():
 		return "📋"
-	} else if item.IsAlbum() {
+	case item.IsAlbum():
 		return "💿"
-	} else if item.IsContainer() {
+	case item.IsContainer():
 		return "📁"
+	default:
+		return "🎶"
 	}
-	return "🎼"
 }
 
 func formatSource(source string) string {
@@ -426,15 +485,16 @@ func formatSource(source string) string {
 }
 
 func formatDuration(d time.Duration) string {
-	if d < time.Minute {
-		return "just now"
-	} else if d < time.Hour {
+	switch {
+	case d < time.Minute:
+		return "< 1 minute"
+	case d < time.Hour:
 		minutes := int(d.Minutes())
 		return fmt.Sprintf("%d minute%s", minutes, pluralize(minutes))
-	} else if d < 24*time.Hour {
+	case d < 24*time.Hour:
 		hours := int(d.Hours())
 		return fmt.Sprintf("%d hour%s", hours, pluralize(hours))
-	} else {
+	default:
 		days := int(d.Hours() / 24)
 		return fmt.Sprintf("%d day%s", days, pluralize(days))
 	}
@@ -444,6 +504,7 @@ func pluralize(count int) string {
 	if count == 1 {
 		return ""
 	}
+
 	return "s"
 }
 
@@ -451,14 +512,17 @@ func truncateString(s string, maxLength int) string {
 	if len(s) <= maxLength {
 		return s
 	}
+
 	if maxLength <= 3 {
 		return "..."
 	}
+
 	return s[:maxLength-3] + "..."
 }
 
 func getAvailableSources(response *models.RecentsResponse) string {
 	sourceMap := make(map[string]bool)
+
 	for _, item := range response.Items {
 		if source := item.GetSource(); source != "" {
 			sourceMap[source] = true
@@ -469,6 +533,7 @@ func getAvailableSources(response *models.RecentsResponse) string {
 	for source := range sourceMap {
 		sources = append(sources, source)
 	}
+
 	sort.Strings(sources)
 
 	if len(sources) == 0 {
