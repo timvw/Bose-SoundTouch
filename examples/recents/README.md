@@ -252,8 +252,8 @@ go run main.go -host 192.168.1.100 -type unknown
 
 This recents data is useful for:
 - [Preset Management](../preset-management/) - Finding presetable content to save
-- [Source Selection](../source-selection/) - Understanding usage patterns
-- [Navigation](../navigation/) - Quickly accessing recently played content
+- [Content Selection](../../docs/SOURCE-SELECTION.md) - Understanding usage patterns
+- [Navigation](../../docs/NAVIGATION-GUIDE.md) - Quickly accessing recently played content
 
 ## Related CLI Commands
 

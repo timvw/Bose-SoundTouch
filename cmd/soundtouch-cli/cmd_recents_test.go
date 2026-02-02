@@ -113,7 +113,7 @@ func TestPrintRecentItem(t *testing.T) {
 			expected: []string{
 				"🎵 Test Song",
 				"Source: Spotify",
-				"Type: Track",
+				"Type: track",
 			},
 		},
 		{
@@ -223,7 +223,7 @@ func TestGetContentTypeIcon(t *testing.T) {
 			item: &models.RecentsResponseItem{
 				ContentItem: &models.ContentItem{Type: "unknown"},
 			},
-			expected: "🎼",
+			expected: "🎶",
 		},
 	}
 

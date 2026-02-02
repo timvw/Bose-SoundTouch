@@ -177,11 +177,11 @@ if err != nil {
 
 This introspect data is useful before:
 - [Preset Management](../preset-management/) - Verify service state before storing presets
-- [Source Selection](../source-selection/) - Check capabilities before switching sources
-- [Zone Management](../zone-management/) - Ensure all devices support the service
+- [Content Selection](../../docs/SOURCE-SELECTION.md) - Check capabilities before switching sources
+- [Zone Management](../../docs/zone-management.md) - Ensure all devices support the service
 
 ## API Documentation
 
 For complete API documentation, see:
 - [API Reference](../../docs/API-Endpoints-Overview.md)
-- [Service Management Guide](../../docs/SERVICE-MANAGEMENT.md)
+- [Service Availability Implementation](../../docs/SERVICE-AVAILABILITY-IMPLEMENTATION.md)
