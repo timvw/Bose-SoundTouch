@@ -792,6 +792,130 @@ func (c *Client) SelectPandora(sourceAccount string) error {
 	return c.SelectSource("PANDORA", sourceAccount)
 }
 
+// SelectContentItem selects content using a ContentItem directly.
+// This method allows full control over all ContentItem properties including
+// complex location parameters for LOCAL_INTERNET_RADIO streamUrl format.
+//
+// Example usage for LOCAL_INTERNET_RADIO with streamUrl:
+//
+//	contentItem := &models.ContentItem{
+//	  Source:       "LOCAL_INTERNET_RADIO",
+//	  Type:         "stationurl",
+//	  Location:     "http://contentapi.gmuth.de/station.php?name=MyStation&streamUrl=https://stream.example.com/radio",
+//	  IsPresetable: true,
+//	  ItemName:     "My Radio Station",
+//	  ContainerArt: "https://example.com/art.png",
+//	}
+//	err := client.SelectContentItem(contentItem)
+func (c *Client) SelectContentItem(contentItem *models.ContentItem) error {
+	if contentItem == nil {
+		return fmt.Errorf("contentItem cannot be nil")
+	}
+
+	if contentItem.Source == "" {
+		return fmt.Errorf("contentItem source cannot be empty")
+	}
+
+	return c.post("/select", contentItem)
+}
+
+// SelectLocalInternetRadio is a convenience method to select LOCAL_INTERNET_RADIO content.
+// For simple direct stream URLs, use streamURL parameter.
+// For complex streamUrl format (with proxy), use the location parameter with full URL.
+//
+// Example 1 - Direct stream:
+//
+//	err := client.SelectLocalInternetRadio("https://stream.example.com/radio", "", "My Radio", "")
+//
+// Example 2 - StreamUrl format with proxy:
+//
+//	location := "http://contentapi.gmuth.de/station.php?name=MyStation&streamUrl=https://stream.example.com/radio"
+//	err := client.SelectLocalInternetRadio(location, "", "My Radio", "https://example.com/art.png")
+func (c *Client) SelectLocalInternetRadio(location, sourceAccount, itemName, containerArt string) error {
+	if location == "" {
+		return fmt.Errorf("location cannot be empty")
+	}
+
+	contentItem := &models.ContentItem{
+		Source:        "LOCAL_INTERNET_RADIO",
+		Type:          "stationurl",
+		Location:      location,
+		SourceAccount: sourceAccount,
+		IsPresetable:  true,
+		ItemName:      itemName,
+		ContainerArt:  containerArt,
+	}
+
+	if itemName == "" {
+		contentItem.ItemName = "Internet Radio"
+	}
+
+	return c.SelectContentItem(contentItem)
+}
+
+// SelectLocalMusic is a convenience method to select LOCAL_MUSIC content.
+// This is used for SoundTouch App Media Server content on local computers.
+//
+// Example:
+//
+//	err := client.SelectLocalMusic("album:983", "3f205110-4a57-4e91-810a-123456789012", "Welcome to the New", "http://192.168.1.14:8085/v1/albums/983/image")
+func (c *Client) SelectLocalMusic(location, sourceAccount, itemName, containerArt string) error {
+	if location == "" {
+		return fmt.Errorf("location cannot be empty")
+	}
+
+	if sourceAccount == "" {
+		return fmt.Errorf("sourceAccount cannot be empty for LOCAL_MUSIC")
+	}
+
+	contentItem := &models.ContentItem{
+		Source:        "LOCAL_MUSIC",
+		Type:          "album", // Default type, could be "track", "artist", etc.
+		Location:      location,
+		SourceAccount: sourceAccount,
+		IsPresetable:  true,
+		ItemName:      itemName,
+		ContainerArt:  containerArt,
+	}
+
+	if itemName == "" {
+		contentItem.ItemName = "Local Music"
+	}
+
+	return c.SelectContentItem(contentItem)
+}
+
+// SelectStoredMusic is a convenience method to select STORED_MUSIC content.
+// This is used for UPnP/DLNA media servers and NAS libraries.
+//
+// Example:
+//
+//	err := client.SelectStoredMusic("6_a2874b5d_4f83d999", "d09708a1-5953-44bc-a413-123456789012/0", "Christmas Album", "")
+func (c *Client) SelectStoredMusic(location, sourceAccount, itemName, containerArt string) error {
+	if location == "" {
+		return fmt.Errorf("location cannot be empty")
+	}
+
+	if sourceAccount == "" {
+		return fmt.Errorf("sourceAccount cannot be empty for STORED_MUSIC")
+	}
+
+	contentItem := &models.ContentItem{
+		Source:        "STORED_MUSIC",
+		Location:      location,
+		SourceAccount: sourceAccount,
+		IsPresetable:  true,
+		ItemName:      itemName,
+		ContainerArt:  containerArt,
+	}
+
+	if itemName == "" {
+		contentItem.ItemName = "Stored Music"
+	}
+
+	return c.SelectContentItem(contentItem)
+}
+
 // GetClockTime retrieves the device's current time from the /clockTime endpoint
 func (c *Client) GetClockTime() (*models.ClockTime, error) {
 	var clockTime models.ClockTime

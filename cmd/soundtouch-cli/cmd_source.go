@@ -209,6 +209,218 @@ func selectAux(c *cli.Context) error {
 	return nil
 }
 
+// selectLocalInternetRadio handles selecting LOCAL_INTERNET_RADIO source
+func selectLocalInternetRadio(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		return err
+	}
+
+	location := c.String("location")
+	if location == "" {
+		return fmt.Errorf("location is required (use --location)")
+	}
+
+	sourceAccount := c.String("account")
+	itemName := c.String("name")
+	containerArt := c.String("artwork")
+
+	// Check LOCAL_INTERNET_RADIO availability
+	checker := NewServiceAvailabilityChecker(client)
+	if !checker.CheckSourceAvailable("LOCAL_INTERNET_RADIO", "select internet radio") {
+		return fmt.Errorf("LOCAL_INTERNET_RADIO is not available")
+	}
+
+	PrintDeviceHeader("Selecting internet radio stream", clientConfig.Host, clientConfig.Port)
+
+	if itemName != "" {
+		fmt.Printf("  Station: %s\n", itemName)
+	}
+	fmt.Printf("  Location: %s\n", location)
+
+	err = client.SelectLocalInternetRadio(location, sourceAccount, itemName, containerArt)
+	if err != nil {
+		return fmt.Errorf("failed to select internet radio: %w", err)
+	}
+
+	PrintSuccess("Internet radio stream selected")
+
+	return nil
+}
+
+// selectLocalMusic handles selecting LOCAL_MUSIC source
+func selectLocalMusic(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		return err
+	}
+
+	location := c.String("location")
+	if location == "" {
+		return fmt.Errorf("location is required (use --location)")
+	}
+
+	sourceAccount := c.String("account")
+	if sourceAccount == "" {
+		return fmt.Errorf("account is required for LOCAL_MUSIC (use --account)")
+	}
+
+	itemName := c.String("name")
+	containerArt := c.String("artwork")
+
+	// Check LOCAL_MUSIC availability
+	checker := NewServiceAvailabilityChecker(client)
+	if !checker.CheckSourceAvailable("LOCAL_MUSIC", "select local music") {
+		return fmt.Errorf("LOCAL_MUSIC is not available")
+	}
+
+	PrintDeviceHeader("Selecting local music content", clientConfig.Host, clientConfig.Port)
+
+	if itemName != "" {
+		fmt.Printf("  Content: %s\n", itemName)
+	}
+	fmt.Printf("  Location: %s\n", location)
+	fmt.Printf("  Account: %s\n", sourceAccount)
+
+	err = client.SelectLocalMusic(location, sourceAccount, itemName, containerArt)
+	if err != nil {
+		return fmt.Errorf("failed to select local music: %w", err)
+	}
+
+	PrintSuccess("Local music content selected")
+
+	return nil
+}
+
+// selectStoredMusic handles selecting STORED_MUSIC source
+func selectStoredMusic(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		return err
+	}
+
+	location := c.String("location")
+	if location == "" {
+		return fmt.Errorf("location is required (use --location)")
+	}
+
+	sourceAccount := c.String("account")
+	if sourceAccount == "" {
+		return fmt.Errorf("account is required for STORED_MUSIC (use --account)")
+	}
+
+	itemName := c.String("name")
+	containerArt := c.String("artwork")
+
+	// Check STORED_MUSIC availability
+	checker := NewServiceAvailabilityChecker(client)
+	if !checker.CheckSourceAvailable("STORED_MUSIC", "select stored music") {
+		return fmt.Errorf("STORED_MUSIC is not available")
+	}
+
+	PrintDeviceHeader("Selecting stored music content", clientConfig.Host, clientConfig.Port)
+
+	if itemName != "" {
+		fmt.Printf("  Content: %s\n", itemName)
+	}
+	fmt.Printf("  Location: %s\n", location)
+	fmt.Printf("  Account: %s\n", sourceAccount)
+
+	err = client.SelectStoredMusic(location, sourceAccount, itemName, containerArt)
+	if err != nil {
+		return fmt.Errorf("failed to select stored music: %w", err)
+	}
+
+	PrintSuccess("Stored music content selected")
+
+	return nil
+}
+
+// selectContent handles selecting content using a ContentItem directly
+func selectContent(c *cli.Context) error {
+	clientConfig := GetClientConfig(c)
+
+	client, err := CreateSoundTouchClient(clientConfig)
+	if err != nil {
+		return err
+	}
+
+	// Required parameters
+	source := strings.ToUpper(c.String("source"))
+	if source == "" {
+		return fmt.Errorf("source is required (use --source)")
+	}
+
+	location := c.String("location")
+	if location == "" {
+		return fmt.Errorf("location is required (use --location)")
+	}
+
+	// Optional parameters
+	sourceAccount := c.String("account")
+	itemName := c.String("name")
+	containerArt := c.String("artwork")
+	itemType := c.String("type")
+	isPresetable := c.Bool("presetable")
+
+	// Create ContentItem
+	contentItem := &models.ContentItem{
+		Source:        source,
+		Type:          itemType,
+		Location:      location,
+		SourceAccount: sourceAccount,
+		IsPresetable:  isPresetable,
+		ItemName:      itemName,
+		ContainerArt:  containerArt,
+	}
+
+	// Set default type if not specified
+	if itemType == "" {
+		switch source {
+		case "SPOTIFY":
+			contentItem.Type = "uri"
+		case "TUNEIN", "LOCAL_INTERNET_RADIO":
+			contentItem.Type = "stationurl"
+		case "LOCAL_MUSIC":
+			contentItem.Type = "album" // default, could be track, artist, etc.
+		}
+	}
+
+	// Set default item name if not specified
+	if itemName == "" {
+		contentItem.ItemName = source
+	}
+
+	PrintDeviceHeader("Selecting content", clientConfig.Host, clientConfig.Port)
+
+	fmt.Printf("  Source: %s\n", source)
+	fmt.Printf("  Location: %s\n", location)
+	if sourceAccount != "" {
+		fmt.Printf("  Account: %s\n", sourceAccount)
+	}
+	if itemName != "" {
+		fmt.Printf("  Name: %s\n", itemName)
+	}
+	if itemType != "" {
+		fmt.Printf("  Type: %s\n", itemType)
+	}
+
+	err = client.SelectContentItem(contentItem)
+	if err != nil {
+		return fmt.Errorf("failed to select content: %w", err)
+	}
+
+	PrintSuccess("Content selected")
+
+	return nil
+}
+
 // getServiceAvailability handles displaying service availability information
 func getServiceAvailability(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)

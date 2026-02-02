@@ -393,6 +393,12 @@ soundtouch-cli --host <device> source select --source <SOURCE> [--account <ACCOU
 soundtouch-cli --host <device> source spotify
 soundtouch-cli --host <device> source bluetooth
 soundtouch-cli --host <device> source aux
+
+# Advanced content selection
+soundtouch-cli --host <device> source internet-radio --location <URL> [--name <NAME>]
+soundtouch-cli --host <device> source local-music --location <LOCATION> --account <ACCOUNT>
+soundtouch-cli --host <device> source stored-music --location <LOCATION> --account <ACCOUNT>
+soundtouch-cli --host <device> source content --source <SOURCE> --location <LOCATION>
 ```
 
 **Source Names:**
@@ -400,9 +406,12 @@ soundtouch-cli --host <device> source aux
 - `BLUETOOTH` - Bluetooth input
 - `AUX` - AUX input
 - `AIRPLAY` - AirPlay
-- `STORED_MUSIC` - Local music library
-- `INTERNET_RADIO` - Internet radio
-- `PRODUCT` - Product-specific sources
+- `LOCAL_MUSIC` - SoundTouch App Media Server content
+- `LOCAL_INTERNET_RADIO` - Internet radio streams
+- `STORED_MUSIC` - UPnP/DLNA media server content
+- `TUNEIN` - TuneIn radio stations
+- `PANDORA` - Pandora music service
+- `PRODUCT` - Product-specific sources (TV, HDMI)
 
 **Examples:**
 ```bash
@@ -417,6 +426,37 @@ soundtouch-cli --host 192.168.1.10 source select --source SPOTIFY --account user
 
 # Select Bluetooth
 soundtouch-cli --host 192.168.1.10 source bluetooth
+
+# Select internet radio with streamUrl format
+soundtouch-cli --host 192.168.1.10 source internet-radio \
+  --location "http://contentapi.gmuth.de/station.php?name=MyStation&streamUrl=https://stream.example.com/radio" \
+  --name "My Radio Station" \
+  --artwork "https://example.com/art.png"
+
+# Select internet radio with direct stream URL
+soundtouch-cli --host 192.168.1.10 source internet-radio \
+  --location "https://stream.example.com/radio" \
+  --name "My Stream"
+
+# Select local music content (requires SoundTouch App Media Server)
+soundtouch-cli --host 192.168.1.10 source local-music \
+  --location "album:983" \
+  --account "3f205110-4a57-4e91-810a-123456789012" \
+  --name "Welcome to the New"
+
+# Select stored music content (requires UPnP/DLNA media server)
+soundtouch-cli --host 192.168.1.10 source stored-music \
+  --location "6_a2874b5d_4f83d999" \
+  --account "d09708a1-5953-44bc-a413-123456789012/0" \
+  --name "Christmas Album"
+
+# Advanced content selection with all options
+soundtouch-cli --host 192.168.1.10 source content \
+  --source LOCAL_INTERNET_RADIO \
+  --location "https://stream.example.com/radio" \
+  --name "My Stream" \
+  --type stationurl \
+  --presetable
 
 # Get introspect data for Spotify
 soundtouch-cli --host 192.168.1.10 source introspect --source SPOTIFY
@@ -435,6 +475,26 @@ soundtouch-cli --host 192.168.1.10 source availability
 
 # Compare sources and availability
 soundtouch-cli --host 192.168.1.10 source compare
+```
+
+**Content Selection Commands:**
+
+| Command | Description | Requirements |
+|---------|-------------|--------------|
+| `internet-radio` | Select internet radio stream (LOCAL_INTERNET_RADIO) | Stream URL |
+| `local-music` | Select local music content (LOCAL_MUSIC) | SoundTouch App Media Server |
+| `stored-music` | Select stored music content (STORED_MUSIC) | UPnP/DLNA media server |
+| `content` | Generic content selection (advanced) | Source and location |
+
+**streamUrl Format Support:**
+
+The `internet-radio` command supports the streamUrl proxy format from the [SoundTouch WebServices API Wiki](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API#select-local_internet_radio---streamurl-format):
+
+```bash
+# Using contentapi.gmuth.de proxy for complex streams
+soundtouch-cli --host 192.168.1.10 source internet-radio \
+  --location "http://contentapi.gmuth.de/station.php?name=Antenne%20Chillout&streamUrl=https://stream.antenne.de/chillout/stream/aacp" \
+  --name "Antenne Chillout"
 ```
 
 #### Service Introspection

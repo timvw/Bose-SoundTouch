@@ -897,6 +897,136 @@ func main() {
 						Before: RequireHost,
 					},
 					{
+						Name:   "internet-radio",
+						Usage:  "Select internet radio stream (LOCAL_INTERNET_RADIO)",
+						Action: selectLocalInternetRadio,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "location",
+								Aliases:  []string{"l"},
+								Usage:    "Stream location URL (direct stream or streamUrl format)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:    "account",
+								Aliases: []string{"a"},
+								Usage:   "Source account (optional)",
+							},
+							&cli.StringFlag{
+								Name:    "name",
+								Aliases: []string{"n"},
+								Usage:   "Station name",
+							},
+							&cli.StringFlag{
+								Name:  "artwork",
+								Usage: "Station artwork URL",
+							},
+						},
+					},
+					{
+						Name:   "local-music",
+						Usage:  "Select local music content (LOCAL_MUSIC)",
+						Action: selectLocalMusic,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "location",
+								Aliases:  []string{"l"},
+								Usage:    "Content location (e.g., album:983, track:2579)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "account",
+								Aliases:  []string{"a"},
+								Usage:    "Source account GUID (required)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:    "name",
+								Aliases: []string{"n"},
+								Usage:   "Content name",
+							},
+							&cli.StringFlag{
+								Name:  "artwork",
+								Usage: "Content artwork URL",
+							},
+						},
+					},
+					{
+						Name:   "stored-music",
+						Usage:  "Select stored music content (STORED_MUSIC)",
+						Action: selectStoredMusic,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "location",
+								Aliases:  []string{"l"},
+								Usage:    "Content location ID (e.g., 6_a2874b5d_4f83d999)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "account",
+								Aliases:  []string{"a"},
+								Usage:    "Source account GUID (required)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:    "name",
+								Aliases: []string{"n"},
+								Usage:   "Content name",
+							},
+							&cli.StringFlag{
+								Name:  "artwork",
+								Usage: "Content artwork URL",
+							},
+						},
+					},
+					{
+						Name:   "content",
+						Usage:  "Select content using ContentItem (advanced)",
+						Action: selectContent,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source",
+								Aliases:  []string{"s"},
+								Usage:    "Content source (SPOTIFY, TUNEIN, LOCAL_INTERNET_RADIO, etc.)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:     "location",
+								Aliases:  []string{"l"},
+								Usage:    "Content location",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:    "account",
+								Aliases: []string{"a"},
+								Usage:   "Source account",
+							},
+							&cli.StringFlag{
+								Name:    "name",
+								Aliases: []string{"n"},
+								Usage:   "Content name",
+							},
+							&cli.StringFlag{
+								Name:    "type",
+								Aliases: []string{"t"},
+								Usage:   "Content type (uri, stationurl, album, track, etc.)",
+							},
+							&cli.StringFlag{
+								Name:  "artwork",
+								Usage: "Content artwork URL",
+							},
+							&cli.BoolFlag{
+								Name:  "presetable",
+								Usage: "Mark content as presetable",
+								Value: true,
+							},
+						},
+					},
+					{
 						Name:   "availability",
 						Usage:  "Show service availability",
 						Action: getServiceAvailability,
