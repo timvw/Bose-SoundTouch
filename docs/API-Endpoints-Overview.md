@@ -686,7 +686,7 @@ Retrieves all supported endpoints for the specific device with comprehensive fea
 - `/setMusicServiceOAuthAccount` - OAuth account setup
 - `/removeMusicServiceAccount` - Remove music service account
 - `/serviceAvailability` ✅ **Implemented** - Check service availability
-- `/introspect` - Get introspect data for specific sources
+- `/introspect` ✅ **Implemented** - Get introspect data for specific sources
 
 **Station Management (Radio/Streaming):**
 - `/searchStation` - Search for stations (tested with Pandora)

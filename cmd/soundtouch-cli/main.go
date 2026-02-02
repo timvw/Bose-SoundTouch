@@ -209,6 +209,72 @@ func main() {
 				Action: getPresets,
 				Before: RequireHost,
 			},
+			// Recent content commands
+			{
+				Name:    "recents",
+				Aliases: []string{"recent"},
+				Usage:   "Recently played content commands",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "list",
+						Usage:  "List recently played content",
+						Action: getRecents,
+						Flags: []cli.Flag{
+							&cli.IntFlag{
+								Name:  "limit",
+								Usage: "Maximum number of items to display (0 for all)",
+								Value: 10,
+							},
+							&cli.BoolFlag{
+								Name:    "detailed",
+								Aliases: []string{"d"},
+								Usage:   "Show detailed information for each item",
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "filter",
+						Usage:  "List recently played content with filters",
+						Action: getRecentsFiltered,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:    "source",
+								Aliases: []string{"s"},
+								Usage:   "Filter by source (SPOTIFY, LOCAL_MUSIC, TUNEIN, etc.)",
+							},
+							&cli.StringFlag{
+								Name:    "type",
+								Aliases: []string{"t"},
+								Usage:   "Filter by content type (track, station, playlist, album, presetable)",
+							},
+							&cli.IntFlag{
+								Name:  "limit",
+								Usage: "Maximum number of items to display (0 for all)",
+								Value: 10,
+							},
+							&cli.BoolFlag{
+								Name:    "detailed",
+								Aliases: []string{"d"},
+								Usage:   "Show detailed information for each item",
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "latest",
+						Usage:  "Show only the most recent item",
+						Action: getRecentsMostRecent,
+						Before: RequireHost,
+					},
+					{
+						Name:   "stats",
+						Usage:  "Show statistics about recent content",
+						Action: recentsStats,
+						Before: RequireHost,
+					},
+				},
+			},
 			// Playback commands
 			{
 				Name:    "play",
@@ -840,6 +906,44 @@ func main() {
 						Name:   "compare",
 						Usage:  "Compare sources and service availability",
 						Action: compareSourcesAndAvailability,
+						Before: RequireHost,
+					},
+					{
+						Name:   "introspect",
+						Usage:  "Get introspect data for a music service",
+						Action: introspectService,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "source",
+								Aliases:  []string{"s"},
+								Usage:    "Music service source (SPOTIFY, PANDORA, TUNEIN, etc.)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:    "account",
+								Aliases: []string{"a"},
+								Usage:   "Source account name (optional)",
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "introspect-spotify",
+						Usage:  "Get Spotify introspect data (convenience command)",
+						Action: introspectSpotify,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:    "account",
+								Aliases: []string{"a"},
+								Usage:   "Spotify account name (optional)",
+							},
+						},
+						Before: RequireHost,
+					},
+					{
+						Name:   "introspect-all",
+						Usage:  "Get introspect data for all available services",
+						Action: introspectAllServices,
 						Before: RequireHost,
 					},
 				},

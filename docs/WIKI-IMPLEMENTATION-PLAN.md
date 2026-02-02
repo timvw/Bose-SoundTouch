@@ -108,8 +108,8 @@ Essential for browsing music libraries and searching content.
 // pkg/api/content.go (new file)
 func (c *Client) Navigate(source, sourceAccount string, options NavigateOptions) (*NavigateResponse, error)
 func (c *Client) Search(source, sourceAccount, searchTerm string, options SearchOptions) (*SearchResponse, error)
-func (c *Client) GetRecents() (*RecentsResponse, error)
-func (c *Client) Introspect(source, sourceAccount string) (*IntrospectResponse, error)
+func (c *Client) GetRecents() (*RecentsResponse, error) // ✅ IMPLEMENTED
+func (c *Client) Introspect(source, sourceAccount string) (*IntrospectResponse, error) // ✅ IMPLEMENTED
 ```
 
 #### Data Structures:

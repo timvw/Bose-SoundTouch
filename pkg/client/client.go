@@ -1681,6 +1681,41 @@ func (c *Client) PlayNotificationBeep() error {
 	return c.get("/playNotification", &status)
 }
 
+// Introspect retrieves introspect data for a specified music service
+func (c *Client) Introspect(source, sourceAccount string) (*models.IntrospectResponse, error) {
+	if source == "" {
+		return nil, fmt.Errorf("source cannot be empty")
+	}
+
+	request := models.NewIntrospectRequest(source, sourceAccount)
+
+	var response models.IntrospectResponse
+
+	err := c.postWithResponse("/introspect", request, &response)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get introspect data for %s: %w", source, err)
+	}
+
+	return &response, nil
+}
+
+// IntrospectSpotify is a convenience method to get introspect data for Spotify
+func (c *Client) IntrospectSpotify(sourceAccount string) (*models.IntrospectResponse, error) {
+	return c.Introspect("SPOTIFY", sourceAccount)
+}
+
+// GetRecents retrieves recently played content from the device
+func (c *Client) GetRecents() (*models.RecentsResponse, error) {
+	var response models.RecentsResponse
+
+	err := c.get("/recents", &response)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get recent items: %w", err)
+	}
+
+	return &response, nil
+}
+
 // postPlayInfo sends a PlayInfo request to the /speaker endpoint
 func (c *Client) postPlayInfo(playInfo *models.PlayInfo) error {
 	return c.post("/speaker", playInfo)

@@ -1,0 +1,148 @@
+package main
+
+import (
+	"flag"
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/gesellix/bose-soundtouch/pkg/client"
+)
+
+func main() {
+	var (
+		host          = flag.String("host", "", "SoundTouch device IP address")
+		source        = flag.String("source", "SPOTIFY", "Music service source (SPOTIFY, PANDORA, TUNEIN)")
+		sourceAccount = flag.String("account", "", "Source account name (optional)")
+		timeout       = flag.Duration("timeout", 10*time.Second, "Request timeout")
+	)
+	flag.Parse()
+
+	if *host == "" {
+		log.Fatal("Please provide a SoundTouch device IP address with -host flag")
+	}
+
+	// Create client
+	config := &client.Config{
+		Host:    *host,
+		Port:    8090,
+		Timeout: *timeout,
+	}
+	soundTouchClient := client.NewClient(config)
+
+	fmt.Printf("Getting introspect data for %s", *source)
+	if *sourceAccount != "" {
+		fmt.Printf(" (account: %s)", *sourceAccount)
+	}
+	fmt.Println()
+
+	// Get introspect data
+	response, err := soundTouchClient.Introspect(*source, *sourceAccount)
+	if err != nil {
+		log.Fatalf("Failed to get introspect data: %v", err)
+	}
+
+	// Display basic information
+	fmt.Printf("\n=== %s Service Introspect Data ===\n", *source)
+	fmt.Printf("State: %s\n", response.State)
+
+	if response.HasUser() {
+		fmt.Printf("User: %s\n", response.User)
+	}
+
+	fmt.Printf("Currently Playing: %t\n", response.IsPlaying)
+
+	if response.HasCurrentContent() {
+		fmt.Printf("Current Content: %s\n", response.CurrentURI)
+	}
+
+	fmt.Printf("Shuffle Mode: %s\n", response.ShuffleMode)
+
+	if response.HasSubscription() {
+		fmt.Printf("Subscription Type: %s\n", response.SubscriptionType)
+	}
+
+	// Display service state
+	fmt.Printf("\n=== Service State ===\n")
+	if response.IsActive() {
+		fmt.Println("✅ Service is ACTIVE")
+	} else if response.IsInactive() {
+		fmt.Println("❌ Service is INACTIVE")
+	}
+
+	// Display capabilities
+	fmt.Printf("\n=== Service Capabilities ===\n")
+	if response.SupportsSkipPrevious() {
+		fmt.Println("✅ Skip Previous supported")
+	} else {
+		fmt.Println("❌ Skip Previous not supported")
+	}
+
+	if response.SupportsSeek() {
+		fmt.Println("✅ Seek supported")
+	} else {
+		fmt.Println("❌ Seek not supported")
+	}
+
+	if response.SupportsResume() {
+		fmt.Println("✅ Resume supported")
+	} else {
+		fmt.Println("❌ Resume not supported")
+	}
+
+	if response.CollectsData() {
+		fmt.Println("📊 Data collection enabled")
+	} else {
+		fmt.Println("🚫 Data collection disabled")
+	}
+
+	// Display history information
+	historySize := response.GetMaxHistorySize()
+	if historySize > 0 {
+		fmt.Printf("\n=== Content History ===\n")
+		fmt.Printf("Max History Size: %d items\n", historySize)
+	}
+
+	// Display technical details
+	if response.TokenLastChangedTimeSeconds > 0 {
+		fmt.Printf("\n=== Technical Details ===\n")
+		fmt.Printf("Token Last Changed: %d seconds\n", response.TokenLastChangedTimeSeconds)
+		if response.TokenLastChangedTimeMicroseconds > 0 {
+			fmt.Printf("Token Microseconds: %d\n", response.TokenLastChangedTimeMicroseconds)
+		}
+		fmt.Printf("Play Status State: %s\n", response.PlayStatusState)
+		fmt.Printf("Received Playback Request: %t\n", response.ReceivedPlaybackRequest)
+	}
+
+	// Show service availability for comparison
+	fmt.Printf("\n=== Service Availability Check ===\n")
+	availability, err := soundTouchClient.GetServiceAvailability()
+	if err != nil {
+		fmt.Printf("Could not check service availability: %v\n", err)
+	} else {
+		switch *source {
+		case "SPOTIFY":
+			if availability.HasSpotify() {
+				fmt.Println("✅ Spotify is available on this device")
+			} else {
+				fmt.Println("❌ Spotify is not available on this device")
+			}
+		case "PANDORA":
+			if availability.HasPandora() {
+				fmt.Println("✅ Pandora is available on this device")
+			} else {
+				fmt.Println("❌ Pandora is not available on this device")
+			}
+		case "TUNEIN":
+			if availability.HasTuneIn() {
+				fmt.Println("✅ TuneIn is available on this device")
+			} else {
+				fmt.Println("❌ TuneIn is not available on this device")
+			}
+		default:
+			fmt.Printf("Service availability check not implemented for %s\n", *source)
+		}
+	}
+
+	fmt.Println("\nDone!")
+}

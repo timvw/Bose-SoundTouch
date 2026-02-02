@@ -267,24 +267,7 @@ Rates currently playing media (Pandora only).
 
 ### System Information
 
-#### GET /recents 🔥 **CRITICAL**
-Returns recently played media content.
 
-**Response Example:**
-```xml
-<recents>
-  <recent deviceID="1004567890AA" utcTime="1701202831">
-    <contentItem source="STORED_MUSIC" location="6_a2874b5d_4f83d999" sourceAccount="d09708a1-5953-44bc-a413-123456789012/0" isPresetable="true">
-      <itemName>MercyMe, It's Christmas!</itemName>
-    </contentItem>
-  </recent>
-  <recent deviceID="1004567890AA" utcTime="1700232917" id="2487503626">
-    <contentItem source="LOCAL_MUSIC" type="track" location="track:2590" sourceAccount="3f205110-4a57-4e91-810a-123456789012" isPresetable="true">
-      <itemName>Baby It's Cold Outside - ANNE MURRAY</itemName>
-    </contentItem>
-  </recent>
-</recents>
-```
 
 #### GET /listMediaServers 🔥 **CRITICAL**
 Returns detected UPnP/DLNA media servers.
@@ -323,22 +306,7 @@ Returns source service availability status.
 </serviceAvailability>
 ```
 
-#### POST /introspect 🔥 **CRITICAL**
-Retrieves introspect data for specified music service.
 
-**Request Example:**
-```xml
-<introspect source="SPOTIFY" sourceAccount="SpotifyConnectUserName" />
-```
-
-**Response Example:**
-```xml
-<spotifyAccountIntrospectResponse state="InactiveUnselected" user="SpotifyConnectUserName" isPlaying="false" tokenLastChangedTimeSeconds="1702566495" tokenLastChangedTimeMicroseconds="427884" shuffleMode="OFF" playStatusState="2" currentUri="" receivedPlaybackRequest="false" subscriptionType="">
-  <cachedPlaybackRequest />
-  <nowPlaying skipPreviousSupported="false" seekSupported="false" resumeSupported="true" collectData="true" />
-  <contentItemHistory maxSize="10" />
-</spotifyAccountIntrospectResponse>
-```
 
 ### Power Management
 

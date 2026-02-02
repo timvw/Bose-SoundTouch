@@ -174,6 +174,77 @@ soundtouch-cli --host 192.168.1.10 play now
 soundtouch-cli --host 192.168.1.10 play now --verbose
 ```
 
+### Recent Content
+
+Recently played content management.
+
+#### `recents <subcommand>`
+
+Recently played content commands.
+
+```bash
+# List recently played items
+soundtouch-cli --host <device> recents list [--limit <number>] [--detailed]
+
+# Filter recent items by source or type
+soundtouch-cli --host <device> recents filter --source <SOURCE> [--type <TYPE>] [--limit <number>]
+
+# Show only the most recent item
+soundtouch-cli --host <device> recents latest
+
+# Show statistics about recent content
+soundtouch-cli --host <device> recents stats
+```
+
+**Basic Usage Examples:**
+```bash
+# List last 10 recent items (default)
+soundtouch-cli --host 192.168.1.10 recents list
+
+# Show all recent items with detailed information
+soundtouch-cli --host 192.168.1.10 recents list --limit 0 --detailed
+
+# Show only the most recent item
+soundtouch-cli --host 192.168.1.10 recents latest
+```
+
+**Filtering Examples:**
+```bash
+# Show only Spotify items
+soundtouch-cli --host 192.168.1.10 recents filter --source SPOTIFY
+
+# Show only tracks (no stations or playlists)
+soundtouch-cli --host 192.168.1.10 recents filter --type track
+
+# Show only presetable items
+soundtouch-cli --host 192.168.1.10 recents filter --type presetable
+
+# Show last 5 local music items
+soundtouch-cli --host 192.168.1.10 recents filter --source LOCAL_MUSIC --limit 5
+```
+
+**Available Sources:**
+- `SPOTIFY` - Spotify streaming
+- `LOCAL_MUSIC` - Local music files
+- `STORED_MUSIC` - Stored music library
+- `TUNEIN` - TuneIn radio stations
+- `PANDORA` - Pandora music
+- `AMAZON` - Amazon Music
+- `DEEZER` - Deezer streaming
+
+**Available Types:**
+- `track` - Individual songs
+- `station` - Radio stations
+- `playlist` - Music playlists
+- `album` - Music albums
+- `presetable` - Items that can be saved as presets
+
+**Statistics Example:**
+```bash
+# Get detailed statistics about recent content
+soundtouch-cli --host 192.168.1.10 recents stats
+```
+
 #### `presets` (Legacy)
 
 Get configured presets (legacy command for backward compatibility).
@@ -346,6 +417,75 @@ soundtouch-cli --host 192.168.1.10 source select --source SPOTIFY --account user
 
 # Select Bluetooth
 soundtouch-cli --host 192.168.1.10 source bluetooth
+
+# Get introspect data for Spotify
+soundtouch-cli --host 192.168.1.10 source introspect --source SPOTIFY
+
+# Get introspect data with account
+soundtouch-cli --host 192.168.1.10 source introspect --source SPOTIFY --account user@spotify.com
+
+# Spotify introspect (convenience command)
+soundtouch-cli --host 192.168.1.10 source introspect-spotify
+
+# Get introspect data for all available services
+soundtouch-cli --host 192.168.1.10 source introspect-all
+
+# Check service availability
+soundtouch-cli --host 192.168.1.10 source availability
+
+# Compare sources and availability
+soundtouch-cli --host 192.168.1.10 source compare
+```
+
+#### Service Introspection
+
+Get detailed information about music service states, user accounts, capabilities, and authentication status.
+
+**Introspect Commands:**
+
+```bash
+# Get introspect data for specific service
+soundtouch-cli --host <device> source introspect --source <SERVICE> [--account <ACCOUNT>]
+
+# Spotify introspect (convenience)
+soundtouch-cli --host <device> source introspect-spotify [--account <ACCOUNT>]
+
+# Get introspect data for all services
+soundtouch-cli --host <device> source introspect-all
+```
+
+**Supported Services for Introspect:**
+- `SPOTIFY` - Spotify streaming service
+- `PANDORA` - Pandora music service
+- `TUNEIN` - TuneIn radio service
+- `AMAZON` - Amazon Music service
+- `DEEZER` - Deezer streaming service
+
+**Introspect Information Includes:**
+- Service state (Active, Inactive, InactiveUnselected)
+- User account information
+- Current playback status and content URI
+- Service capabilities (skip, seek, resume support)
+- Authentication token status
+- Subscription type and content history limits
+- Shuffle mode and data collection settings
+
+**Examples:**
+```bash
+# Get Spotify service status
+soundtouch-cli --host 192.168.1.10 source introspect --source SPOTIFY
+
+# Get Spotify status with specific account
+soundtouch-cli --host 192.168.1.10 source introspect --source SPOTIFY --account my_spotify_user
+
+# Use Spotify convenience command
+soundtouch-cli --host 192.168.1.10 source introspect-spotify
+
+# Get status for all available streaming services
+soundtouch-cli --host 192.168.1.10 source introspect-all
+
+# Check which services are available before introspecting
+soundtouch-cli --host 192.168.1.10 source availability
 ```
 
 ### Bass Control
