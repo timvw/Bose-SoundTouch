@@ -64,7 +64,27 @@ func main() {
 }
 ```
 
-### Using the CLI Demo
+### Using the CLI
+
+The recommended way to monitor WebSocket events is through the built-in CLI command:
+
+```bash
+# Monitor all events from a specific device
+soundtouch-cli --host 192.168.1.10 events subscribe
+
+# Monitor only volume and now playing events
+soundtouch-cli --host 192.168.1.10 events subscribe --filter volume,nowPlaying
+
+# Monitor for 5 minutes with verbose output
+soundtouch-cli --host 192.168.1.10 events subscribe --duration 5m --verbose
+
+# Monitor zone events without automatic reconnection
+soundtouch-cli --host 192.168.1.10 events subscribe --filter zone --no-reconnect
+```
+
+### Using the CLI Demo (Alternative)
+
+For development or testing purposes, you can also use the standalone demo:
 
 ```bash
 # Auto-discover device and monitor all events

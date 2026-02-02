@@ -1500,6 +1500,42 @@ func main() {
 					},
 				},
 			},
+			// Events commands
+			{
+				Name:    "events",
+				Aliases: []string{"e"},
+				Usage:   "WebSocket event monitoring commands",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "subscribe",
+						Usage:  "Subscribe to real-time device events via WebSocket",
+						Action: eventSubscribe,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:    "filter",
+								Aliases: []string{"f"},
+								Usage:   "Filter events by type (comma-separated): nowPlaying,volume,connection,preset,zone,bass,sdkInfo,userActivity",
+							},
+							&cli.DurationFlag{
+								Name:    "duration",
+								Aliases: []string{"d"},
+								Usage:   "How long to listen for events (0 = infinite)",
+								Value:   0,
+							},
+							&cli.BoolFlag{
+								Name:  "no-reconnect",
+								Usage: "Disable automatic reconnection on connection loss",
+							},
+							&cli.BoolFlag{
+								Name:    "verbose",
+								Aliases: []string{"v"},
+								Usage:   "Enable verbose logging and detailed event information",
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 

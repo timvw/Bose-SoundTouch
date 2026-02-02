@@ -772,6 +772,58 @@ soundtouch-cli --host 192.168.1.10 speaker beep
 - Currently playing content is paused during notification and resumed after
 - If device is zone master, notification plays on all zone members
 
+### WebSocket Events
+
+#### `events <subcommand>`
+
+Real-time device event monitoring via WebSocket connection.
+
+##### `events subscribe`
+
+Subscribe to real-time device events and display them in the terminal.
+
+**Usage:**
+```bash
+soundtouch-cli --host <device> events subscribe [flags]
+```
+
+**Flags:**
+- `--filter, -f <types>` - Filter events by type (comma-separated)
+- `--duration, -d <duration>` - How long to listen (0 = infinite)
+- `--no-reconnect` - Disable automatic reconnection
+- `--verbose, -v` - Enable verbose logging
+
+**Event Types:**
+- `nowPlaying` - Track changes, playback status
+- `volume` - Volume and mute changes  
+- `connection` - Network connectivity status
+- `preset` - Preset configuration changes
+- `zone` - Multiroom zone changes
+- `bass` - Bass level changes
+- `sdkInfo` - SDK version information
+- `userActivity` - User interaction notifications
+
+**Examples:**
+```bash
+# Monitor all events
+soundtouch-cli --host 192.168.1.10 events subscribe
+
+# Monitor only volume and now playing events
+soundtouch-cli --host 192.168.1.10 events subscribe --filter volume,nowPlaying
+
+# Monitor for 5 minutes with verbose output
+soundtouch-cli --host 192.168.1.10 events subscribe --duration 5m --verbose
+
+# Monitor zone events without automatic reconnection
+soundtouch-cli --host 192.168.1.10 events subscribe --filter zone --no-reconnect
+```
+
+**Notes:**
+- WebSocket connection automatically reconnects on connection loss (unless disabled)
+- Press Ctrl+C to stop monitoring
+- Events are displayed in real-time with emoji indicators
+- Verbose mode shows additional technical details
+
 ## Common Usage Patterns
 
 ### Quick Device Setup
