@@ -19,7 +19,9 @@ A comprehensive Go library and CLI tool for controlling Bose SoundTouch devices 
 - 📻 **Content Navigation**: Browse and search TuneIn, Pandora, Spotify, local music
 - 🎙️ **Station Management**: Add and play radio stations without presets
 - 🖥️ **CLI Tool**: Comprehensive command-line interface
-- 🌐 **SoundTouch Service**: Emulate Bose services and proxy device traffic (offline support)
+- 🌐 **SoundTouch Service**: Emulate Bose cloud services for offline device operation
+- 🔧 **Service Migration**: Migrate devices to use local services instead of Bose cloud
+- 📊 **Traffic Analysis**: Proxy and log device communications for debugging
 - 🔒 **Production Ready**: Extensive testing with real SoundTouch hardware
 - 🌐 **Cross-Platform**: Windows, macOS, Linux support
 
@@ -75,23 +77,57 @@ soundtouch-cli --host 192.168.1.100 speaker beep
 soundtouch-cli --host 192.168.1.100 events subscribe
 ```
 
-### Service Usage
+### SoundTouch Service
 
-The `soundtouch-service` provides a REST API and can emulate Bose backend services (BMX/Marge), which is useful for offline device usage or custom service integration.
+The `soundtouch-service` is a local server that emulates Bose's cloud services, enabling offline operation and custom integrations. This is particularly valuable as Bose has announced the discontinuation of cloud support in May 2026.
 
-#### Start the Service
+#### Key Features
+
+- **🏠 Local Service Emulation**: Complete BMX (Bose Media eXchange) and Marge service implementation
+- **🔧 Device Migration**: Seamlessly migrate devices from Bose cloud to local services  
+- **📊 Traffic Proxying**: Inspect and log all device communications for debugging
+- **🌐 Web Management UI**: Browser-based interface for device management
+- **💾 Persistent Data**: Store device configurations, presets, and usage statistics
+- **🔍 Auto-Discovery**: Automatically detect and configure SoundTouch devices
+- **🔒 Offline Operation**: Continue using full device functionality without internet
+
+#### Quick Start
+
 ```bash
-# Start with default settings (port 8000)
+# Install the service
+go install github.com/gesellix/bose-soundtouch/cmd/soundtouch-service@latest
+
+# Start with default settings (http://localhost:8000)
 soundtouch-service
+
+# Or configure with environment variables
+PORT=9000 DATA_DIR=/my/data soundtouch-service
 ```
 
-#### Key Service Features
-- **Device Discovery**: Automatically scans and lists Bose devices.
-- **Service Emulation**: Emulates Bose BMX and Marge services.
-- **Logging Proxy**: Intercept and log traffic between your device and the service.
-- **Embedded Web UI**: Management interface available at `http://localhost:8000/`.
+#### Device Migration Example
 
-See [docs/SOUNDTOUCH-SERVICE.md](docs/SOUNDTOUCH-SERVICE.md) for detailed configuration and API usage.
+```bash
+# 1. Start the service
+soundtouch-service
+
+# 2. Open web UI at http://localhost:8000
+# 3. Discover your devices
+# 4. Click "Migrate" to configure devices to use local services
+
+# Or use the API directly:
+curl -X POST http://localhost:8000/setup/migrate/192.168.1.100
+```
+
+#### Service Endpoints
+
+- **Web UI**: `http://localhost:8000/` - Device management interface
+- **Discovery**: `GET /setup/devices` - List discovered devices
+- **Migration**: `POST /setup/migrate/{deviceIP}` - Switch device to local services
+- **BMX Services**: `/bmx/*` - Music service emulation (TuneIn, etc.)
+- **Marge Services**: `/marge/*` - Account and device management
+- **Proxy**: `/proxy/*` - Traffic inspection and debugging
+
+See [docs/SOUNDTOUCH-SERVICE.md](docs/SOUNDTOUCH-SERVICE.md) for detailed configuration and API reference.
 
 ### Library Usage
 
@@ -386,6 +422,7 @@ This library supports all Bose SoundTouch-compatible devices, including:
 - 📖 [Contributing Guide](CONTRIBUTING.md) - How to contribute to the project
 - 📚 [API Reference](docs/API-Endpoints-Overview.md) - Complete endpoint documentation
 - 🔧 [CLI Reference](docs/CLI-REFERENCE.md) - Command-line tool guide
+- 🌐 [SoundTouch Service Guide](docs/SOUNDTOUCH-SERVICE.md) - Local service setup and migration
 - 🎯 [Getting Started](docs/GETTING-STARTED.md) - Detailed setup and usage
 - 📻 [Preset Quick Start](docs/PRESET-QUICKSTART.md) - Favorite content management
 - 🧭 [Navigation Guide](docs/NAVIGATION-GUIDE.md) - Content browsing and station management
@@ -476,21 +513,46 @@ This Go library will continue to work as it uses the local Web API for direct de
 
 **Community Alternatives**: See the [Related Projects](#related-projects) section below for additional tools like SoundCork that provide cloud service alternatives and the SoundTouch Plus project that offers comprehensive Home Assistant integration.
 
-## Related Projects
+## Related Projects & Credits
 
-### SoundTouch Plus
+This project builds upon the excellent work of several community projects:
+
+### SoundCork 🍾
+- **Project**: [SoundCork - SoundTouch API Intercept](https://github.com/deborahgu/soundcork)
+- **Authors**: Deborah Gu and contributors
+- **Our Implementation**: The `soundtouch-service` in this project is heavily inspired by and based on SoundCork's Python implementation. SoundCork pioneered the approach of intercepting and emulating Bose's cloud services, providing the foundation for offline SoundTouch operation.
+- **Key Contributions**: Service emulation architecture, BMX/Marge endpoint discovery, device migration strategies
+- **License**: MIT License
+
+### ÜberBöse API 🎵
+- **Project**: [ÜberBöse API](https://github.com/julius-d/ueberboese-api)
+- **Author**: Julius D.
+- **Our Implementation**: This project provided valuable insights into advanced SoundTouch API endpoints and helped make our implementation more complete, particularly for content navigation and advanced device features.
+- **Key Contributions**: Extended API endpoint documentation, advanced feature discovery
+- **License**: MIT License
+
+### SoundTouch Plus 🏠
 - **Project**: [SoundTouch Plus Home Assistant Component](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus)
 - **Wiki**: [SoundTouch WebServices API Documentation](https://github.com/thlucas1/homeassistantcomponent_soundtouchplus/wiki/SoundTouch-WebServices-API)
-- **Description**: Comprehensive Home Assistant integration with extensive API documentation
-- **Contribution**: The SoundTouch Plus Wiki provided invaluable documentation of working endpoints beyond the official API, enabling the preset management and content navigation features in this library
+- **Author**: Todd Lucas
+- **Our Implementation**: The comprehensive API documentation in the SoundTouch Plus Wiki provided invaluable insights into undocumented endpoints beyond the official API, enabling our preset management and content navigation features.
+- **Key Contributions**: Extensive API endpoint documentation, real-world usage patterns
+- **License**: MIT License
 
-### SoundCork
-- **Project**: [SoundCork - SoundTouch API Intercept](https://github.com/deborahgu/soundcork)
-- **Description**: Intercept API for Bose SoundTouch devices after cloud service discontinuation
-- **Purpose**: Provides a local alternative to cloud-based SoundTouch services post-sunset
-- **Compatibility**: Complements this Go library by extending functionality beyond the local device API
+### Community Ecosystem
 
-These projects form a comprehensive ecosystem for SoundTouch device management and provide alternatives to Bose's discontinued cloud services.
+These projects together form a comprehensive ecosystem for SoundTouch device management:
+
+- **This Project**: Go library + CLI + service for programmatic control and offline operation
+- **SoundCork**: Python-based service interception and cloud replacement  
+- **SoundTouch Plus**: Home Assistant integration with extensive device support
+- **ÜberBöse**: API research and advanced endpoint discovery
+
+We are grateful to these projects and their maintainers for paving the way and providing the foundation that made this comprehensive Go implementation possible. The SoundTouch community's collaborative approach to reverse engineering and documentation has been invaluable.
+
+### Contributing Back
+
+If you discover new endpoints, features, or improvements through this library, please consider contributing back to these projects as well. The stronger our community ecosystem becomes, the better we can support SoundTouch devices beyond Bose's official support timeline.
 
 ## Support
 
