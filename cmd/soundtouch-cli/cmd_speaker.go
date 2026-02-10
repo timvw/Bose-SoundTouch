@@ -147,10 +147,16 @@ func playURL(c *cli.Context) error {
 	return nil
 }
 
-// playNotificationBeep plays a notification beep on the speaker (uses existing endpoint)
-func playNotificationBeep(c *cli.Context) error {
+// playNotification plays a notification sound or a local file on the speaker
+func playNotification(c *cli.Context) error {
 	clientConfig := GetClientConfig(c)
-	PrintDeviceHeader("Playing notification beep", clientConfig.Host, clientConfig.Port)
+	path := c.String("path")
+
+	if path != "" {
+		PrintDeviceHeader(fmt.Sprintf("Playing notification file: %s", path), clientConfig.Host, clientConfig.Port)
+	} else {
+		PrintDeviceHeader("Playing notification beep", clientConfig.Host, clientConfig.Port)
+	}
 
 	client, err := CreateSoundTouchClient(clientConfig)
 	if err != nil {
@@ -158,16 +164,28 @@ func playNotificationBeep(c *cli.Context) error {
 		return err
 	}
 
-	// Use the existing playNotification endpoint
-	err = client.PlayNotificationBeep()
+	err = client.PlayNotification(path)
 	if err != nil {
-		PrintError(fmt.Sprintf("Failed to play notification beep: %v", err))
+		if path != "" {
+			PrintError(fmt.Sprintf("Failed to play notification file: %v", err))
+		} else {
+			PrintError(fmt.Sprintf("Failed to play notification beep: %v", err))
+		}
 		return err
 	}
 
-	fmt.Printf("✅ Notification beep played successfully\n")
+	if path != "" {
+		fmt.Printf("✅ Notification file sent successfully: %s\n", path)
+	} else {
+		fmt.Printf("✅ Notification beep played successfully\n")
+	}
 
 	return nil
+}
+
+// playNotificationBeep plays a notification beep on the speaker (uses existing endpoint)
+func playNotificationBeep(c *cli.Context) error {
+	return playNotification(c)
 }
 
 // showSpeakerHelp displays help information about speaker functionality
@@ -188,6 +206,10 @@ func showSpeakerHelp(_ *cli.Context) error {
 	fmt.Println("• Notification Beep:")
 	fmt.Println("  Play a simple notification sound")
 	fmt.Println("  Example: soundtouch-cli speaker beep")
+	fmt.Println()
+	fmt.Println("• Custom Notification:")
+	fmt.Println("  Play a device-local PCM file as notification")
+	fmt.Println("  Example: soundtouch-cli speaker notify --path \"/opt/Bose/chimes/grouped.pcm\"")
 	fmt.Println()
 	fmt.Println("Notes:")
 	fmt.Println("• Only ST-10 (Series III) speakers support the /speaker endpoint")

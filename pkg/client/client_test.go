@@ -1,6 +1,7 @@
 package client
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -1158,5 +1159,73 @@ func TestClient_RequestToken_Error(t *testing.T) {
 
 	if !strings.Contains(err.Error(), "failed to request token") {
 		t.Errorf("Error should mention 'failed to request token', got: %v", err)
+	}
+}
+
+func TestClient_PlayNotificationBeep(t *testing.T) {
+	// Create mock server
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/playNotification" {
+			t.Errorf("Expected path '/playNotification', got '%s'", r.URL.Path)
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET method, got %s", r.Method)
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/xml")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8" ?><status>success</status>`))
+	}))
+	defer server.Close()
+
+	// Create test client
+	client := createTestClient(server.URL)
+
+	// Test PlayNotificationBeep
+	err := client.PlayNotificationBeep()
+	if err != nil {
+		t.Fatalf("PlayNotificationBeep() failed: %v", err)
+	}
+}
+
+func TestClient_PlayNotification_Path(t *testing.T) {
+	testPath := "/opt/Bose/chimes/grouped.pcm"
+
+	// Create mock server
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/playNotification" {
+			t.Errorf("Expected path '/playNotification', got '%s'", r.URL.Path)
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		if r.Method != http.MethodPost {
+			t.Errorf("Expected POST method, got %s", r.Method)
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		body, _ := io.ReadAll(r.Body)
+		expectedXML := `<audioSource pathToFile="` + testPath + `"></audioSource>`
+		if string(body) != expectedXML {
+			t.Errorf("Expected body '%s', got '%s'", expectedXML, string(body))
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	// Create test client
+	client := createTestClient(server.URL)
+
+	// Test PlayNotification with path
+	err := client.PlayNotification(testPath)
+	if err != nil {
+		t.Fatalf("PlayNotification() failed: %v", err)
 	}
 }

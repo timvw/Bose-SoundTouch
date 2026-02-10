@@ -1708,6 +1708,19 @@ func main() {
 						},
 					},
 					{
+						Name:   "notify",
+						Usage:  "Play a notification sound or local file",
+						Action: playNotification,
+						Before: RequireHost,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:    "path",
+								Aliases: []string{"p"},
+								Usage:   "Device-local path to a PCM file (e.g. /opt/Bose/chimes/grouped.pcm)",
+							},
+						},
+					},
+					{
 						Name:   "beep",
 						Usage:  "Play a notification beep sound",
 						Action: playNotificationBeep,

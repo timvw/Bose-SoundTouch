@@ -1801,8 +1801,29 @@ func (c *Client) PlayCustom(playInfo *models.PlayInfo) error {
 
 // PlayNotificationBeep plays a notification beep on the device
 func (c *Client) PlayNotificationBeep() error {
-	var status models.StationResponse
-	return c.get("/playNotification", &status)
+	return c.PlayNotification("")
+}
+
+// PlayNotification plays a notification. If a non-empty local path is provided,
+// it will be sent as XML body to play that specific device-local PCM file.
+// When path is empty, the device's default beep is triggered.
+func (c *Client) PlayNotification(path string) error {
+	// Empty path -> trigger default beep via GET
+	if strings.TrimSpace(path) == "" {
+		var status models.StationResponse
+		return c.get("/playNotification", &status)
+	}
+
+	// Non-empty path -> POST minimal XML payload as required by the device
+	payload := struct {
+		XMLName    xml.Name `xml:"audioSource"`
+		PathToFile string   `xml:"pathToFile,attr"`
+	}{
+		XMLName:    xml.Name{Local: "audioSource"},
+		PathToFile: path,
+	}
+
+	return c.post("/playNotification", payload)
 }
 
 // Introspect retrieves introspect data for a specified music service
