@@ -575,14 +575,14 @@ This project builds upon the excellent work of several community projects:
 
 ### SoundCork 🍾
 - **Project**: [SoundCork - SoundTouch API Intercept](https://github.com/deborahgu/soundcork)
-- **Authors**: Deborah Gu and contributors
+- **Authors**: Deborah Kaplan and contributors
 - **Our Implementation**: The `soundtouch-service` in this project is heavily inspired by and based on SoundCork's Python implementation. SoundCork pioneered the approach of intercepting and emulating Bose's cloud services, providing the foundation for offline SoundTouch operation.
 - **Key Contributions**: Service emulation architecture, BMX/Marge endpoint discovery, device migration strategies
 - **License**: MIT License
 
 ### ÜberBöse API 🎵
 - **Project**: [ÜberBöse API](https://github.com/julius-d/ueberboese-api)
-- **Author**: Julius D.
+- **Author**: Julius
 - **Our Implementation**: This project provided valuable insights into advanced SoundTouch API endpoints and helped make our implementation more complete, particularly for content navigation and advanced device features.
 - **Key Contributions**: Extended API endpoint documentation, advanced feature discovery
 - **License**: MIT License
