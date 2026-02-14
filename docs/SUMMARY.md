@@ -1,5 +1,7 @@
 # Table of Contents
 
+* [Introduction](README.md)
+
 ## User Guides
 * [Cloud Shutdown Survival Guide](guides/SURVIVAL-GUIDE.md)
 * [Migration & Safety Guide](guides/MIGRATION-SAFETY.md)
