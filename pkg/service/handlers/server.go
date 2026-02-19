@@ -13,6 +13,7 @@ import (
 	"github.com/gesellix/bose-soundtouch/pkg/service/datastore"
 	"github.com/gesellix/bose-soundtouch/pkg/service/proxy"
 	"github.com/gesellix/bose-soundtouch/pkg/service/setup"
+	"github.com/gesellix/bose-soundtouch/pkg/service/spotify"
 )
 
 // Server handles HTTP requests for the SoundTouch service.
@@ -47,6 +48,7 @@ type Server struct {
 	spotifyRedirectURI   string
 	zeroconfEnabled      bool
 	baseURL              string
+	spotifyService       *spotify.SpotifyService
 }
 
 // NewServer creates a new SoundTouch service server.
@@ -255,6 +257,14 @@ func (s *Server) SetBaseURL(baseURL string) {
 	defer s.mu.Unlock()
 
 	s.baseURL = baseURL
+}
+
+// SetSpotifyService sets the Spotify OAuth service.
+func (s *Server) SetSpotifyService(ss *spotify.SpotifyService) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.spotifyService = ss
 }
 
 // GetRecordEnabled returns whether recording is enabled.

@@ -23,6 +23,7 @@ import (
 	"github.com/gesellix/bose-soundtouch/pkg/service/handlers"
 	"github.com/gesellix/bose-soundtouch/pkg/service/proxy"
 	"github.com/gesellix/bose-soundtouch/pkg/service/setup"
+	"github.com/gesellix/bose-soundtouch/pkg/service/spotify"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/urfave/cli/v2"
@@ -227,6 +228,21 @@ func main() {
 			server.SetMgmtConfig(config.mgmtUsername, config.mgmtPassword)
 			server.SetZeroconfEnabled(config.zeroconfEnabled)
 			server.SetBaseURL(config.baseURL)
+
+			if config.spotifyClientID != "" {
+				spotifyService := spotify.NewSpotifyService(
+					config.spotifyClientID,
+					config.spotifyClientSecret,
+					config.spotifyRedirectURI,
+					config.dataDir,
+				)
+				server.SetSpotifyService(spotifyService)
+				clientIDPrefix := config.spotifyClientID
+				if len(clientIDPrefix) > 8 {
+					clientIDPrefix = clientIDPrefix[:8]
+				}
+				log.Printf("Spotify service initialized (client ID: %s...)", clientIDPrefix)
+			}
 
 			// Load and set initial DNS discoveries
 			dnsDiscoveries, err := ds.LoadDNSDiscoveries()
