@@ -718,6 +718,24 @@ func setupRouter(server *handlers.Server) *chi.Mux {
 		r.Get("/devices/{deviceId}/events", server.HandleGetDeviceEvents)
 	})
 
+	r.Route("/api/speakers", func(r chi.Router) {
+		r.Get("/", server.HandleAPISpeakersList)
+		r.Get("/{id}/info", server.HandleAPISpeakerInfo)
+		r.Get("/{id}/volume", server.HandleAPISpeakerVolume)
+		r.Post("/{id}/volume", server.HandleAPISpeakerSetVolume)
+		r.Get("/{id}/now-playing", server.HandleAPISpeakerNowPlaying)
+		r.Post("/{id}/play-control", server.HandleAPISpeakerPlayControl)
+		r.Get("/{id}/presets", server.HandleAPISpeakerPresets)
+		r.Post("/{id}/store-preset", server.HandleAPISpeakerStorePreset)
+		r.Post("/{id}/remove-preset", server.HandleAPISpeakerRemovePreset)
+		r.Get("/{id}/recents", server.HandleAPISpeakerRecents)
+		r.Post("/{id}/select", server.HandleAPISpeakerSelect)
+		r.Post("/{id}/key", server.HandleAPISpeakerKey)
+		r.Get("/{id}/standby", server.HandleAPISpeakerStandby)
+		r.Post("/{id}/name", server.HandleAPISpeakerSetName)
+		r.Get("/{id}/zones", server.HandleAPISpeakerZones)
+	})
+
 	r.NotFound(server.HandleNotFound)
 
 	return r
