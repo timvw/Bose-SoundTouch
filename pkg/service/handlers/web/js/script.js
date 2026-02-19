@@ -1552,8 +1552,127 @@ async function removePreset(id) {
     setTimeout(refreshPresets, 500);
 }
 
+// === Spotify Configuration ===
+
+function getMgmtAuth() {
+    const u = localStorage.getItem('mgmt-username') || '';
+    const p = localStorage.getItem('mgmt-password') || '';
+    return 'Basic ' + btoa(u + ':' + p);
+}
+
+function saveMgmtCredentials() {
+    localStorage.setItem('mgmt-username', document.getElementById('mgmt-username').value);
+    localStorage.setItem('mgmt-password', document.getElementById('mgmt-password').value);
+    document.getElementById('mgmt-status').textContent = 'Saved';
+    setTimeout(() => document.getElementById('mgmt-status').textContent = '', 2000);
+}
+
+function loadMgmtCredentials() {
+    document.getElementById('mgmt-username').value = localStorage.getItem('mgmt-username') || '';
+    document.getElementById('mgmt-password').value = localStorage.getItem('mgmt-password') || '';
+}
+
+async function testMgmtConnection() {
+    const status = document.getElementById('mgmt-status');
+    try {
+        const resp = await fetch('/mgmt/spotify/accounts', {
+            headers: {'Authorization': getMgmtAuth()}
+        });
+        if (resp.ok) {
+            status.textContent = 'Connected';
+            status.style.color = 'green';
+        } else if (resp.status === 401) {
+            status.textContent = 'Invalid credentials';
+            status.style.color = 'red';
+        } else {
+            status.textContent = resp.statusText;
+            status.style.color = 'orange';
+        }
+    } catch (e) {
+        status.textContent = 'Connection failed';
+        status.style.color = 'red';
+    }
+}
+
+async function initSpotifyAuth() {
+    const status = document.getElementById('spotify-link-status');
+    try {
+        const resp = await fetch('/mgmt/spotify/init', {
+            method: 'POST',
+            headers: {
+                'Authorization': getMgmtAuth(),
+                'Content-Type': 'application/json'
+            },
+            body: '{}'
+        });
+        if (!resp.ok) {
+            status.textContent = resp.status === 401 ? 'Auth failed -- configure credentials above' : resp.statusText;
+            status.style.color = 'red';
+            return;
+        }
+        const data = await resp.json();
+        if (data.redirectUrl) {
+            window.open(data.redirectUrl, '_blank', 'width=500,height=700');
+            document.getElementById('spotify-confirm-section').style.display = 'block';
+            status.textContent = 'Authorize in the popup, then paste the code below.';
+            status.style.color = '#666';
+        }
+    } catch (e) {
+        status.textContent = 'Failed: ' + e.message;
+        status.style.color = 'red';
+    }
+}
+
+async function confirmSpotifyAuth() {
+    const code = document.getElementById('spotify-auth-code').value.trim();
+    const status = document.getElementById('spotify-link-status');
+    if (!code) { status.textContent = 'Enter the authorization code'; return; }
+    try {
+        const resp = await fetch(`/mgmt/spotify/confirm?code=${encodeURIComponent(code)}`, {
+            method: 'POST',
+            headers: {'Authorization': getMgmtAuth()}
+        });
+        if (resp.ok) {
+            status.textContent = 'Account linked!';
+            status.style.color = 'green';
+            document.getElementById('spotify-confirm-section').style.display = 'none';
+            document.getElementById('spotify-auth-code').value = '';
+            refreshSpotifyAccounts();
+        } else {
+            status.textContent = 'Failed: ' + resp.statusText;
+            status.style.color = 'red';
+        }
+    } catch (e) {
+        status.textContent = e.message;
+        status.style.color = 'red';
+    }
+}
+
+async function refreshSpotifyAccounts() {
+    try {
+        const resp = await fetch('/mgmt/spotify/accounts', {
+            headers: {'Authorization': getMgmtAuth()}
+        });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const list = document.getElementById('spotify-accounts-list');
+        if (!data.accounts || data.accounts.length === 0) {
+            list.innerHTML = '<p style="color:#999;">No accounts linked yet.</p>';
+            return;
+        }
+        let html = '<table style="width:100%; border-collapse:collapse;"><tr><th style="text-align:left; padding:5px; border-bottom:1px solid #ddd;">Display Name</th><th style="text-align:left; padding:5px; border-bottom:1px solid #ddd;">Email</th><th style="text-align:left; padding:5px; border-bottom:1px solid #ddd;">User ID</th></tr>';
+        data.accounts.forEach(a => {
+            html += `<tr><td style="padding:5px;">${a.display_name || ''}</td><td style="padding:5px;">${a.email || ''}</td><td style="padding:5px; font-family:monospace; font-size:0.9em;">${a.user_id || ''}</td></tr>`;
+        });
+        html += '</table>';
+        list.innerHTML = html;
+    } catch (e) { console.error('Spotify accounts error', e); }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchDevices();
     fetchSettings();
     triggerDiscovery();
+    loadMgmtCredentials();
+    refreshSpeakerList();
 });

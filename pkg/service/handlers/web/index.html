@@ -20,6 +20,7 @@
             <button class="tab-btn" onclick="openTab(event, 'tab-interactions')">5. Interactions & Events</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-speaker')">6. Speaker</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-presets')">7. Presets & Recents</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-spotify')">8. Spotify</button>
         </div>
 
         <!-- Tab 0: Overview -->
@@ -486,6 +487,51 @@
             <h3 style="margin-top:20px;">Recents</h3>
             <div id="recents-list">
                 <!-- Filled by JS -->
+            </div>
+        </div>
+
+        <!-- Tab 8: Spotify Configuration -->
+        <div id="tab-spotify" class="tab-content">
+            <h2>Spotify Configuration</h2>
+
+            <!-- Management credentials -->
+            <div class="info-box">
+                <h3>Management API Credentials</h3>
+                <p style="font-size:0.9em; color:#666;">These credentials are used to authenticate with the management API. They are stored in your browser only.</p>
+                <div class="form-group">
+                    <label for="mgmt-username">Username:</label>
+                    <input type="text" id="mgmt-username" value="" placeholder="admin">
+                </div>
+                <div class="form-group">
+                    <label for="mgmt-password">Password:</label>
+                    <input type="password" id="mgmt-password" value="" placeholder="password">
+                </div>
+                <button onclick="saveMgmtCredentials()">Save</button>
+                <button onclick="testMgmtConnection()">Test Connection</button>
+                <span id="mgmt-status"></span>
+            </div>
+
+            <!-- Link account -->
+            <h3>Link Spotify Account</h3>
+            <button onclick="initSpotifyAuth()" id="btn-link-spotify">Link Spotify Account</button>
+            <div id="spotify-confirm-section" style="display:none; margin-top:10px;">
+                <p>After authorizing in the popup, paste the authorization code here:</p>
+                <input type="text" id="spotify-auth-code" placeholder="Authorization code" style="width:300px;">
+                <button onclick="confirmSpotifyAuth()">Confirm</button>
+            </div>
+            <span id="spotify-link-status"></span>
+
+            <!-- Linked accounts -->
+            <h3>Linked Accounts</h3>
+            <div id="spotify-accounts-list">
+                <p style="color:#999;">No accounts linked yet.</p>
+            </div>
+            <button onclick="refreshSpotifyAccounts()">Refresh</button>
+
+            <!-- ZeroConf status -->
+            <h3>ZeroConf Primer</h3>
+            <div class="info-box">
+                <p>The ZeroConf primer automatically pushes Spotify tokens to your speakers at boot and periodically (every 45 minutes). This is configured server-side via the <code>--zeroconf-primer-enabled</code> flag.</p>
             </div>
         </div>
 
