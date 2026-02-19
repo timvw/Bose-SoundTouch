@@ -40,6 +40,13 @@ type Server struct {
 	Version              string
 	Commit               string
 	Date                 string
+	mgmtUsername         string
+	mgmtPassword         string
+	spotifyClientID      string
+	spotifyClientSecret  string
+	spotifyRedirectURI   string
+	zeroconfEnabled      bool
+	baseURL              string
 }
 
 // NewServer creates a new SoundTouch service server.
@@ -213,6 +220,41 @@ func (s *Server) SetRecorder(r *proxy.Recorder) {
 	if r != nil {
 		r.Redact = s.proxyRedact
 	}
+}
+
+// SetSpotifyConfig sets the Spotify OAuth configuration.
+func (s *Server) SetSpotifyConfig(clientID, clientSecret, redirectURI string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.spotifyClientID = clientID
+	s.spotifyClientSecret = clientSecret
+	s.spotifyRedirectURI = redirectURI
+}
+
+// SetMgmtConfig sets the management API authentication credentials.
+func (s *Server) SetMgmtConfig(username, password string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.mgmtUsername = username
+	s.mgmtPassword = password
+}
+
+// SetZeroconfEnabled sets whether ZeroConf Spotify primer is enabled.
+func (s *Server) SetZeroconfEnabled(enabled bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.zeroconfEnabled = enabled
+}
+
+// SetBaseURL sets the external base URL for OAuth callbacks.
+func (s *Server) SetBaseURL(baseURL string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.baseURL = baseURL
 }
 
 // GetRecordEnabled returns whether recording is enabled.

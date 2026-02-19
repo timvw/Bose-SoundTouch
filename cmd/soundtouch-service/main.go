@@ -155,6 +155,45 @@ func main() {
 				Value:   ":53",
 				EnvVars: []string{"DNS_BIND_ADDR"},
 			},
+			&cli.StringFlag{
+				Name:    "spotify-client-id",
+				Usage:   "Spotify OAuth client ID",
+				EnvVars: []string{"SPOTIFY_CLIENT_ID"},
+			},
+			&cli.StringFlag{
+				Name:    "spotify-client-secret",
+				Usage:   "Spotify OAuth client secret",
+				EnvVars: []string{"SPOTIFY_CLIENT_SECRET"},
+			},
+			&cli.StringFlag{
+				Name:    "spotify-redirect-uri",
+				Usage:   "Spotify OAuth redirect URI",
+				Value:   "ueberboese-login://spotify",
+				EnvVars: []string{"SPOTIFY_REDIRECT_URI"},
+			},
+			&cli.StringFlag{
+				Name:    "mgmt-username",
+				Usage:   "Management API username for HTTP Basic Auth",
+				Value:   "admin",
+				EnvVars: []string{"MGMT_USERNAME"},
+			},
+			&cli.StringFlag{
+				Name:    "mgmt-password",
+				Usage:   "Management API password for HTTP Basic Auth",
+				Value:   "change_me!",
+				EnvVars: []string{"MGMT_PASSWORD"},
+			},
+			&cli.BoolFlag{
+				Name:    "zeroconf-primer-enabled",
+				Usage:   "Enable ZeroConf Spotify primer for speakers",
+				Value:   true,
+				EnvVars: []string{"ZEROCONF_PRIMER_ENABLED"},
+			},
+			&cli.StringFlag{
+				Name:    "base-url",
+				Usage:   "External base URL for OAuth callbacks behind reverse proxy",
+				EnvVars: []string{"BASE_URL"},
+			},
 		},
 		Action: func(c *cli.Context) error {
 			config := loadConfig(c)
@@ -184,6 +223,10 @@ func main() {
 			server.SetVersionInfo(version, commit, date)
 			server.SetDiscoverySettings(config.discoveryInterval, persisted.DiscoveryEnabled)
 			server.SetDNSSettings(persisted.DNSEnabled, persisted.DNSUpstream, persisted.DNSBindAddr)
+			server.SetSpotifyConfig(config.spotifyClientID, config.spotifyClientSecret, config.spotifyRedirectURI)
+			server.SetMgmtConfig(config.mgmtUsername, config.mgmtPassword)
+			server.SetZeroconfEnabled(config.zeroconfEnabled)
+			server.SetBaseURL(config.baseURL)
 
 			// Load and set initial DNS discoveries
 			dnsDiscoveries, err := ds.LoadDNSDiscoveries()
@@ -298,6 +341,13 @@ type serviceConfig struct {
 	dnsBind              string
 	discoveryInterval    time.Duration
 	domains              []string
+	spotifyClientID      string
+	spotifyClientSecret  string
+	spotifyRedirectURI   string
+	mgmtUsername         string
+	mgmtPassword         string
+	zeroconfEnabled      bool
+	baseURL              string
 }
 
 func loadConfig(c *cli.Context) serviceConfig {
@@ -356,6 +406,14 @@ func loadConfig(c *cli.Context) serviceConfig {
 		discoveryInterval = 5 * time.Minute
 	}
 
+	spotifyClientID := c.String("spotify-client-id")
+	spotifyClientSecret := c.String("spotify-client-secret")
+	spotifyRedirectURI := c.String("spotify-redirect-uri")
+	mgmtUsername := c.String("mgmt-username")
+	mgmtPassword := c.String("mgmt-password")
+	zeroconfEnabled := c.Bool("zeroconf-primer-enabled")
+	baseURL := c.String("base-url")
+
 	return serviceConfig{
 		port:                 port,
 		bindAddr:             bindAddr,
@@ -374,6 +432,13 @@ func loadConfig(c *cli.Context) serviceConfig {
 		dnsBind:              dnsBind,
 		discoveryInterval:    discoveryInterval,
 		domains:              domains,
+		spotifyClientID:      spotifyClientID,
+		spotifyClientSecret:  spotifyClientSecret,
+		spotifyRedirectURI:   spotifyRedirectURI,
+		mgmtUsername:         mgmtUsername,
+		mgmtPassword:         mgmtPassword,
+		zeroconfEnabled:      zeroconfEnabled,
+		baseURL:              baseURL,
 	}
 }
 
