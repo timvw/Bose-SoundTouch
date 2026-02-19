@@ -18,6 +18,7 @@
             <button class="tab-btn" onclick="openTab(event, 'tab-sync')">3. Data Sync</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-migration')">4. Migration</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-interactions')">5. Interactions & Events</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-speaker')">6. Speaker</button>
         </div>
 
         <!-- Tab 0: Overview -->
@@ -460,6 +461,56 @@
                             <tr><td colspan="3" style="padding: 20px; text-align: center; color: #666;">Select a device to view events.</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 6: Speaker Control -->
+        <div id="tab-speaker" class="tab-content">
+            <h2>Speaker Control</h2>
+
+            <!-- Speaker selector -->
+            <div class="form-group">
+                <label for="speaker-select">Speaker:</label>
+                <select id="speaker-select" onchange="onSpeakerSelected()">
+                    <option value="">Select a speaker...</option>
+                </select>
+                <button onclick="refreshSpeakerList()">Refresh</button>
+            </div>
+
+            <!-- Now Playing -->
+            <div id="now-playing-panel" style="display:none;">
+                <h3>Now Playing</h3>
+                <div style="display:flex; gap:20px; align-items:center;">
+                    <img id="np-art" src="" alt="" style="width:128px; height:128px; object-fit:cover; border-radius:8px; background:#eee;">
+                    <div>
+                        <div id="np-track" style="font-size:1.2em; font-weight:bold;"></div>
+                        <div id="np-artist" style="color:#666;"></div>
+                        <div id="np-album" style="color:#999; font-size:0.9em;"></div>
+                        <div id="np-status" style="margin-top:5px;"></div>
+                    </div>
+                </div>
+
+                <!-- Playback controls -->
+                <div style="margin-top:15px; display:flex; gap:10px; align-items:center;">
+                    <button onclick="sendKey('PREV_TRACK')">⏮</button>
+                    <button onclick="sendPlayControl('PLAY_PAUSE_CONTROL')" style="font-size:1.3em;">⏯</button>
+                    <button onclick="sendKey('NEXT_TRACK')">⏭</button>
+                    <button onclick="sendKey('SHUFFLE_ON')" id="btn-shuffle" title="Shuffle">🔀</button>
+                    <button onclick="cycleRepeat()" id="btn-repeat" title="Repeat">🔁</button>
+                </div>
+
+                <!-- Volume -->
+                <div style="margin-top:15px; display:flex; gap:10px; align-items:center;">
+                    <button onclick="sendKey('MUTE')" title="Mute">🔇</button>
+                    <input type="range" id="volume-slider" min="0" max="100" value="50"
+                           oninput="debounceVolume(this.value)" style="flex:1;">
+                    <span id="volume-display">50</span>
+                </div>
+
+                <!-- Standby -->
+                <div style="margin-top:15px;">
+                    <button onclick="sendStandby()">Standby</button>
                 </div>
             </div>
         </div>

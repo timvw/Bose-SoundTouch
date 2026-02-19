@@ -109,3 +109,16 @@ pre { background-color: #eee; padding: 10px; overflow-x: auto; font-size: 12px; 
     font-size: 0.8em;
     font-weight: bold;
 }
+
+/* Form group */
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+.form-group select {
+    padding: 5px;
+    min-width: 250px;
+}

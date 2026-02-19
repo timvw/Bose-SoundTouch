@@ -1355,6 +1355,118 @@ async function toggleMigrationMethod() {
     }
 }
 
+// === Speaker Control ===
+
+let selectedSpeakerIP = '';
+let nowPlayingInterval = null;
+let volumeDebounceTimer = null;
+
+async function refreshSpeakerList() {
+    try {
+        const resp = await fetch('/api/speakers');
+        const speakers = await resp.json();
+        const select = document.getElementById('speaker-select');
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">Select a speaker...</option>';
+        (speakers || []).forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.ipAddress;
+            opt.textContent = `${s.name} (${s.ipAddress})`;
+            select.appendChild(opt);
+        });
+        if (currentVal) select.value = currentVal;
+    } catch (e) { console.error('Failed to load speakers', e); }
+}
+
+function onSpeakerSelected() {
+    selectedSpeakerIP = document.getElementById('speaker-select').value;
+    const panel = document.getElementById('now-playing-panel');
+    if (selectedSpeakerIP) {
+        panel.style.display = 'block';
+        refreshNowPlaying();
+        if (nowPlayingInterval) clearInterval(nowPlayingInterval);
+        nowPlayingInterval = setInterval(refreshNowPlaying, 3000);
+    } else {
+        panel.style.display = 'none';
+        if (nowPlayingInterval) clearInterval(nowPlayingInterval);
+    }
+}
+
+async function refreshNowPlaying() {
+    if (!selectedSpeakerIP) return;
+    try {
+        const resp = await fetch(`/api/speakers/${selectedSpeakerIP}/now-playing`);
+        const np = await resp.json();
+        document.getElementById('np-track').textContent = np.track || np.source || 'Unknown';
+        document.getElementById('np-artist').textContent = np.artist || '';
+        document.getElementById('np-album').textContent = np.album || '';
+        document.getElementById('np-status').textContent = np.playStatus || '';
+        const art = document.getElementById('np-art');
+        if (np.art) {
+            art.src = np.art.startsWith('http') ? np.art : `/api/speakers/${selectedSpeakerIP}/info`;
+            art.style.display = 'block';
+        } else {
+            art.style.display = 'none';
+        }
+        // Also refresh volume
+        const vResp = await fetch(`/api/speakers/${selectedSpeakerIP}/volume`);
+        const vol = await vResp.json();
+        document.getElementById('volume-slider').value = vol.actualVolume || 0;
+        document.getElementById('volume-display').textContent = vol.actualVolume || 0;
+    } catch (e) { console.error('Now playing error', e); }
+}
+
+async function sendPlayControl(control) {
+    if (!selectedSpeakerIP) return;
+    await fetch(`/api/speakers/${selectedSpeakerIP}/play-control`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({control: control})
+    });
+    setTimeout(refreshNowPlaying, 500);
+}
+
+async function sendKey(key) {
+    if (!selectedSpeakerIP) return;
+    await fetch(`/api/speakers/${selectedSpeakerIP}/key`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({key: key, state: 'press'})
+    });
+    // Send release after brief delay
+    setTimeout(async () => {
+        await fetch(`/api/speakers/${selectedSpeakerIP}/key`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({key: key, state: 'release'})
+        });
+    }, 100);
+    setTimeout(refreshNowPlaying, 500);
+}
+
+function debounceVolume(val) {
+    document.getElementById('volume-display').textContent = val;
+    if (volumeDebounceTimer) clearTimeout(volumeDebounceTimer);
+    volumeDebounceTimer = setTimeout(async () => {
+        if (!selectedSpeakerIP) return;
+        await fetch(`/api/speakers/${selectedSpeakerIP}/volume`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({volume: parseInt(val)})
+        });
+    }, 200);
+}
+
+function cycleRepeat() {
+    // Cycle through REPEAT_OFF -> REPEAT_ALL -> REPEAT_ONE -> REPEAT_OFF
+    sendKey('REPEAT_ALL'); // simplified - just toggle
+}
+
+async function sendStandby() {
+    if (!selectedSpeakerIP) return;
+    await fetch(`/api/speakers/${selectedSpeakerIP}/standby`);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchDevices();
     fetchSettings();
