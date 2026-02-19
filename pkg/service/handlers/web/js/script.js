@@ -1390,6 +1390,11 @@ function onSpeakerSelected() {
         panel.style.display = 'none';
         if (nowPlayingInterval) clearInterval(nowPlayingInterval);
     }
+    // Update presets tab speaker info
+    const selectedOpt = document.getElementById('speaker-select').selectedOptions[0];
+    document.getElementById('presets-speaker-name').textContent = selectedOpt ? selectedOpt.textContent : '';
+    document.getElementById('btn-refresh-presets').style.display = selectedSpeakerIP ? 'inline' : 'none';
+    if (selectedSpeakerIP) refreshPresets();
 }
 
 async function refreshNowPlaying() {
@@ -1465,6 +1470,86 @@ function cycleRepeat() {
 async function sendStandby() {
     if (!selectedSpeakerIP) return;
     await fetch(`/api/speakers/${selectedSpeakerIP}/standby`);
+}
+
+// === Presets & Recents ===
+
+async function refreshPresets() {
+    if (!selectedSpeakerIP) return;
+    try {
+        // Presets
+        const pResp = await fetch(`/api/speakers/${selectedSpeakerIP}/presets`);
+        const presets = await pResp.json();
+        const grid = document.getElementById('presets-grid');
+        grid.innerHTML = '';
+        for (let i = 1; i <= 6; i++) {
+            const preset = (presets || []).find(p => p.id === i);
+            const card = document.createElement('div');
+            card.className = 'preset-card';
+            if (preset && preset.contentItem) {
+                card.innerHTML = `
+                    <div class="preset-number">${i}</div>
+                    <div class="preset-name">${preset.contentItem.itemName || 'Preset ' + i}</div>
+                    <div class="preset-source">${preset.contentItem.source || ''}</div>
+                    <div class="preset-actions">
+                        <button onclick="playPreset(${JSON.stringify(JSON.stringify(preset.contentItem))})">Play</button>
+                        <button onclick="removePreset(${i})">Remove</button>
+                    </div>`;
+            } else {
+                card.innerHTML = `
+                    <div class="preset-number">${i}</div>
+                    <div class="preset-name" style="color:#999;">Empty</div>`;
+            }
+            grid.appendChild(card);
+        }
+
+        // Recents
+        const rResp = await fetch(`/api/speakers/${selectedSpeakerIP}/recents`);
+        const recents = await rResp.json();
+        const list = document.getElementById('recents-list');
+        list.innerHTML = '';
+        (recents || []).forEach(r => {
+            const row = document.createElement('div');
+            row.className = 'recent-row';
+            row.innerHTML = `
+                <span class="recent-name">${r.contentItem?.itemName || 'Unknown'}</span>
+                <span class="recent-source">${r.contentItem?.source || ''}</span>
+                <button onclick="playRecent(${JSON.stringify(JSON.stringify(r.contentItem))})">Play</button>`;
+            list.appendChild(row);
+        });
+    } catch (e) { console.error('Presets/recents error', e); }
+}
+
+async function playPreset(contentItemJson) {
+    if (!selectedSpeakerIP) return;
+    const item = JSON.parse(contentItemJson);
+    await fetch(`/api/speakers/${selectedSpeakerIP}/select`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(item)
+    });
+    setTimeout(refreshNowPlaying, 1000);
+}
+
+async function playRecent(contentItemJson) {
+    if (!selectedSpeakerIP) return;
+    const item = JSON.parse(contentItemJson);
+    await fetch(`/api/speakers/${selectedSpeakerIP}/select`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(item)
+    });
+    setTimeout(refreshNowPlaying, 1000);
+}
+
+async function removePreset(id) {
+    if (!selectedSpeakerIP) return;
+    await fetch(`/api/speakers/${selectedSpeakerIP}/remove-preset`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id: id})
+    });
+    setTimeout(refreshPresets, 500);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

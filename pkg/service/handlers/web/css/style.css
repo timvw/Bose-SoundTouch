@@ -122,3 +122,45 @@ pre { background-color: #eee; padding: 10px; overflow-x: auto; font-size: 12px; 
     padding: 5px;
     min-width: 250px;
 }
+
+/* Presets & Recents */
+.preset-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    min-height: 80px;
+}
+.preset-number {
+    font-size: 0.8em;
+    color: #999;
+    margin-bottom: 5px;
+}
+.preset-name {
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+.preset-source {
+    font-size: 0.8em;
+    color: #666;
+    margin-bottom: 5px;
+}
+.preset-actions button {
+    margin: 2px;
+    font-size: 0.8em;
+}
+.recent-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+.recent-name {
+    flex: 1;
+    font-weight: bold;
+}
+.recent-source {
+    color: #666;
+    font-size: 0.9em;
+}
