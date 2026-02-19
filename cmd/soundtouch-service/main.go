@@ -229,8 +229,9 @@ func main() {
 			server.SetZeroconfEnabled(config.zeroconfEnabled)
 			server.SetBaseURL(config.baseURL)
 
+			var spotifyService *spotify.SpotifyService
 			if config.spotifyClientID != "" {
-				spotifyService := spotify.NewSpotifyService(
+				spotifyService = spotify.NewSpotifyService(
 					config.spotifyClientID,
 					config.spotifyClientSecret,
 					config.spotifyRedirectURI,
@@ -242,6 +243,14 @@ func main() {
 					clientIDPrefix = clientIDPrefix[:8]
 				}
 				log.Printf("Spotify service initialized (client ID: %s...)", clientIDPrefix)
+			}
+
+			if config.zeroconfEnabled && spotifyService != nil {
+				zeroconfPrimer := spotify.NewZeroConfPrimer(spotifyService)
+				server.SetZeroConfPrimer(zeroconfPrimer)
+				zeroconfPrimer.StartPeriodic(45 * time.Minute)
+				defer zeroconfPrimer.Stop()
+				log.Printf("ZeroConf Spotify primer enabled (45-minute refresh)")
 			}
 
 			// Load and set initial DNS discoveries

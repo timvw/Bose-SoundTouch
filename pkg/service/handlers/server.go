@@ -49,6 +49,7 @@ type Server struct {
 	zeroconfEnabled      bool
 	baseURL              string
 	spotifyService       *spotify.SpotifyService
+	zeroconfPrimer       *spotify.ZeroConfPrimer
 }
 
 // NewServer creates a new SoundTouch service server.
@@ -265,6 +266,14 @@ func (s *Server) SetSpotifyService(ss *spotify.SpotifyService) {
 	defer s.mu.Unlock()
 
 	s.spotifyService = ss
+}
+
+// SetZeroConfPrimer sets the ZeroConf Spotify speaker primer.
+func (s *Server) SetZeroConfPrimer(p *spotify.ZeroConfPrimer) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.zeroconfPrimer = p
 }
 
 // GetRecordEnabled returns whether recording is enabled.

@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gesellix/bose-soundtouch/pkg/models"
@@ -53,11 +54,21 @@ func (s *Server) HandleMargeAccountFull(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/xml")
 	w.Header()["ETag"] = []string{etag}
 	_, _ = w.Write(data)
+
+	if s.zeroconfPrimer != nil {
+		ip := strings.Split(r.RemoteAddr, ":")[0]
+		s.zeroconfPrimer.RegisterSpeaker(account, "", ip)
+	}
 }
 
 // HandleMargePowerOn handles the Marge power on request.
-func (s *Server) HandleMargePowerOn(w http.ResponseWriter, _ *http.Request) {
+func (s *Server) HandleMargePowerOn(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
+
+	if s.zeroconfPrimer != nil {
+		ip := strings.Split(r.RemoteAddr, ":")[0]
+		go s.zeroconfPrimer.OnPowerOn("", "", ip)
+	}
 }
 
 // HandleMargeAccountProfile returns the account profile.
