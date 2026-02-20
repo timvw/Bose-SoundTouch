@@ -46,7 +46,6 @@ type Server struct {
 	spotifyClientID      string
 	spotifyClientSecret  string
 	spotifyRedirectURI   string
-	zeroconfEnabled      bool
 	baseURL              string
 	spotifyService       *spotify.SpotifyService
 }
@@ -241,14 +240,6 @@ func (s *Server) SetMgmtConfig(username, password string) {
 
 	s.mgmtUsername = username
 	s.mgmtPassword = password
-}
-
-// SetZeroconfEnabled sets whether ZeroConf Spotify primer is enabled.
-func (s *Server) SetZeroconfEnabled(enabled bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.zeroconfEnabled = enabled
 }
 
 // SetBaseURL sets the external base URL for OAuth callbacks.

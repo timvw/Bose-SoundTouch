@@ -184,12 +184,6 @@ func main() {
 				Value:   "change_me!",
 				EnvVars: []string{"MGMT_PASSWORD"},
 			},
-			&cli.BoolFlag{
-				Name:    "zeroconf-primer-enabled",
-				Usage:   "Enable ZeroConf Spotify primer for speakers",
-				Value:   true,
-				EnvVars: []string{"ZEROCONF_PRIMER_ENABLED"},
-			},
 			&cli.StringFlag{
 				Name:    "base-url",
 				Usage:   "External base URL for OAuth callbacks behind reverse proxy",
@@ -226,7 +220,6 @@ func main() {
 			server.SetDNSSettings(persisted.DNSEnabled, persisted.DNSUpstream, persisted.DNSBindAddr)
 			server.SetSpotifyConfig(config.spotifyClientID, config.spotifyClientSecret, config.spotifyRedirectURI)
 			server.SetMgmtConfig(config.mgmtUsername, config.mgmtPassword)
-			server.SetZeroconfEnabled(config.zeroconfEnabled)
 			server.SetBaseURL(config.baseURL)
 
 			if config.spotifyClientID != "" {
@@ -362,7 +355,6 @@ type serviceConfig struct {
 	spotifyRedirectURI   string
 	mgmtUsername         string
 	mgmtPassword         string
-	zeroconfEnabled      bool
 	baseURL              string
 }
 
@@ -427,7 +419,6 @@ func loadConfig(c *cli.Context) serviceConfig {
 	spotifyRedirectURI := c.String("spotify-redirect-uri")
 	mgmtUsername := c.String("mgmt-username")
 	mgmtPassword := c.String("mgmt-password")
-	zeroconfEnabled := c.Bool("zeroconf-primer-enabled")
 	baseURL := c.String("base-url")
 
 	return serviceConfig{
@@ -453,7 +444,6 @@ func loadConfig(c *cli.Context) serviceConfig {
 		spotifyRedirectURI:   spotifyRedirectURI,
 		mgmtUsername:         mgmtUsername,
 		mgmtPassword:         mgmtPassword,
-		zeroconfEnabled:      zeroconfEnabled,
 		baseURL:              baseURL,
 	}
 }
@@ -668,14 +658,21 @@ func setupRouter(server *handlers.Server) *chi.Mux {
 	})
 
 	r.Route("/mgmt", func(r chi.Router) {
-		r.Use(server.BasicAuthMgmt())
-		r.Get("/accounts/{accountId}/speakers", server.HandleMgmtListSpeakers)
-		r.Get("/devices/{deviceId}/events", server.HandleMgmtDeviceEvents)
-		r.Post("/spotify/init", server.HandleMgmtSpotifyInit)
-		r.Post("/spotify/confirm", server.HandleMgmtSpotifyConfirm)
-		r.Get("/spotify/accounts", server.HandleMgmtSpotifyAccounts)
-		r.Get("/spotify/token", server.HandleMgmtSpotifyToken)
-		r.Post("/spotify/entity", server.HandleMgmtSpotifyEntity)
+		// OAuth callback — no auth required (browser redirect from Spotify).
+		// The authorization code is single-use, short-lived, and useless without
+		// the client_secret (which only the server has).
+		r.Get("/spotify/confirm", server.HandleMgmtSpotifyConfirm)
+
+		// All other management endpoints require Basic Auth.
+		r.Group(func(r chi.Router) {
+			r.Use(server.BasicAuthMgmt())
+			r.Get("/accounts/{accountId}/speakers", server.HandleMgmtListSpeakers)
+			r.Get("/devices/{deviceId}/events", server.HandleMgmtDeviceEvents)
+			r.Post("/spotify/init", server.HandleMgmtSpotifyInit)
+			r.Get("/spotify/accounts", server.HandleMgmtSpotifyAccounts)
+			r.Get("/spotify/token", server.HandleMgmtSpotifyToken)
+			r.Post("/spotify/entity", server.HandleMgmtSpotifyEntity)
+		})
 	})
 
 	r.Get("/proxy/*", server.HandleProxyRequest)
